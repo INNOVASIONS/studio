@@ -40,7 +40,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
         </time>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="aspect-w-16 aspect-h-9 bg-muted">
+        <div className="bg-muted">
           <Image
             src={photo.imageUrl}
             alt={photo.caption}
