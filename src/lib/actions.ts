@@ -36,8 +36,7 @@ export async function handleGenerateItinerary(
 }
 
 export type LocationState = {
-  latitude?: number;
-  longitude?: number;
+  locationName?: string;
   confidence?: number;
   error?: string;
 };
@@ -56,8 +55,7 @@ export async function handleFindLocation(
     const input: ImageBasedLocationFinderInput = { photoDataUri };
     const result = await imageBasedLocationFinder(input);
     return {
-      latitude: result.latitude,
-      longitude: result.longitude,
+      locationName: result.locationName,
       confidence: result.confidence,
     };
   } catch (e: any) {

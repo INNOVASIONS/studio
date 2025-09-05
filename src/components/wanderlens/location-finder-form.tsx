@@ -1,16 +1,15 @@
 'use client';
 
-import { useActionState } from 'react';
+import React, { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
+import Image from 'next/image';
 import { handleFindLocation, LocationState } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Globe, Upload } from 'lucide-react';
+import { Loader2, Globe } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import React, { useState } from 'react';
-import Image from 'next/image';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -87,21 +86,17 @@ export function LocationFinderForm() {
                 <AlertDescription>{state.error}</AlertDescription>
             </Alert>
         )}
-        {state?.latitude !== undefined && state?.longitude !== undefined ? (
+        {state?.locationName ? (
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="font-headline text-2xl">Location Found</CardTitle>
+              <CardTitle className="font-headline text-2xl">Location Found!</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Latitude</span>
-                <span className="font-mono text-lg font-semibold">{state.latitude.toFixed(6)}</span>
+              <div>
+                <p className="text-muted-foreground mb-2">Looks like this is...</p>
+                <p className="text-2xl font-semibold text-primary">{state.locationName}</p>
               </div>
-               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Longitude</span>
-                <span className="font-mono text-lg font-semibold">{state.longitude.toFixed(6)}</span>
-              </div>
-               <div className="flex justify-between items-center">
+               <div className="flex justify-between items-center pt-4 border-t">
                 <span className="text-muted-foreground">Confidence</span>
                 <span className="font-mono text-lg font-semibold">{((state.confidence || 0) * 100).toFixed(1)}%</span>
               </div>
@@ -111,7 +106,7 @@ export function LocationFinderForm() {
             <Card className="flex flex-col items-center justify-center h-full min-h-[300px] border-dashed">
                 <CardContent className="text-center text-muted-foreground">
                     <Globe className="mx-auto h-12 w-12 mb-4" />
-                    <p className="font-semibold">Coordinates will appear here.</p>
+                    <p className="font-semibold">The location will appear here.</p>
                 </CardContent>
             </Card>
         )}

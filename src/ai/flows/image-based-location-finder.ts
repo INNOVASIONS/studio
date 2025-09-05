@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview An AI agent that finds the geographical coordinates of a photo.
+ * @fileOverview An AI agent that finds the geographical location of a photo.
  *
  * - imageBasedLocationFinder - A function that handles the location finding process.
  * - ImageBasedLocationFinderInput - The input type for the imageBasedLocationFinder function.
@@ -20,8 +20,11 @@ const ImageBasedLocationFinderInputSchema = z.object({
 export type ImageBasedLocationFinderInput = z.infer<typeof ImageBasedLocationFinderInputSchema>;
 
 const ImageBasedLocationFinderOutputSchema = z.object({
-  latitude: z.number().describe('The latitude of the location.'),
-  longitude: z.number().describe('The longitude of the location.'),
+  locationName: z
+    .string()
+    .describe(
+      'A simple, human-readable name for the location, like "Eiffel Tower, Paris" or "a sunny beach in California". Make it easy for a child to understand.'
+    ),
   confidence: z
     .number()
     .describe(
@@ -40,7 +43,7 @@ const prompt = ai.definePrompt({
   name: 'imageBasedLocationFinderPrompt',
   input: {schema: ImageBasedLocationFinderInputSchema},
   output: {schema: ImageBasedLocationFinderOutputSchema},
-  prompt: `You are a master geographical location identifier. Your task is to analyze the provided photo and determine the precise latitude and longitude where it was taken. You must also provide a confidence score between 0 and 1.
+  prompt: `You are a master geographical location identifier. Your task is to analyze the provided photo and determine where it was taken. Instead of coordinates, provide a simple, human-readable name for the location that a child could understand (e.g., "a big clock tower in London" or "a beautiful mountain with snow"). You must also provide a confidence score between 0 and 1.
 
 You must respond in a valid JSON format that strictly adheres to the provided output schema.
 
