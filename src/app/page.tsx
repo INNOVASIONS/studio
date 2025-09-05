@@ -5,21 +5,47 @@ import {
   Compass,
   FileText,
   Globe,
+  Map,
   Plus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPhotos, getUsers } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+const featureCards = [
+    {
+        icon: FileText,
+        title: "AI Itinerary Generator",
+        description: "Craft your perfect journey in seconds. Let our AI be your personal travel agent.",
+        href: "/itinerary-generator",
+        cta: "Generate Itinerary",
+    },
+    {
+        icon: Globe,
+        title: "AI Location Finder",
+        description: "Ever wonder where a photo was taken? Upload an image and let our AI pinpoint the location.",
+        href: "/location-finder",
+        cta: "Find Location",
+    },
+    {
+        icon: Map,
+        title: "Nearby Places",
+        description: "Discover restaurants and points of interest near you or at your next destination.",
+        href: "/nearby-places",
+        cta: "Explore Nearby",
+    },
+]
 
 export default function Home() {
-  const photos = getPhotos().slice(0, 5);
+  const photos = getPhotos().slice(0, 3);
   const users = getUsers();
 
   const findUser = (userId: number) => users.find((u) => u.id === userId);
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <section className="text-center mb-12">
+      <section className="text-center mb-16">
         <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight text-primary mb-4">
           Capture Your Journey.
         </h1>
@@ -38,11 +64,33 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="mb-16">
+        <h2 className="font-headline text-4xl font-semibold tracking-tight mb-8 text-center">
+          AI-Powered Travel Tools
+        </h2>
+        <div className="grid md:grid-cols-3 gap-8">
+            {featureCards.map(feature => (
+                <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow">
+                    <CardHeader className="items-center text-center">
+                        <feature.icon className="h-12 w-12 text-accent mb-4" />
+                        <CardTitle className="font-headline text-2xl">{feature.title}</CardTitle>
+                        <CardDescription>{feature.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow flex items-end">
+                        <Button asChild className="w-full">
+                            <Link href={feature.href}>{feature.cta}</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
+      </section>
+
       <section>
-        <h2 className="font-headline text-3xl font-semibold tracking-tight mb-6">
+        <h2 className="font-headline text-4xl font-semibold tracking-tight mb-8 text-center">
           Recent Moments
         </h2>
-        <div className="flex flex-col items-center gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {photos.map((photo) => {
             const user = findUser(photo.userId);
             return user ? (
