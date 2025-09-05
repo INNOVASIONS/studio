@@ -40,11 +40,11 @@ const prompt = ai.definePrompt({
   name: 'imageBasedLocationFinderPrompt',
   input: {schema: ImageBasedLocationFinderInputSchema},
   output: {schema: ImageBasedLocationFinderOutputSchema},
-  prompt: `You are a geographical location identifier. Given a photo, you will identify the latitude and longitude of where the photo was taken.
+  prompt: `You are a master geographical location identifier. Your task is to analyze the provided photo and determine the precise latitude and longitude where it was taken. You must also provide a confidence score between 0 and 1.
 
-  Respond in a JSON format.
+You must respond in a valid JSON format that strictly adheres to the provided output schema.
 
-  Photo: {{media url=photoDataUri}}`,
+Photo: {{media url=photoDataUri}}`,
 });
 
 const imageBasedLocationFinderFlow = ai.defineFlow(
@@ -55,6 +55,9 @@ const imageBasedLocationFinderFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error('Unable to determine location from the provided image.');
+    }
+    return output;
   }
 );
