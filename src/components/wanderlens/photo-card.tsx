@@ -26,9 +26,14 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
         </Link>
-        <div className="flex items-center text-xs text-muted-foreground">
-          <MapPin className="h-3 w-3 mr-1 text-accent" />
-          <span>{photo.location}</span>
+        <div className="flex flex-col">
+          <Link href="/profile" className="font-semibold hover:underline text-sm">
+              {user.name}
+          </Link>
+          <div className="flex items-center text-xs text-muted-foreground">
+            <MapPin className="h-3 w-3 mr-1 text-accent" />
+            <span>{photo.location}</span>
+          </div>
         </div>
         <time className="ml-auto text-xs text-muted-foreground">
           {photo.timestamp}
@@ -45,15 +50,12 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
             data-ai-hint={photo.dataAiHint}
           />
         </div>
-        <div className="p-4 space-y-2">
-          <p className="text-sm">
-            <Link href="/profile" className="font-semibold hover:underline">
-                {user.name}
-            </Link>
-            <span className="ml-2">{photo.caption}</span>
-          </p>
-        </div>
       </CardContent>
+      <div className="p-4 space-y-2">
+        <p className="text-sm">
+          {photo.caption}
+        </p>
+      </div>
       <CardFooter className="p-4 border-t">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
