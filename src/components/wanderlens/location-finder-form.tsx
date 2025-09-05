@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { handleFindLocation, LocationState } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +30,7 @@ function SubmitButton() {
 
 export function LocationFinderForm() {
   const initialState: LocationState = {};
-  const [state, dispatch] = useFormState(handleFindLocation, initialState);
+  const [state, dispatch] = useActionState(handleFindLocation, initialState);
   const [preview, setPreview] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

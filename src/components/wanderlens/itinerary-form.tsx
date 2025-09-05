@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { handleGenerateItinerary, ItineraryState } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,7 +29,7 @@ function SubmitButton() {
 
 export function ItineraryForm() {
   const initialState: ItineraryState = {};
-  const [state, dispatch] = useFormState(handleGenerateItinerary, initialState);
+  const [state, dispatch] = useActionState(handleGenerateItinerary, initialState);
 
   return (
     <div className="grid md:grid-cols-2 gap-8">
