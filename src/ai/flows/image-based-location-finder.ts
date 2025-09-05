@@ -23,12 +23,12 @@ const ImageBasedLocationFinderOutputSchema = z.object({
   locationName: z
     .string()
     .describe(
-      'The exact geographical location name, such as "Eiffel Tower, Paris" or "Grand Canyon National Park, USA".'
+      'The exact geographical location name, such as "Eiffel Tower, Paris" or "Grand Canyon National Park, USA". If the location cannot be determined, this should be "Unknown Location".'
     ),
   confidence: z
     .number()
     .describe(
-      'The confidence level of the location identification, from 0 to 1.'
+      'The confidence level of the location identification, from 0 to 1. If the location is unknown, this should be 0.'
     ),
 });
 export type ImageBasedLocationFinderOutput = z.infer<typeof ImageBasedLocationFinderOutputSchema>;
@@ -43,7 +43,9 @@ const prompt = ai.definePrompt({
   name: 'imageBasedLocationFinderPrompt',
   input: {schema: ImageBasedLocationFinderInputSchema},
   output: {schema: ImageBasedLocationFinderOutputSchema},
-  prompt: `You are a master geographical location identifier. Your task is to analyze the provided photo and determine its exact location. Provide the specific name of the place, landmark, city, and country (e.g., "Eiffel Tower, Paris, France" or "Machu Picchu, Peru"). You must also provide a confidence score between 0 and 1.
+  prompt: `You are a geographical location identifier. Your task is to analyze the provided photo and determine its location. Provide the specific name of the place, landmark, city, and country (e.g., "Eiffel Tower, Paris, France" or "Machu Picchu, Peru"). You must also provide a confidence score between 0 and 1.
+
+If you cannot determine the location, you must return "Unknown Location" for the locationName and a confidence of 0.
 
 You must respond in a valid JSON format that strictly adheres to the provided output schema.
 
@@ -59,7 +61,7 @@ const imageBasedLocationFinderFlow = ai.defineFlow(
   async input => {
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('Unable to determine location from the provided image.');
+      throw new Error('Unable to determine location from the provided image. The AI model did not return a valid response.');
     }
     return output;
   }
