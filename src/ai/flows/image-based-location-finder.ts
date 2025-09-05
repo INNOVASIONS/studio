@@ -23,7 +23,7 @@ const ImageBasedLocationFinderOutputSchema = z.object({
   locationName: z
     .string()
     .describe(
-      'A simple, human-readable name for the location, like "Eiffel Tower, Paris" or "a sunny beach in California". Make it easy for a child to understand.'
+      'The exact geographical location name, such as "Eiffel Tower, Paris" or "Grand Canyon National Park, USA".'
     ),
   confidence: z
     .number()
@@ -43,7 +43,7 @@ const prompt = ai.definePrompt({
   name: 'imageBasedLocationFinderPrompt',
   input: {schema: ImageBasedLocationFinderInputSchema},
   output: {schema: ImageBasedLocationFinderOutputSchema},
-  prompt: `You are a master geographical location identifier. Your task is to analyze the provided photo and determine where it was taken. Instead of coordinates, provide a simple, human-readable name for the location that a child could understand (e.g., "a big clock tower in London" or "a beautiful mountain with snow"). You must also provide a confidence score between 0 and 1.
+  prompt: `You are a master geographical location identifier. Your task is to analyze the provided photo and determine its exact location. Provide the specific name of the place, landmark, city, and country (e.g., "Eiffel Tower, Paris, France" or "Machu Picchu, Peru"). You must also provide a confidence score between 0 and 1.
 
 You must respond in a valid JSON format that strictly adheres to the provided output schema.
 
