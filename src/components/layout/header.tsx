@@ -8,6 +8,7 @@ import {
   FileText,
   Globe,
   Home,
+  Map,
   Menu,
   User,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ const navLinks = [
   { href: '/discover', label: 'Discover', icon: Compass },
   { href: '/itinerary-generator', label: 'Itinerary AI', icon: FileText },
   { href: '/location-finder', label: 'Location AI', icon: Globe },
+  { href: '/nearby-places', label: 'Nearby', icon: Map },
 ];
 
 export function AppHeader() {
