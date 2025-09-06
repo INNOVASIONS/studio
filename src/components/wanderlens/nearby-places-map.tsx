@@ -27,14 +27,19 @@ export function NearbyPlacesMap() {
   const handleFindMyLocation = useCallback(() => {
     setIsLoading(true);
     setError(null);
+    toast({
+      title: 'Locating...',
+      description: 'Attempting to find your location. Please wait.',
+    });
 
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser.');
+      const errorMsg = 'Geolocation is not supported by your browser.';
+      setError(errorMsg);
       setIsLoading(false);
       toast({
         variant: "destructive",
         title: 'Geolocation Error',
-        description: 'Geolocation is not supported by your browser.',
+        description: errorMsg,
       });
       return;
     }
