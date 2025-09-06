@@ -9,32 +9,36 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
-const DEFAULT_LOCATION = { lat: 13.0827, lng: 80.2707 }; // Default to Chennai
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export function NearbyPlacesMap() {
-  const [location, setLocation] = useState(DEFAULT_LOCATION);
   const [searchQuery, setSearchQuery] = useState('restaurants');
   const [locationQuery, setLocationQuery] = useState('Chennai');
   const [mapUrl, setMapUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Immediately set the map to the default location and query on mount
-    updateMapUrl(searchQuery, locationQuery);
-  }, []);
-
   const updateMapUrl = (query: string, place: string) => {
-    if (!GOOGLE_API_KEY) return;
-    const q = `${query}+in+${place}`;
+    if (!GOOGLE_API_KEY) {
+      setError('Google Maps API Key is missing.');
+      setIsLoading(false);
+      return;
+    }
+    const q = `${query} in ${place}`;
     const url = `https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=${encodeURIComponent(q)}`;
     setMapUrl(url);
+    setIsLoading(false);
   };
   
+  useEffect(() => {
+    // Load the map with a default query on initial render.
+    updateMapUrl(searchQuery, locationQuery);
+  }, []); // Note: Empty dependency array ensures this runs only once on mount.
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     updateMapUrl(searchQuery, locationQuery);
   };
 
@@ -43,7 +47,7 @@ export function NearbyPlacesMap() {
     setError(null);
     toast({
       title: 'Locating...',
-      description: 'Attempting to find your location using a more accurate service.',
+      description: 'Attempting to find your location using our accurate service.',
     });
 
     try {
@@ -63,10 +67,10 @@ export function NearbyPlacesMap() {
           description: `Map updated. Accuracy: ${data.accuracy.toFixed(2)} meters.`,
         });
       } else {
-        throw new Error("API did not return a location. Trying browser's service.");
+        throw new Error("The location API did not return a valid location.");
       }
     } catch (apiError: any) {
-      setError(`Google API failed: ${apiError.message}. Trying browser's service...`);
+      setError(`Primary location service failed: ${apiError.message}. Trying browser's fallback...`);
       toast({
           variant: 'destructive',
           title: 'Primary Service Failed',
@@ -79,39 +83,40 @@ export function NearbyPlacesMap() {
             const newLocation = `${position.coords.latitude},${position.coords.longitude}`;
             setLocationQuery(newLocation);
             updateMapUrl(searchQuery, newLocation);
-            setIsLoading(false);
-            setError(null);
+            setError(null); // Clear previous error
             toast({
               title: 'Location Found (Fallback)',
-              description: 'Map updated using browser location.',
+              description: 'Map updated using your browser\'s location service.',
             });
           },
           (err) => {
-            const message = 'Both location services failed. Please check browser permissions and network connection.';
+            const message = 'All location services failed. Please check browser permissions and network, or search for a location manually.';
             setError(message);
-            setIsLoading(false);
             toast({
               variant: 'destructive',
               title: 'Location Error',
               description: message,
             });
-          },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            // Fallback to default if all else fails
+            updateMapUrl(searchQuery, 'Chennai');
+          }
         );
       } else {
-        const message = 'Geolocation is not supported by your browser.';
+        const message = 'Geolocation is not supported by this browser. Please search for a location manually.';
         setError(message);
-        setIsLoading(false);
         toast({
             variant: 'destructive',
-            title: 'Unsupported',
+            title: 'Unsupported Browser',
             description: message,
         });
+        updateMapUrl(searchQuery, 'Chennai');
       }
     } finally {
-        if (!navigator.geolocation) {
-            setIsLoading(false);
-        }
+      // In many cases, setIsLoading(false) is handled by the functions called within,
+      // but a final check ensures we don't stay in a loading state.
+      // The Geolocation API is async, so we might need to wait.
+      // A simple timeout can work, or we handle it in each branch.
+      // For now, it's handled in updateMapUrl and the error callbacks.
     }
   };
 
@@ -121,7 +126,7 @@ export function NearbyPlacesMap() {
         <Terminal className="h-4 w-4" />
         <AlertTitle>Google Maps API Key Missing</AlertTitle>
         <AlertDescription>
-          Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file.
+          Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file to use this feature.
         </AlertDescription>
       </Alert>
     );
@@ -150,13 +155,13 @@ export function NearbyPlacesMap() {
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button type="submit" className="w-full">
-              <Search />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && mapUrl ? <Loader2 className="animate-spin" /> : <Search />}
               Search
             </Button>
             <Button onClick={handleFindMyLocation} type="button" variant="secondary" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="animate-spin" /> : <LocateFixed />}
-              {isLoading ? 'Locating...' : 'My Location'}
+              {isLoading && !mapUrl ? <Loader2 className="animate-spin" /> : <LocateFixed />}
+              {isLoading && !mapUrl ? 'Locating...' : 'My Location'}
             </Button>
           </div>
         </form>
@@ -171,7 +176,12 @@ export function NearbyPlacesMap() {
       )}
 
       <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative flex items-center justify-center bg-muted">
-        {mapUrl ? (
+        {isLoading ? (
+          <div className="text-center p-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground font-semibold">Loading map...</p>
+          </div>
+        ) : mapUrl ? (
           <iframe
             key={mapUrl}
             width="100%"
@@ -183,10 +193,11 @@ export function NearbyPlacesMap() {
             src={mapUrl}
           ></iframe>
         ) : (
-          <div className="text-center p-4">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground font-semibold">Loading map...</p>
-          </div>
+           <div className="text-center p-4 text-muted-foreground">
+             <Terminal className="h-12 w-12 mx-auto mb-4" />
+             <p className="font-semibold">Map could not be loaded.</p>
+             <p>Please check your API key and network connection.</p>
+           </div>
         )}
       </Card>
       
@@ -194,7 +205,7 @@ export function NearbyPlacesMap() {
         <Terminal className="h-4 w-4" />
         <AlertTitle>How It Works</AlertTitle>
         <AlertDescription>
-          Enter what you want to find and where. Use the "My Location" button to search near you.
+          Enter what you want to find and where. Use the "My Location" button to search near you. The map will update with your search results.
         </AlertDescription>
       </Alert>
     </div>
