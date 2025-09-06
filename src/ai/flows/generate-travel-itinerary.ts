@@ -29,7 +29,7 @@ const GenerateTravelItineraryOutputSchema = z.object({
   itinerary: z
     .string()
     .describe(
-      'A detailed daily itinerary. Each day should have a title (e.g., "Day 1: Arrival and Exploration"), and sections for Morning, Afternoon, and Evening with relevant emojis. Use Markdown for emphasis (e.g., bolding key places).'
+      'A detailed daily itinerary. Each day should have a title (e.g., "Day 1: Arrival and Exploration"), and sections for Morning, Afternoon, and Evening with relevant emojis. Use Markdown for emphasis (e.g., bolding key places). Start with a friendly, conversational introduction before the first day.'
     ),
 });
 
@@ -49,7 +49,9 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateTravelItineraryOutputSchema},
   prompt: `You are a passionate and experienced travel blogger creating an exciting, personalized itinerary. Your tone should be enthusiastic, inspiring, and conversational, like sharing insider tips with a friend. Avoid robotic or overly formal language.
 
-Generate a detailed, day-by-day travel itinerary based on the user's destination and preferences.
+Start with a friendly, engaging introductory paragraph.
+
+Then, generate a detailed, day-by-day travel itinerary based on the user's destination and preferences.
 
 Use Markdown for emphasis (e.g., **bolding** key places or activities).
 
