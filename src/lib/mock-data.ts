@@ -24,7 +24,7 @@ const users: User[] = [
   },
 ];
 
-const photos: Photo[] = [
+let photos: Photo[] = [
   {
     id: 1,
     userId: 1,
@@ -158,6 +158,19 @@ export const getCurrentUser = () => users[0];
 export const getPhotos = () => photos;
 export const getPhotosByUserId = (userId: number) => photos.filter((photo) => photo.userId === userId);
 export const getUserPlaces = () => userPlaces;
+
+export const addPhoto = (photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'>) => {
+    const newPhoto: Photo = {
+        id: photos.length > 0 ? Math.max(...photos.map(p => p.id)) + 1 : 1,
+        likes: 0,
+        comments: 0,
+        timestamp: 'Just now',
+        ...photoData,
+    };
+    photos = [newPhoto, ...photos];
+    return newPhoto;
+};
+
 export const addUserPlace = (place: Omit<UserPlace, 'id'>) => {
     const newPlace = { ...place, id: userPlaces.length + 1 };
     userPlaces = [...userPlaces, newPlace];

@@ -8,6 +8,9 @@ import {
   imageBasedLocationFinder,
   ImageBasedLocationFinderInput,
 } from '@/ai/flows/image-based-location-finder';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { addPhoto, getCurrentUser } from './mock-data';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -62,4 +65,43 @@ export async function handleFindLocation(
     console.error(e);
     return { error: e.message || 'Failed to identify location from image.' };
   }
+}
+
+export type CreatePostState = {
+  message: string;
+  success?: boolean;
+};
+
+export async function handleCreatePost(
+  prevState: CreatePostState,
+  formData: FormData,
+): Promise<CreatePostState> {
+  const currentUser = getCurrentUser();
+  const photoDataUri = formData.get('photoDataUri') as string;
+  const caption = formData.get('caption') as string;
+  const location = formData.get('location') as string;
+  const transportDetails = formData.get('transportDetails') as string | undefined;
+  const foodDetails = formData.get('foodDetails') as string | undefined;
+  
+  if (!photoDataUri || !caption || !location) {
+    return { message: 'Photo, caption, and location are required.' };
+  }
+
+  try {
+    addPhoto({
+      userId: currentUser.id,
+      imageUrl: photoDataUri, // Using data URI directly as mock data
+      caption,
+      location,
+      transportDetails,
+      foodDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    return { message: 'Failed to create post.' };
+  }
+
+  revalidatePath('/');
+  revalidatePath('/profile');
+  return { message: 'Post created successfully', success: true };
 }

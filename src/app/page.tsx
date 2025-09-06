@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { getPhotos, getUsers } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AddPostDialog } from '@/components/wanderlens/add-post-dialog';
 
 const featureCards = [
     {
@@ -38,7 +39,7 @@ const featureCards = [
 ]
 
 export default function Home() {
-  const photos = getPhotos().slice(0, 3);
+  const photos = getPhotos();
   const users = getUsers();
 
   const findUser = (userId: number) => users.find((u) => u.id === userId);
@@ -58,9 +59,11 @@ export default function Home() {
               Explore Photos <ArrowRight />
             </Link>
           </Button>
-          <Button size="lg" variant="outline">
-            Upload a Photo <Plus />
-          </Button>
+          <AddPostDialog>
+            <Button size="lg" variant="outline">
+              Upload a Photo <Plus />
+            </Button>
+          </AddPostDialog>
         </div>
       </section>
 

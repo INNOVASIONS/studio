@@ -10,6 +10,7 @@ import {
   Home,
   Map,
   Menu,
+  Plus,
   User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getCurrentUser } from '@/lib/mock-data';
+import { AddPostDialog } from '../wanderlens/add-post-dialog';
 
 const navLinks = [
   { href: '/', label: 'Home', icon: Home },
@@ -101,6 +103,11 @@ export function AppHeader() {
         </Sheet>
 
         <div className="flex flex-1 items-center justify-end space-x-4">
+           <AddPostDialog>
+              <Button>
+                  <Plus className="mr-2 h-4 w-4" /> New Post
+              </Button>
+           </AddPostDialog>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
