@@ -45,7 +45,7 @@ export function NearbyPlacesMap() {
       },
       {
         enableHighAccuracy: true,
-        timeout: 20000, // Increased timeout for better accuracy
+        timeout: 20000,
         maximumAge: 0,
       }
     );
