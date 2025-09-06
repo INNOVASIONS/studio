@@ -1,4 +1,4 @@
-import type { User, Photo } from './types';
+import type { User, Photo, UserPlace } from './types';
 
 const users: User[] = [
   {
@@ -6,7 +6,7 @@ const users: User[] = [
     name: 'Alex Wanderer',
     handle: '@alexwanderer',
     avatarUrl: 'https://picsum.photos/id/237/100/100',
-    bio: 'Chasing horizons and camera clicks. Roaming the globe one photo at a time.',
+    bio: 'Chasing horizons and camera clicks. Roaming the globe one a a time.',
   },
   {
     id: 2,
@@ -115,8 +115,35 @@ const photos: Photo[] = [
   },
 ];
 
+let userPlaces: UserPlace[] = [
+    {
+        id: 1,
+        name: 'Murugan Idli Shop',
+        type: 'Restaurant',
+        description: 'Famous for its soft idlis and variety of chutneys. A must-try for breakfast.',
+        lat: 13.0475,
+        lng: 80.2587,
+        addedBy: 'Bella Vista',
+    },
+    {
+        id: 2,
+        name: 'Writer\'s Cafe',
+        type: 'Cafe',
+        description: 'A quiet cafe with a great book collection. Perfect for working or relaxing.',
+        lat: 13.0400,
+        lng: 80.2500,
+        addedBy: 'Alex Wanderer',
+    }
+];
+
 export const getUsers = () => users;
 export const getUserById = (id: number) => users.find((user) => user.id === id);
 export const getCurrentUser = () => users[0];
 export const getPhotos = () => photos;
 export const getPhotosByUserId = (userId: number) => photos.filter((photo) => photo.userId === userId);
+export const getUserPlaces = () => userPlaces;
+export const addUserPlace = (place: Omit<UserPlace, 'id'>) => {
+    const newPlace = { ...place, id: userPlaces.length + 1 };
+    userPlaces = [...userPlaces, newPlace];
+    return newPlace;
+};

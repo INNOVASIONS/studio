@@ -17,3 +17,13 @@ export type Photo = {
   timestamp: string;
   dataAiHint?: string;
 };
+
+export type UserPlace = {
+  id: number;
+  name: string;
+  type: string;
+  description: string;
+  lat: number;
+  lng: number;
+  addedBy: string;
+};
