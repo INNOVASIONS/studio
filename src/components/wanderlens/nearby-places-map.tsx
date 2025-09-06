@@ -36,12 +36,12 @@ export function NearbyPlacesMap() {
         })
       },
       (err) => {
-        let message = `Error getting location: ${err.message}.`;
+        let message = `Error getting location: ${err.message}. Defaulting to a preset location.`;
         if (err.code === 1) { // PERMISSION_DENIED
-            message = "Location access was denied. Please enable it in your browser settings to find nearby places."
+            message = "Location access was denied. Please enable it in your browser settings to find nearby places. Defaulting to a preset location."
         }
         setError(message);
-        setLocation(null);
+        // We don't set location to null, to allow the map to show a default.
         setLoading(false);
       },
       {
@@ -80,37 +80,38 @@ export function NearbyPlacesMap() {
     )
   }
 
-  if (error || !location) {
-     return (
-        <Card className="shadow-lg w-full h-[600px] flex items-center justify-center">
-             <div className='text-center max-w-md mx-auto'>
-                <Alert variant="destructive">
-                    <Terminal className="h-4 w-4" />
-                    <AlertTitle>Could Not Get Location</AlertTitle>
-                    <AlertDescription>
-                        {error || "An unknown error occurred while trying to get your location."}
-                    </AlertDescription>
-                </Alert>
-                <Button onClick={getLocation} className="mt-4">
+  const mapQuery = location 
+    ? `q=restaurants&center=${location.lat},${location.lng}`
+    : `q=restaurants+in+chennai`;
+
+  return (
+    <div className="space-y-4">
+        {error && (
+            <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Could Not Get Your Precise Location</AlertTitle>
+                <AlertDescription>
+                    {error}
+                </AlertDescription>
+            </Alert>
+        )}
+        <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative">
+            <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`}
+            ></iframe>
+            <div className="absolute top-4 right-4">
+                <Button onClick={getLocation} variant="secondary" className="shadow-lg">
                     <LocateFixed className="mr-2"/>
-                    Try Again
+                    {loading ? 'Locating...' : 'Retry My Location'}
                 </Button>
             </div>
         </Card>
-    )
-  }
-  
-  return (
-    <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl">
-      <iframe
-        width="100%"
-        height="100%"
-        style={{ border: 0 }}
-        loading="lazy"
-        allowFullScreen
-        referrerPolicy="no-referrer-when-downgrade"
-        src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&q=restaurants+in+chennai`}
-      ></iframe>
-    </Card>
+    </div>
   );
 }
