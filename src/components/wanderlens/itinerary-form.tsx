@@ -31,6 +31,20 @@ function SubmitButton() {
 function ItineraryDisplay({ itinerary }: { itinerary: string }) {
   const days = itinerary.split(/(?=Day\s\d+:)/).filter(day => day.trim() !== '');
 
+  const formatContent = (content: string) => {
+    // Basic Markdown-to-HTML conversion
+    const html = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>'); // Italics
+
+    return (
+      <div
+        className="whitespace-pre-line text-sm text-muted-foreground"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  };
+
   return (
     <Card className="shadow-lg">
       <CardHeader>
@@ -47,11 +61,7 @@ function ItineraryDisplay({ itinerary }: { itinerary: string }) {
               <AccordionItem key={index} value={`day-${index}`}>
                 <AccordionTrigger className="text-lg font-semibold text-primary hover:no-underline">{title}</AccordionTrigger>
                 <AccordionContent>
-                    <div
-                        className="whitespace-pre-line text-sm text-muted-foreground"
-                    >
-                        {content}
-                    </div>
+                    {formatContent(content)}
                 </AccordionContent>
               </AccordionItem>
             );

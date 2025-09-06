@@ -29,7 +29,7 @@ const GenerateTravelItineraryOutputSchema = z.object({
   itinerary: z
     .string()
     .describe(
-      'A detailed daily itinerary as plain text. Each day should have a title (e.g., "Day 1: Arrival and Exploration"), and sections for Morning, Afternoon, and Evening with relevant emojis. Do not use Markdown formatting like bold or italics.'
+      'A detailed daily itinerary. Each day should have a title (e.g., "Day 1: Arrival and Exploration"), and sections for Morning, Afternoon, and Evening with relevant emojis. Use Markdown for emphasis (e.g., bolding key places).'
     ),
 });
 
@@ -51,7 +51,7 @@ const prompt = ai.definePrompt({
 
 Generate a detailed, day-by-day travel itinerary based on the user's destination and preferences.
 
-The response must be plain text. Do not use any Markdown like asterisks for bold or lists.
+Use Markdown for emphasis (e.g., **bolding** key places or activities).
 
 For each day, provide:
 - A clear, exciting title (e.g., "Day 1: Arrival and Ancient Wonders 🏛️").
