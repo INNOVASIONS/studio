@@ -1,11 +1,10 @@
 import { ProfileHeader } from "@/components/wanderlens/profile-header";
-import { getCurrentUser, getPhotosByUserId, getUsers } from "@/lib/mock-data";
+import { getCurrentUser, getPhotosByUserId } from "@/lib/mock-data";
 import { PhotoCard } from "@/components/wanderlens/photo-card";
 
 export default function ProfilePage() {
     const currentUser = getCurrentUser();
     const userPhotos = getPhotosByUserId(currentUser.id);
-    const allUsers = getUsers();
 
     return(
         <div className="container mx-auto px-4 py-8">
@@ -15,13 +14,19 @@ export default function ProfilePage() {
                 <h2 className="font-headline text-3xl font-semibold tracking-tight mb-6">
                     Your Posts
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {userPhotos.map((photo) => (
-                        <div key={photo.id} className="flex justify-center">
-                            <PhotoCard photo={photo} user={currentUser} />
-                        </div>
-                    ))}
-                </div>
+                {userPhotos.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {userPhotos.map((photo) => (
+                            <div key={photo.id} className="flex justify-center">
+                                <PhotoCard photo={photo} user={currentUser} />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-16 text-muted-foreground">
+                        <p>You haven't posted any photos yet.</p>
+                    </div>
+                )}
             </div>
         </div>
     )
