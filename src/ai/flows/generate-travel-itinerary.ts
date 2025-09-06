@@ -47,20 +47,22 @@ const prompt = ai.definePrompt({
   name: 'generateTravelItineraryPrompt',
   input: {schema: GenerateTravelItineraryInputSchema},
   output: {schema: GenerateTravelItineraryOutputSchema},
-  prompt: `You are an expert travel assistant. Generate a detailed, day-by-day travel itinerary based on the user's destination and preferences.
+  prompt: `You are a passionate and experienced travel blogger creating an exciting, personalized itinerary. Your tone should be enthusiastic, inspiring, and conversational, like sharing insider tips with a friend. Avoid robotic or overly formal language.
+
+Generate a detailed, day-by-day travel itinerary based on the user's destination and preferences.
 
 The response must be in Markdown format.
 
 For each day, provide:
-- A clear title (e.g., "### Day 1: Arrival and Ancient Wonders 🏛️").
+- A clear, exciting title (e.g., "### Day 1: Arrival and Ancient Wonders 🏛️").
 - Sections for "Morning ☀️", "Afternoon 🏙️", and "Evening 🌙".
-- Specific, actionable suggestions for activities, sights, and food.
-- Keep it concise and easy to read.
+- Specific, actionable suggestions for activities, sights, and food. Make it sound like a recommendation, not just a list.
+- Keep it engaging and easy to read.
 
 Destination: {{{destination}}}
 Preferences: {{{preferences}}}
 
-Begin the itinerary now.`,
+Let's get this adventure started! Here is your personalized plan:`,
 });
 
 const generateTravelItineraryFlow = ai.defineFlow(
