@@ -29,7 +29,9 @@ function SubmitButton() {
 }
 
 function ItineraryDisplay({ itinerary }: { itinerary: string }) {
-    const days = itinerary.split(/(?=Day\s\d+:)/).filter(day => day.trim() !== '');
+    const parts = itinerary.split(/(?=Day\s\d+:)/);
+    const intro = parts[0] && !parts[0].startsWith('Day') ? parts[0].trim() : '';
+    const days = (intro ? parts.slice(1) : parts).filter(day => day.trim() !== '');
 
     const formatContent = (content: string) => {
         const html = content
@@ -50,6 +52,7 @@ function ItineraryDisplay({ itinerary }: { itinerary: string }) {
         <Card className="shadow-lg">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">Your Custom Itinerary</CardTitle>
+                {intro && <CardDescription className="pt-2">{intro}</CardDescription>}
             </CardHeader>
             <CardContent>
                 <Accordion type="single" collapsible className="w-full" defaultValue="day-0">
