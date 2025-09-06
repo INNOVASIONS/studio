@@ -29,7 +29,7 @@ const GenerateTravelItineraryOutputSchema = z.object({
   itinerary: z
     .string()
     .describe(
-      'A detailed daily itinerary of travel activities for the specified destination, tailored to the user preferences.'
+      'A detailed daily itinerary in Markdown format. Each day should have a title (e.g., "Day 1: Arrival and Exploration"), and sections for Morning, Afternoon, and Evening with relevant emojis.'
     ),
 });
 
@@ -47,12 +47,20 @@ const prompt = ai.definePrompt({
   name: 'generateTravelItineraryPrompt',
   input: {schema: GenerateTravelItineraryInputSchema},
   output: {schema: GenerateTravelItineraryOutputSchema},
-  prompt: `You are an expert travel assistant. Generate a detailed travel itinerary based on the user's destination and preferences.
+  prompt: `You are an expert travel assistant. Generate a detailed, day-by-day travel itinerary based on the user's destination and preferences.
+
+The response must be in Markdown format.
+
+For each day, provide:
+- A clear title (e.g., "### Day 1: Arrival and Ancient Wonders 🏛️").
+- Sections for "Morning ☀️", "Afternoon 🏙️", and "Evening 🌙".
+- Specific, actionable suggestions for activities, sights, and food.
+- Keep it concise and easy to read.
 
 Destination: {{{destination}}}
 Preferences: {{{preferences}}}
 
-Itinerary:`,
+Begin the itinerary now.`,
 });
 
 const generateTravelItineraryFlow = ai.defineFlow(

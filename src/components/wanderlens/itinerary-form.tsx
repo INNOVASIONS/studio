@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Wand2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -26,6 +27,40 @@ function SubmitButton() {
     </Button>
   );
 }
+
+function ItineraryDisplay({ itinerary }: { itinerary: string }) {
+  const days = itinerary.split(/(?=###\sDay\s\d+:)/).filter(day => day.trim() !== '');
+
+  return (
+    <Card className="shadow-lg">
+      <CardHeader>
+        <CardTitle className="font-headline text-2xl">Your Custom Itinerary</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Accordion type="single" collapsible className="w-full" defaultValue="day-0">
+          {days.map((day, index) => {
+            const lines = day.split('\n');
+            const title = lines[0]?.replace('###', '').trim();
+            const content = lines.slice(1).join('\n');
+            
+            return (
+              <AccordionItem key={index} value={`day-${index}`}>
+                <AccordionTrigger className="text-lg font-semibold text-primary hover:no-underline">{title}</AccordionTrigger>
+                <AccordionContent>
+                    <div
+                        className="prose prose-sm max-w-none prose-headings:font-headline prose-headings:text-primary prose-strong:text-foreground"
+                        dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }}
+                    />
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      </CardContent>
+    </Card>
+  );
+}
+
 
 export function ItineraryForm() {
   const initialState: ItineraryState = {};
@@ -74,16 +109,7 @@ export function ItineraryForm() {
             </Alert>
         )}
         {state?.itinerary ? (
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="font-headline text-2xl">Your Custom Itinerary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm max-w-none whitespace-pre-wrap">
-                {state.itinerary}
-              </div>
-            </CardContent>
-          </Card>
+          <ItineraryDisplay itinerary={state.itinerary} />
         ) : (
             <Card className="flex flex-col items-center justify-center h-full min-h-[300px] border-dashed">
                 <CardContent className="text-center text-muted-foreground">
