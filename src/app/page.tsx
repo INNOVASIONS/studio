@@ -64,28 +64,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mb-16">
-        <h2 className="font-headline text-4xl font-semibold tracking-tight mb-8 text-center">
-          AI-Powered Travel Tools
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-            {featureCards.map(feature => (
-                <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow">
-                    <CardHeader className="items-center text-center">
-                        <feature.icon className="h-12 w-12 text-accent mb-4" />
-                        <CardTitle className="font-headline text-2xl">{feature.title}</CardTitle>
-                        <CardDescription>{feature.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow flex items-end">
-                        <Button asChild className="w-full">
-                            <Link href={feature.href}>{feature.cta}</Link>
-                        </Button>
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
-      </section>
-
       <section>
         <h2 className="font-headline text-4xl font-semibold tracking-tight mb-8 text-center">
           Recent Moments
