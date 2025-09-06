@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -147,7 +148,7 @@ export function NearbyPlacesMap() {
         )}
         {error ? (
           <ApiKeyErrorCard />
-        ) : (
+        ) : mapUrl ? (
           <iframe
             key={mapUrl}
             width="100%"
@@ -163,7 +164,7 @@ export function NearbyPlacesMap() {
             }}
             className="z-10"
           ></iframe>
-        )}
+        ) : null}
       </Card>
     </div>
   );
