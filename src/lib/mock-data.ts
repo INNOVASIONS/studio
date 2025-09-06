@@ -35,6 +35,8 @@ const photos: Photo[] = [
     likes: 1204,
     comments: 88,
     timestamp: '2d',
+    transportDetails: 'Best way to get here is by train to the nearest town, then a local bus. The bus is scenic and much cheaper than a taxi!',
+    foodDetails: 'Pack a picnic! There are no shops nearby. For dinner, the "Alpine Inn" in the village has amazing fondue at a reasonable price.',
   },
   {
     id: 2,
@@ -46,6 +48,8 @@ const photos: Photo[] = [
     likes: 2345,
     comments: 152,
     timestamp: '3d',
+    transportDetails: 'The city center is very walkable. For longer distances, the trams are efficient and affordable. A 24-hour pass is the best value.',
+    foodDetails: 'Trdelník (chimney cake) from a street vendor is a must-try! For a cheap and hearty meal, find a local "jídelna" for traditional Czech food.',
   },
   {
     id: 3,
@@ -57,6 +61,8 @@ const photos: Photo[] = [
     likes: 3102,
     comments: 230,
     timestamp: '5d',
+    transportDetails: 'Renting a scooter is the most popular and cheapest way to get around. Alternatively, use ride-sharing apps like Gojek or Grab for the best prices on cars.',
+    foodDetails: 'Warungs are small, family-owned eateries with delicious and incredibly cheap local food. Try the Nasi Goreng at Warung Murah!',
   },
   {
     id: 4,
@@ -68,6 +74,8 @@ const photos: Photo[] = [
     likes: 1890,
     comments: 112,
     timestamp: '1w',
+    transportDetails: 'The subway is the fastest and most cost-effective way to travel. Buy a MetroCard and load it up. Avoid taxis during rush hour.',
+    foodDetails: 'You can\'t go wrong with a classic slice of pizza for $1-3 from the thousands of slice shops. Food carts are also great for a cheap and quick bite.',
   },
   {
     id: 5,

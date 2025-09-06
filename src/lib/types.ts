@@ -16,6 +16,8 @@ export type Photo = {
   comments: number;
   timestamp: string;
   dataAiHint?: string;
+  transportDetails?: string;
+  foodDetails?: string;
 };
 
 export type UserPlace = {
