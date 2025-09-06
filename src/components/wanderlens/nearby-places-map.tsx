@@ -17,6 +17,7 @@ export function NearbyPlacesMap() {
   const getLocation = useCallback(() => {
     setLoading(true);
     setError(null);
+    setLocation(null);
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser. Showing a default location.');
       setLoading(false);
@@ -41,7 +42,7 @@ export function NearbyPlacesMap() {
             message = "Location access was denied. Please enable it in your browser settings to find nearby places. Defaulting to a preset location."
         }
         setError(message);
-        setLocation(null); // Explicitly set location to null on error to use the fallback
+        setLocation(null); 
         setLoading(false);
       },
       {
@@ -83,34 +84,32 @@ export function NearbyPlacesMap() {
                 </AlertDescription>
             </Alert>
         )}
-        {loading && (
-             <Card className="shadow-lg w-full h-[600px] flex items-center justify-center">
-                <div className='text-center'>
-                    <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-                    <p className="text-muted-foreground">Trying to access your location...</p>
-                    <p className="text-xs text-muted-foreground mt-2">Please allow location access when prompted.</p>
+        <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative">
+            {loading && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+                    <div className='text-center'>
+                        <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+                        <p className="text-muted-foreground">Trying to access your location...</p>
+                        <p className="text-xs text-muted-foreground mt-2">Please allow location access when prompted.</p>
+                    </div>
                 </div>
-            </Card>
-        )}
-        {!loading && (
-            <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative">
-                <iframe
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    allowFullScreen
-                    referrerPolicy="no-referrer-when-downgrade"
-                    src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`}
-                ></iframe>
-                <div className="absolute top-4 right-4">
-                    <Button onClick={getLocation} variant="secondary" className="shadow-lg">
-                        <LocateFixed className="mr-2"/>
-                        Retry My Location
-                    </Button>
-                </div>
-            </Card>
-        )}
+            )}
+            <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`}
+            ></iframe>
+            <div className="absolute top-4 right-4">
+                <Button onClick={getLocation} variant="secondary" className="shadow-lg" disabled={loading}>
+                    <LocateFixed className="mr-2"/>
+                    Retry My Location
+                </Button>
+            </div>
+        </Card>
     </div>
   );
 }
