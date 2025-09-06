@@ -87,6 +87,8 @@ const photos: Photo[] = [
     likes: 2056,
     comments: 178,
     timestamp: '2w',
+    transportDetails: 'A car is essential to explore the vast redwood parks. Rent one from a major airport for the best rates. Book ahead, especially in summer.',
+    foodDetails: 'Stock up on groceries in a larger town before heading into the parks. The small general stores have limited options and are pricey. In-N-Out Burger on the way is a classic, affordable Californian meal.',
   },
   {
     id: 6,
@@ -98,6 +100,8 @@ const photos: Photo[] = [
     likes: 2788,
     comments: 201,
     timestamp: '3w',
+    transportDetails: 'A 4x4 tour is the only way to go deep into the desert. Book with a reputable company that includes a driver. It\'s not a place for self-driving unless you\'re very experienced.',
+    foodDetails: 'Meals are usually included with desert tours. Expect lots of tagine! It\'s delicious and authentic. Pack plenty of your own water and snacks for the long drives.',
   },
     {
     id: 7,
@@ -109,6 +113,8 @@ const photos: Photo[] = [
     likes: 4123,
     comments: 340,
     timestamp: '1m',
+    transportDetails: 'Take the train to Füssen, then bus 73 or 78 towards the castle. The Bayern-Ticket is a great deal for regional train travel for groups.',
+    foodDetails: 'The restaurants right by the castle are touristy and expensive. Walk down to the village of Hohenschwangau for more traditional and affordable Bavarian food. A bratwurst and pretzel is a classic cheap lunch.',
   },
   {
     id: 8,
@@ -120,6 +126,8 @@ const photos: Photo[] = [
     likes: 2987,
     comments: 199,
     timestamp: '1m',
+    transportDetails: 'The Medina (old city) is a maze best explored on foot. For destinations outside the walls, "petit taxis" are cheap, but make sure they use the meter!',
+    foodDetails: 'The food stalls in the main square, Djemaa el-Fna, are an amazing experience for dinner. Try various grilled meats and tagines. Be adventurous!',
   },
 ];
 
