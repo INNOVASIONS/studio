@@ -29,7 +29,7 @@ function SubmitButton() {
 }
 
 function ItineraryDisplay({ itinerary }: { itinerary: string }) {
-  const days = itinerary.split(/(?=###\sDay\s\d+:)/).filter(day => day.trim() !== '');
+  const days = itinerary.split(/(?=Day\s\d+:)/).filter(day => day.trim() !== '');
 
   return (
     <Card className="shadow-lg">
@@ -40,7 +40,7 @@ function ItineraryDisplay({ itinerary }: { itinerary: string }) {
         <Accordion type="single" collapsible className="w-full" defaultValue="day-0">
           {days.map((day, index) => {
             const lines = day.split('\n');
-            const title = lines[0]?.replace('###', '').trim();
+            const title = lines[0]?.trim();
             const content = lines.slice(1).join('\n');
             
             return (
@@ -48,9 +48,10 @@ function ItineraryDisplay({ itinerary }: { itinerary: string }) {
                 <AccordionTrigger className="text-lg font-semibold text-primary hover:no-underline">{title}</AccordionTrigger>
                 <AccordionContent>
                     <div
-                        className="prose prose-sm max-w-none prose-headings:font-headline prose-headings:text-primary prose-strong:text-foreground"
-                        dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }}
-                    />
+                        className="whitespace-pre-line text-sm text-muted-foreground"
+                    >
+                        {content}
+                    </div>
                 </AccordionContent>
               </AccordionItem>
             );
