@@ -13,6 +13,7 @@ export function NearbyPlacesMap() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mapUrl, setMapUrl] = useState<string>('');
   const { toast } = useToast();
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -20,7 +21,7 @@ export function NearbyPlacesMap() {
     setLoading(true);
     setError(null);
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser. Showing a default location.');
+      setError('Geolocation is not supported by your browser. Defaulting to a preset location.');
       setLocation(DEFAULT_LOCATION);
       setLoading(false);
       return;
@@ -59,6 +60,17 @@ export function NearbyPlacesMap() {
     getLocation();
   }, [getLocation]);
 
+  useEffect(() => {
+    if (location && apiKey) {
+        const mapQuery = `q=restaurants&center=${location.lat},${location.lng}`;
+        setMapUrl(`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`);
+    } else if (!location && apiKey) {
+        const mapQuery = `q=restaurants&center=${DEFAULT_LOCATION.lat},${DEFAULT_LOCATION.lng}`;
+        setMapUrl(`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`);
+    }
+  }, [location, apiKey]);
+
+
   if (!apiKey) {
     return (
       <Alert variant="destructive">
@@ -70,8 +82,6 @@ export function NearbyPlacesMap() {
       </Alert>
     );
   }
-  
-  const mapQuery = location ? `q=restaurants&center=${location.lat},${location.lng}` : '';
 
   return (
     <div className="space-y-4">
@@ -83,10 +93,10 @@ export function NearbyPlacesMap() {
         </Alert>
       )}
       <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative flex items-center justify-center bg-muted">
-        {loading || !location ? (
+        {loading || !mapUrl ? (
           <div className="z-10 text-center p-4 bg-background/80 rounded-lg shadow-lg">
             <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground font-semibold">Trying to access your location...</p>
+            <p className="text-muted-foreground font-semibold">Locating you and loading map...</p>
             <p className="text-xs text-muted-foreground mt-2">
               Please allow location access when prompted.
             </p>
@@ -99,7 +109,7 @@ export function NearbyPlacesMap() {
               loading="lazy"
               allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
-              src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`}
+              src={mapUrl}
           ></iframe>
         )}
         <div className="absolute top-4 right-4">
