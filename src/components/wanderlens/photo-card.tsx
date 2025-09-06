@@ -45,7 +45,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
   return (
     <Card className="w-full max-w-2xl overflow-hidden shadow-lg">
       <CardHeader className="flex flex-row items-center gap-3 p-4">
-        <Link href="/profile">
+        <Link href={`/profile/${user.id}`}>
           <Avatar>
             <AvatarImage src={user.avatarUrl} alt={user.name} />
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
@@ -53,7 +53,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
         </Link>
         <div className="flex flex-col">
           <Link
-            href="/profile"
+            href={`/profile/${user.id}`}
             className="font-semibold hover:underline text-sm"
           >
             {user.name}
