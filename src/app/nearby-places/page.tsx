@@ -8,7 +8,7 @@ export default function NearbyPlacesPage() {
           Discover Nearby Restaurants
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Explore restaurants in India.
+          Explore restaurants near you based on your current location.
         </p>
       </div>
       <NearbyPlacesMap />
