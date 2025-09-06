@@ -41,6 +41,7 @@ export function NearbyPlacesMap() {
             message = "Location access was denied. Please enable it in your browser settings to find nearby places."
         }
         setError(message);
+        setLocation(null);
         setLoading(false);
       },
       {
@@ -79,7 +80,7 @@ export function NearbyPlacesMap() {
     )
   }
 
-  if (error) {
+  if (error || !location) {
      return (
         <Card className="shadow-lg w-full h-[600px] flex items-center justify-center">
              <div className='text-center max-w-md mx-auto'>
@@ -87,7 +88,7 @@ export function NearbyPlacesMap() {
                     <Terminal className="h-4 w-4" />
                     <AlertTitle>Could Not Get Location</AlertTitle>
                     <AlertDescription>
-                        {error}
+                        {error || "An unknown error occurred while trying to get your location."}
                     </AlertDescription>
                 </Alert>
                 <Button onClick={getLocation} className="mt-4">
@@ -98,17 +99,7 @@ export function NearbyPlacesMap() {
         </Card>
     )
   }
-
-  if (!location) {
-    // This state should ideally not be reached if loading and error are handled,
-    // but it's good practice as a fallback.
-    return (
-        <Card className="shadow-lg w-full h-[600px] flex items-center justify-center">
-            <p className="text-muted-foreground">Something went wrong. Please try again.</p>
-        </Card>
-    );
-  }
-
+  
   return (
     <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl">
       <iframe
@@ -118,7 +109,7 @@ export function NearbyPlacesMap() {
         loading="lazy"
         allowFullScreen
         referrerPolicy="no-referrer-when-downgrade"
-        src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&q=restaurants&center=${location.lat},${location.lng}&zoom=14`}
+        src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&q=restaurants+in+chennai`}
       ></iframe>
     </Card>
   );
