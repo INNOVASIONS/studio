@@ -1,76 +1,24 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Loader2, LocateFixed, Search, PlusCircle, Hotel, Utensils } from 'lucide-react';
+import { Terminal, Loader2, LocateFixed, Search } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { getUserPlaces, UserPlace } from '@/lib/mock-data';
-import { AddPlaceForm } from './add-place-form';
 
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-
-const containerStyle = {
-  width: '100%',
-  height: '100%',
-};
-
-const defaultCenter = {
-  lat: 13.0827,
-  lng: 80.2707,
-};
 
 export function NearbyPlacesMap() {
   const [searchQuery, setSearchQuery] = useState('restaurants');
   const [locationQuery, setLocationQuery] = useState('Chennai');
   const [mapUrl, setMapUrl] = useState('');
-  const [mapCenter, setMapCenter] = useState(defaultCenter);
-  const [zoom, setZoom] = useState(12);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  
-  const [userPlaces, setUserPlaces] = useState<UserPlace[]>([]);
-  const [selectedPlace, setSelectedPlace] = useState<UserPlace | null>(null);
-  const [isAddPlaceFormOpen, setIsAddPlaceFormOpen] = useState(false);
-  const [newPlaceLocation, setNewPlaceLocation] = useState<{lat: number, lng: number} | null>(null);
-
-  useEffect(() => {
-    setUserPlaces(getUserPlaces());
-    updateMapUrl(searchQuery, locationQuery);
-  }, []);
-
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: GOOGLE_API_KEY!,
-  });
-
-  const onMapClick = useCallback((e: google.maps.MapMouseEvent) => {
-    if (e.latLng) {
-      setNewPlaceLocation({ lat: e.latLng.lat(), lng: e.latLng.lng() });
-      setIsAddPlaceFormOpen(true);
-    }
-  }, []);
-  
-  const handleAddPlace = (newPlace: Omit<UserPlace, 'id' | 'lat' | 'lng'>) => {
-    if (newPlaceLocation) {
-        const placeWithLocation = { ...newPlace, ...newPlaceLocation };
-        // In a real app, this would be an API call.
-        // For now, just updating local state for immediate feedback.
-        setUserPlaces(prev => [...prev, { ...placeWithLocation, id: Date.now() }]);
-        setIsAddPlaceFormOpen(false);
-        setNewPlaceLocation(null);
-        toast({
-            title: 'Place Added!',
-            description: `${newPlace.name} has been added to the map.`,
-        });
-    }
-  };
 
   const updateMapUrl = (query: string, place: string) => {
     if (!GOOGLE_API_KEY) {
@@ -81,19 +29,20 @@ export function NearbyPlacesMap() {
     const url = `https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=${encodeURIComponent(q)}`;
     setMapUrl(url);
   };
-  
+
+  useEffect(() => {
+    updateMapUrl(searchQuery, locationQuery);
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     updateMapUrl(searchQuery, locationQuery);
-    
-    // Simple geocoding simulation to move the map
-    // In a real app, use the Geocoding API
-    if (locationQuery.toLowerCase() === 'chennai') {
-        setMapCenter(defaultCenter);
-        setZoom(12);
-    } 
     setIsLoading(false);
+    toast({
+      title: 'Search Complete',
+      description: `Showing results for "${searchQuery}" in "${locationQuery}".`,
+    });
   };
 
   const handleFindMyLocation = async () => {
@@ -110,10 +59,9 @@ export function NearbyPlacesMap() {
       if (data.error) throw new Error(data.error);
       
       const { lat, lng } = data.location;
-      setLocationQuery(`${lat},${lng}`);
-      setMapCenter({ lat, lng });
-      setZoom(15);
-      updateMapUrl(searchQuery, `${lat},${lng}`);
+      const newLocationQuery = `${lat},${lng}`;
+      setLocationQuery(newLocationQuery);
+      updateMapUrl(searchQuery, newLocationQuery);
       
       toast({
         title: 'Location Found',
@@ -184,67 +132,26 @@ export function NearbyPlacesMap() {
       )}
 
       <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative flex items-center justify-center bg-muted">
-        {isLoaded ? (
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={mapCenter}
-            zoom={zoom}
-            onClick={onMapClick}
-            onCenterChanged={() => {
-                // To prevent infinite loops with state updates, we don't set center here
-            }}
-          >
-            {userPlaces.map(place => (
-                <Marker 
-                    key={place.id}
-                    position={{ lat: place.lat, lng: place.lng }}
-                    onClick={() => setSelectedPlace(place)}
-                    icon={{
-                        path: google.maps.SymbolPath.CIRCLE,
-                        fillColor: place.type === 'Restaurant' ? '#ea4335' : '#4285f4',
-                        fillOpacity: 1,
-                        strokeWeight: 0,
-                        scale: 8,
-                    }}
-                />
-            ))}
-            {selectedPlace && (
-                <InfoWindow
-                    position={{ lat: selectedPlace.lat, lng: selectedPlace.lng }}
-                    onCloseClick={() => setSelectedPlace(null)}
-                >
-                    <div className="p-1 max-w-xs">
-                        <h4 className="font-bold text-md flex items-center">
-                           {selectedPlace.type === 'Restaurant' ? <Utensils className="mr-2 h-4 w-4"/> : <Hotel className="mr-2 h-4 w-4"/>}
-                           {selectedPlace.name}
-                        </h4>
-                        <p className="text-sm mt-1">{selectedPlace.description}</p>
-                        <p className="text-xs text-muted-foreground mt-2">Added by: {selectedPlace.addedBy}</p>
-                    </div>
-                </InfoWindow>
-            )}
-            {newPlaceLocation && <Marker position={newPlaceLocation} />}
-          </GoogleMap>
+        {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+        )}
+        {mapUrl ? (
+          <iframe
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            loading="lazy"
+            allowFullScreen
+            src={mapUrl}
+          ></iframe>
         ) : (
           <div className="text-center p-4">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-muted-foreground font-semibold">Loading map...</p>
+            <p className="text-muted-foreground font-semibold">Enter a search to load the map.</p>
           </div>
         )}
       </Card>
-      
-      <Alert>
-        <PlusCircle className="h-4 w-4" />
-        <AlertTitle>Add to the Map!</AlertTitle>
-        <AlertDescription>
-          Click anywhere on the map to add a new hotel, restaurant, or point of interest. Your contributions help everyone discover new places!
-        </AlertDescription>
-      </Alert>
-      <AddPlaceForm 
-        isOpen={isAddPlaceFormOpen}
-        onClose={() => setIsAddPlaceFormOpen(false)}
-        onSubmit={handleAddPlace}
-      />
     </div>
   );
 }
