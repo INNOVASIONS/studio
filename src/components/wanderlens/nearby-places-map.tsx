@@ -17,7 +17,8 @@ export function NearbyPlacesMap() {
   const getLocation = useCallback(() => {
     setLoading(true);
     setError(null);
-    setLocation(null);
+    // Not resetting location to null here to avoid the "world map" flash.
+    
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser. Showing a default location.');
       setLoading(false);
@@ -42,7 +43,7 @@ export function NearbyPlacesMap() {
             message = "Location access was denied. Please enable it in your browser settings to find nearby places. Defaulting to a preset location."
         }
         setError(message);
-        setLocation(null); 
+        // Do not set location to null here, so it keeps the default if it exists
         setLoading(false);
       },
       {
