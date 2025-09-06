@@ -29,47 +29,48 @@ function SubmitButton() {
 }
 
 function ItineraryDisplay({ itinerary }: { itinerary: string }) {
-  const days = itinerary.split(/(?=Day\s\d+:)/).filter(day => day.trim() !== '');
+    const days = itinerary.split(/(?=Day\s\d+:)/).filter(day => day.trim() !== '');
 
-  const formatContent = (content: string) => {
-    // Basic Markdown-to-HTML conversion
-    const html = content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-      .replace(/\*(.*?)\*/g, '<em>$1</em>'); // Italics
+    const formatContent = (content: string) => {
+        const html = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/(\b(?:Morning|Afternoon|Evening)\b\s*☀️|🏙️|🌙)/g, '<br /><strong>$1</strong>')
+            .trim();
+
+        return (
+            <div
+                className="whitespace-pre-line text-sm text-muted-foreground"
+                dangerouslySetInnerHTML={{ __html: html }}
+            />
+        );
+    };
 
     return (
-      <div
-        className="whitespace-pre-line text-sm text-muted-foreground"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    );
-  };
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">Your Custom Itinerary</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Accordion type="single" collapsible className="w-full" defaultValue="day-0">
+                    {days.map((day, index) => {
+                        const lines = day.split('\n');
+                        const title = lines[0]?.trim();
+                        const content = lines.slice(1).join('\n');
 
-  return (
-    <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl">Your Custom Itinerary</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Accordion type="single" collapsible className="w-full" defaultValue="day-0">
-          {days.map((day, index) => {
-            const lines = day.split('\n');
-            const title = lines[0]?.trim();
-            const content = lines.slice(1).join('\n');
-            
-            return (
-              <AccordionItem key={index} value={`day-${index}`}>
-                <AccordionTrigger className="text-lg font-semibold text-primary hover:no-underline">{title}</AccordionTrigger>
-                <AccordionContent>
-                    {formatContent(content)}
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
-        </Accordion>
-      </CardContent>
-    </Card>
-  );
+                        return (
+                            <AccordionItem key={index} value={`day-${index}`}>
+                                <AccordionTrigger className="text-lg font-semibold text-primary hover:no-underline">{title}</AccordionTrigger>
+                                <AccordionContent>
+                                    {formatContent(content)}
+                                </AccordionContent>
+                            </AccordionItem>
+                        );
+                    })}
+                </Accordion>
+            </CardContent>
+        </Card>
+    );
 }
 
 
