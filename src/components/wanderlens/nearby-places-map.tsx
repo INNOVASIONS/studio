@@ -17,9 +17,18 @@ export function NearbyPlacesMap() {
   const { toast } = useToast();
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
+  const buildMapUrl = useCallback((loc: { lat: number; lng: number }) => {
+    if (apiKey) {
+      const mapQuery = `q=restaurants&center=${loc.lat},${loc.lng}`;
+      return `https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`;
+    }
+    return '';
+  }, [apiKey]);
+  
   const getLocation = useCallback(() => {
     setLoading(true);
     setError(null);
+
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser. Defaulting to a preset location.');
       setLocation(DEFAULT_LOCATION);
@@ -29,10 +38,11 @@ export function NearbyPlacesMap() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setLocation({
+        const newLocation = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
-        });
+        };
+        setLocation(newLocation);
         toast({
           title: 'Location Found',
           description: 'Showing restaurants near you.',
@@ -42,11 +52,16 @@ export function NearbyPlacesMap() {
       (err) => {
         let message = 'Could not get your precise location. Defaulting to a preset location.';
         if (err.code === 1) { // PERMISSION_DENIED
-          message = 'Location access was denied. Please enable it in your browser settings. Defaulting to a preset location.';
+          message = 'Location access was denied. Please enable it in your browser settings to continue. Defaulting to a preset location.';
         }
         setError(message);
         setLocation(DEFAULT_LOCATION);
         setLoading(false);
+         toast({
+          variant: "destructive",
+          title: 'Location Error',
+          description: message,
+        });
       },
       {
         enableHighAccuracy: true,
@@ -59,16 +74,12 @@ export function NearbyPlacesMap() {
   useEffect(() => {
     getLocation();
   }, [getLocation]);
-
+  
   useEffect(() => {
-    if (location && apiKey) {
-        const mapQuery = `q=restaurants&center=${location.lat},${location.lng}`;
-        setMapUrl(`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`);
-    } else if (!location && apiKey) {
-        const mapQuery = `q=restaurants&center=${DEFAULT_LOCATION.lat},${DEFAULT_LOCATION.lng}`;
-        setMapUrl(`https://www.google.com/maps/embed/v1/search?key=${apiKey}&${mapQuery}`);
+    if (location) {
+        setMapUrl(buildMapUrl(location));
     }
-  }, [location, apiKey]);
+  }, [location, buildMapUrl]);
 
 
   if (!apiKey) {
@@ -85,7 +96,7 @@ export function NearbyPlacesMap() {
 
   return (
     <div className="space-y-4">
-      {error && (
+      {error && !loading && (
         <Alert>
           <Terminal className="h-4 w-4" />
           <AlertTitle>Location Notice</AlertTitle>
@@ -119,7 +130,7 @@ export function NearbyPlacesMap() {
             className="shadow-lg"
             disabled={loading}
           >
-            {loading ? <Loader2 className="animate-spin" /> : <LocateFixed className="mr-2" />}
+            {loading ? <Loader2 className="animate-spin" /> : <LocateFixed />}
             {loading ? 'Locating...' : 'Retry My Location'}
           </Button>
         </div>
