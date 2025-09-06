@@ -95,7 +95,7 @@ export function NearbyPlacesMap() {
         loading="lazy"
         allowFullScreen
         referrerPolicy="no-referrer-when-downgrade"
-        src={`https://www.google.com/maps/embed/v1/search?q=restaurants&center=${location.lat},${location.lng}&key=${apiKey}`}
+        src={`https://www.google.com/maps/embed/v1/search?key=${apiKey}&q=restaurants+in&center=${location.lat},${location.lng}&zoom=14`}
       ></iframe>
     </Card>
   );
