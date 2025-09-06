@@ -1,7 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import { User } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Camera } from "lucide-react";
 
 type ProfileHeaderProps = {
     user: User;
@@ -9,6 +11,8 @@ type ProfileHeaderProps = {
 }
 
 export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
+    const [isFollowing, setIsFollowing] = useState(false);
+
     const stats = [
         { label: "Posts", value: photosCount },
         { label: "Followers", value: "1.2k" },
@@ -26,7 +30,7 @@ export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
                 <p className="text-muted-foreground text-lg">{user.handle}</p>
                 <div className="flex justify-center md:justify-start gap-6 my-4">
                     {stats.map(stat => (
-                        <div key={stat.label} className="text-center">
+                        <div key={stat.label} className="text-center transition-opacity hover:opacity-80 cursor-pointer">
                             <p className="font-bold text-xl">{stat.value}</p>
                             <p className="text-sm text-muted-foreground">{stat.label}</p>
                         </div>
@@ -34,7 +38,9 @@ export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
                 </div>
                 <p className="max-w-md text-sm">{user.bio}</p>
                  <div className="mt-4 flex justify-center md:justify-start gap-2">
-                    <Button>Follow</Button>
+                    <Button onClick={() => setIsFollowing(!isFollowing)} variant={isFollowing ? 'secondary' : 'default'}>
+                        {isFollowing ? 'Following' : 'Follow'}
+                    </Button>
                     <Button variant="outline">Message</Button>
                  </div>
             </div>

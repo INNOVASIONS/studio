@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -22,6 +25,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { cn } from '@/lib/utils';
 
 type PhotoCardProps = {
   photo: Photo;
@@ -30,6 +34,13 @@ type PhotoCardProps = {
 
 export function PhotoCard({ photo, user }: PhotoCardProps) {
   const hasDetails = photo.transportDetails || photo.foodDetails;
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(photo.likes);
+
+  const handleLikeClick = () => {
+    setIsLiked(!isLiked);
+    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+  };
 
   return (
     <Card className="w-full max-w-2xl overflow-hidden shadow-lg">
@@ -107,9 +118,9 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
 
       <CardFooter className="p-4 border-t">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            <Heart className="h-5 w-5 text-accent" />
-            <span>{photo.likes.toLocaleString()}</span>
+          <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={handleLikeClick}>
+            <Heart className={cn("h-5 w-5 text-accent", isLiked && "fill-accent")} />
+            <span>{likeCount.toLocaleString()}</span>
           </Button>
           <Button variant="ghost" size="sm" className="flex items-center gap-2">
             <MessageCircle className="h-5 w-5 text-accent" />
