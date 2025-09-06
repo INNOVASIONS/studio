@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Loader2, LocateFixed, Search } from 'lucide-react';
+import { Terminal, Loader2, LocateFixed, Search, AlertTriangle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '../ui/input';
@@ -16,18 +16,28 @@ export function NearbyPlacesMap() {
   const [locationQuery, setLocationQuery] = useState('Chennai');
   const [mapUrl, setMapUrl] = useState('');
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const updateMapUrl = (query: string, place: string) => {
+    setIsLoading(true);
+    setError(null);
     if (!GOOGLE_API_KEY) {
-      setError('Google Maps API Key is missing.');
+      setError('key_missing');
+      setIsLoading(false);
       return;
     }
+    if (!query || !place) {
+        setError('query_missing');
+        setIsLoading(false);
+        return;
+    }
+
     const q = `${query} in ${place}`;
     const url = `https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=${encodeURIComponent(q)}`;
     setMapUrl(url);
+    // Note: The iframe's onLoad event will set isLoading to false
   };
 
   useEffect(() => {
@@ -36,13 +46,7 @@ export function NearbyPlacesMap() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     updateMapUrl(searchQuery, locationQuery);
-    setIsLoading(false);
-    toast({
-      title: 'Search Complete',
-      description: `Showing results for "${searchQuery}" in "${locationQuery}".`,
-    });
   };
 
   const handleFindMyLocation = async () => {
@@ -55,6 +59,10 @@ export function NearbyPlacesMap() {
 
     try {
       const res = await fetch('/api/get-accurate-location', { method: 'POST' });
+      if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Failed to fetch location.');
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       
@@ -71,24 +79,32 @@ export function NearbyPlacesMap() {
         toast({
             variant: 'destructive',
             title: 'Location Error',
-            description: 'Could not get your location. Please check permissions or search manually.',
+            description: apiError.message || 'Could not get your location. Please check permissions or search manually.',
         });
-    } finally {
         setIsLoading(false);
     }
   };
 
-  if (!GOOGLE_API_KEY) {
-    return (
-      <Alert variant="destructive">
-        <Terminal className="h-4 w-4" />
-        <AlertTitle>Google Maps API Key Missing</AlertTitle>
-        <AlertDescription>
-          Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file.
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  const ApiKeyErrorCard = () => (
+    <Card className="h-full flex items-center justify-center border-destructive bg-destructive/10">
+        <CardContent className="text-center p-6">
+            <AlertTriangle className="mx-auto h-12 w-12 text-destructive mb-4" />
+            <h2 className="text-xl font-semibold text-destructive">Google Maps Error</h2>
+            <p className="text-destructive/80 mt-2">
+                The map failed to load. This is usually due to an invalid or restricted API key.
+            </p>
+            <div className="text-left text-sm mt-4 p-4 bg-background rounded-md border">
+                <h3 className="font-semibold mb-2">How to Fix:</h3>
+                <ol className="list-decimal list-inside space-y-2">
+                    <li>Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium">Google Cloud Console</a>.</li>
+                    <li>Ensure the <strong>"Maps Embed API"</strong> is enabled for your project.</li>
+                    <li>Check your API key's restrictions. If you have <strong>HTTP referrer restrictions</strong>, make sure your current development domain is allowed.</li>
+                    <li>Confirm your project has an active <strong>Billing Account</strong>.</li>
+                </ol>
+            </div>
+        </CardContent>
+    </Card>
+  )
 
   return (
     <div className="space-y-6">
@@ -123,33 +139,30 @@ export function NearbyPlacesMap() {
         </form>
       </Card>
 
-      {error && (
-        <Alert variant="destructive">
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
       <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative flex items-center justify-center bg-muted">
         {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-20">
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
             </div>
         )}
-        {mapUrl ? (
+        {error ? (
+          <ApiKeyErrorCard />
+        ) : (
           <iframe
+            key={mapUrl}
             width="100%"
             height="100%"
             style={{ border: 0 }}
             loading="lazy"
             allowFullScreen
             src={mapUrl}
+            onLoad={() => setIsLoading(false)}
+            onError={() => {
+                setError('iframe_error');
+                setIsLoading(false);
+            }}
+            className="z-10"
           ></iframe>
-        ) : (
-          <div className="text-center p-4">
-            <p className="text-muted-foreground font-semibold">Enter a search to load the map.</p>
-          </div>
         )}
       </Card>
     </div>
