@@ -3,31 +3,40 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, Loader2, LocateFixed } from 'lucide-react';
+import { Terminal, Loader2, LocateFixed, Search } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 const DEFAULT_LOCATION = { lat: 13.0827, lng: 80.2707 }; // Default to Chennai
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export function NearbyPlacesMap() {
   const [location, setLocation] = useState(DEFAULT_LOCATION);
+  const [searchQuery, setSearchQuery] = useState('restaurants');
+  const [locationQuery, setLocationQuery] = useState('Chennai');
   const [mapUrl, setMapUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Immediately set the map to the default location on mount
-    const url = `https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=restaurants&center=${DEFAULT_LOCATION.lat},${DEFAULT_LOCATION.lng}&zoom=14`;
-    setMapUrl(url);
+    // Immediately set the map to the default location and query on mount
+    updateMapUrl(searchQuery, locationQuery);
   }, []);
 
-  useEffect(() => {
-    // Update map URL whenever location changes
-    const url = `https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=restaurants&center=${location.lat},${location.lng}&zoom=14`;
+  const updateMapUrl = (query: string, place: string) => {
+    if (!GOOGLE_API_KEY) return;
+    const q = `${query}+in+${place}`;
+    const url = `https://www.google.com/maps/embed/v1/search?key=${GOOGLE_API_KEY}&q=${encodeURIComponent(q)}`;
     setMapUrl(url);
-  }, [location]);
+  };
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateMapUrl(searchQuery, locationQuery);
+  };
 
   const handleFindMyLocation = async () => {
     setIsLoading(true);
@@ -46,17 +55,14 @@ export function NearbyPlacesMap() {
       }
 
       if (data.location) {
-        const newLocation = {
-          lat: data.location.lat,
-          lng: data.location.lng,
-        };
-        setLocation(newLocation);
+        const newLocation = `${data.location.lat},${data.location.lng}`;
+        setLocationQuery(newLocation);
+        updateMapUrl(searchQuery, newLocation);
         toast({
           title: 'Location Found',
           description: `Map updated. Accuracy: ${data.accuracy.toFixed(2)} meters.`,
         });
       } else {
-        // Fallback to browser geolocation if API fails to return location
         throw new Error("API did not return a location. Trying browser's service.");
       }
     } catch (apiError: any) {
@@ -70,11 +76,9 @@ export function NearbyPlacesMap() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            const newLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            setLocation(newLocation);
+            const newLocation = `${position.coords.latitude},${position.coords.longitude}`;
+            setLocationQuery(newLocation);
+            updateMapUrl(searchQuery, newLocation);
             setIsLoading(false);
             setError(null);
             toast({
@@ -105,12 +109,9 @@ export function NearbyPlacesMap() {
         });
       }
     } finally {
-      // Only set loading to false if not handled by async browser geolocation
-      if (navigator.geolocation) {
-          // The geolocation callback will handle setting isLoading to false
-      } else {
-          setIsLoading(false);
-      }
+        if (!navigator.geolocation) {
+            setIsLoading(false);
+        }
     }
   };
 
@@ -127,7 +128,40 @@ export function NearbyPlacesMap() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <Card className="shadow-lg p-4 sm:p-6">
+        <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+          <div className="space-y-2">
+            <Label htmlFor="search-query">What to find?</Label>
+            <Input 
+              id="search-query"
+              placeholder="e.g., panipuri, cafe, park"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location-query">Where?</Label>
+            <Input 
+              id="location-query"
+              placeholder="e.g., Chennai, or your address"
+              value={locationQuery}
+              onChange={(e) => setLocationQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button type="submit" className="w-full">
+              <Search />
+              Search
+            </Button>
+            <Button onClick={handleFindMyLocation} type="button" variant="secondary" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : <LocateFixed />}
+              {isLoading ? 'Locating...' : 'My Location'}
+            </Button>
+          </div>
+        </form>
+      </Card>
+
       {error && (
         <Alert variant="destructive">
           <Terminal className="h-4 w-4" />
@@ -135,6 +169,7 @@ export function NearbyPlacesMap() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
       <Card className="shadow-lg w-full h-[600px] overflow-hidden rounded-xl relative flex items-center justify-center bg-muted">
         {mapUrl ? (
           <iframe
@@ -153,18 +188,13 @@ export function NearbyPlacesMap() {
             <p className="text-muted-foreground font-semibold">Loading map...</p>
           </div>
         )}
-        <div className="absolute top-4 right-4 z-20">
-          <Button onClick={handleFindMyLocation} variant="secondary" className="shadow-lg" disabled={isLoading}>
-            {isLoading ? <Loader2 className="animate-spin" /> : <LocateFixed />}
-            {isLoading ? 'Locating...' : 'Find My Location'}
-          </Button>
-        </div>
       </Card>
+      
       <Alert>
         <Terminal className="h-4 w-4" />
         <AlertTitle>How It Works</AlertTitle>
         <AlertDescription>
-          The map defaults to Chennai. Click "Find My Location" to use Google's advanced location service to find you.
+          Enter what you want to find and where. Use the "My Location" button to search near you.
         </AlertDescription>
       </Alert>
     </div>
