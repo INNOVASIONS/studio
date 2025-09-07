@@ -48,10 +48,10 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => (
   </div>
 );
 
-const CostDisplay = ({ cost, label, currency }: { cost: number; label: string, currency?: string }) => (
+const CostDisplay = ({ cost, currency }: { cost: number; currency?: string }) => (
     <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium bg-muted px-2 py-1 rounded-md">
         <Wallet className="h-4 w-4 text-accent" />
-        <span>~{currency}{cost.toFixed(2)} {label}</span>
+        <span>~{currency}{cost.toFixed(2)} per person</span>
     </div>
 );
 
@@ -123,7 +123,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
                   {photo.transportDetails}
                   {photo.transportCost && (
-                      <CostDisplay cost={photo.transportCost} label="per person" currency={photo.currency} />
+                      <CostDisplay cost={photo.transportCost} currency={photo.currency} />
                   )}
                 </AccordionContent>
               </AccordionItem>
@@ -142,7 +142,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
                   {photo.foodDetails}
                   {photo.foodCost && (
-                        <CostDisplay cost={photo.foodCost} label="per person" currency={photo.currency} />
+                        <CostDisplay cost={photo.foodCost} currency={photo.currency} />
                     )}
                 </AccordionContent>
               </AccordionItem>
