@@ -162,7 +162,7 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4 border-t pt-4">
                 <div className="flex justify-between items-center">
                     <Label htmlFor="transportDetails">Transport Details (Optional)</Label>
                     <StarRating rating={transportRating} setRating={setTransportRating} />
@@ -172,9 +172,13 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
                     name="transportDetails"
                     placeholder="e.g., 'Rented a scooter to get here. Best way to explore!'"
                 />
+                <div className="space-y-2">
+                    <Label htmlFor="transportCost">Transport Cost (USD, optional)</Label>
+                    <Input id="transportCost" name="transportCost" type="number" step="0.01" placeholder="e.g., 25.50" />
+                </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-4 border-t pt-4">
                 <div className="flex justify-between items-center">
                     <Label htmlFor="foodDetails">Food Details (Optional)</Label>
                     <StarRating rating={foodRating} setRating={setFoodRating} />
@@ -184,6 +188,10 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
                     name="foodDetails"
                     placeholder="e.g., 'The local warung had the best Nasi Goreng!'"
                 />
+                <div className="space-y-2">
+                    <Label htmlFor="foodCost">Food Cost (USD, optional)</Label>
+                    <Input id="foodCost" name="foodCost" type="number" step="0.01" placeholder="e.g., 12.00" />
+                </div>
             </div>
 
 

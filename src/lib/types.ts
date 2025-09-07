@@ -20,6 +20,8 @@ export type Photo = {
   foodDetails?: string;
   transportRating?: number;
   foodRating?: number;
+  transportCost?: number;
+  foodCost?: number;
 };
 
 export type UserPlace = {

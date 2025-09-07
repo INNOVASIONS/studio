@@ -38,8 +38,10 @@ let photos: Photo[] = [
     timestamp: '2d',
     transportDetails: 'Best way to get here is by train to the nearest town, then a local bus. The bus is scenic and much cheaper than a taxi!',
     transportRating: 4,
+    transportCost: 25,
     foodDetails: 'Pack a picnic! There are no shops nearby. For dinner, the "Alpine Inn" in the village has amazing fondue at a reasonable price.',
     foodRating: 5,
+    foodCost: 40,
   },
   {
     id: 2,
@@ -53,8 +55,10 @@ let photos: Photo[] = [
     timestamp: '3d',
     transportDetails: 'The city center is very walkable. For longer distances, the trams are efficient and affordable. A 24-hour pass is the best value.',
     transportRating: 5,
+    transportCost: 5,
     foodDetails: 'Trdelník (chimney cake) from a street vendor is a must-try! For a cheap and hearty meal, find a local "jídelna" for traditional Czech food.',
     foodRating: 4,
+    foodCost: 15,
   },
   {
     id: 3,
@@ -68,8 +72,10 @@ let photos: Photo[] = [
     timestamp: '5d',
     transportDetails: 'Renting a scooter is the most popular and cheapest way to get around. Alternatively, use ride-sharing apps like Gojek or Grab for the best prices on cars.',
     transportRating: 4,
+    transportCost: 10,
     foodDetails: 'Warungs are small, family-owned eateries with delicious and incredibly cheap local food. Try the Nasi Goreng at Warung Murah!',
     foodRating: 5,
+    foodCost: 8,
   },
   {
     id: 4,
@@ -83,8 +89,10 @@ let photos: Photo[] = [
     timestamp: '1w',
     transportDetails: 'The subway is the fastest and most cost-effective way to travel. Buy a MetroCard and load it up. Avoid taxis during rush hour.',
     transportRating: 4,
+    transportCost: 3,
     foodDetails: 'You can\'t go wrong with a classic slice of pizza for $1-3 from the thousands of slice shops. Food carts are also great for a cheap and quick bite.',
     foodRating: 3,
+    foodCost: 10,
   },
   {
     id: 5,
@@ -124,8 +132,10 @@ let photos: Photo[] = [
     timestamp: '1m',
     transportDetails: 'Take the train to Füssen, then bus 73 or 78 towards the castle. The Bayern-Ticket is a great deal for regional train travel for groups.',
     transportRating: 5,
+    transportCost: 30,
     foodDetails: 'The restaurants right by the castle are touristy and expensive. Walk down to the village of Hohenschwangau for more traditional and affordable Bavarian food. A bratwurst and pretzel is a classic cheap lunch.',
     foodRating: 3,
+    foodCost: 20,
   },
   {
     id: 8,
@@ -139,8 +149,10 @@ let photos: Photo[] = [
     timestamp: '1m',
     transportDetails: 'The Medina (old city) is a maze best explored on foot. For destinations outside the walls, "petit taxis" are cheap, but make sure they use the meter!',
     transportRating: 3,
+    transportCost: 2,
     foodDetails: 'The food stalls in the main square, Djemaa el-Fna, are an amazing experience for dinner. Try various grilled meats and tagines. Be adventurous!',
     foodRating: 5,
+    foodCost: 10,
   },
 ];
 
