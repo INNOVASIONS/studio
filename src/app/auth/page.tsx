@@ -29,7 +29,7 @@ export default function AuthPage() {
   const handleLogin = () => {
     // This is a mock authentication check.
     // In a real app, this would be a call to a server.
-    if (loginEmail === 'yourhandle@example.com' && loginPassword.length > 0) {
+    if (loginEmail.toLowerCase() === 'yourhandle@example.com' && loginPassword.length > 0) {
       toast({
         title: 'Login Successful',
         description: 'Welcome back!',
