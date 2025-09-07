@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { handleCreatePost, CreatePostState } from '@/lib/actions';
 import { Loader2, Plus, Upload } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { ScrollArea } from '../ui/scroll-area';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -70,13 +71,14 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Create a New Post</DialogTitle>
           <DialogDescription>
             Share your latest travel moment with the community.
           </DialogDescription>
         </DialogHeader>
+        <ScrollArea className="pr-6 -mr-6">
         <form action={dispatch} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="photo">Photo</Label>
@@ -149,10 +151,11 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
             </Alert>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="sticky bottom-0 bg-background pt-4">
             <SubmitButton />
           </DialogFooter>
         </form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
