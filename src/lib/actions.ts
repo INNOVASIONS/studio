@@ -80,6 +80,7 @@ export async function handleCreatePost(
   const photoDataUri = formData.get('photoDataUri') as string;
   const caption = formData.get('caption') as string;
   const location = formData.get('location') as string;
+  const currency = formData.get('currency') as string | undefined;
   const transportDetails = formData.get('transportDetails') as string | undefined;
   const foodDetails = formData.get('foodDetails') as string | undefined;
   const transportRating = parseInt(formData.get('transportRating') as string, 10) || undefined;
@@ -97,6 +98,7 @@ export async function handleCreatePost(
       imageUrl: photoDataUri, // Using data URI directly as mock data
       caption,
       location,
+      currency,
       transportDetails,
       foodDetails,
       transportRating,

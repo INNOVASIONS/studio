@@ -22,6 +22,7 @@ export type Photo = {
   foodRating?: number;
   transportCost?: number;
   foodCost?: number;
+  currency?: string;
 };
 
 export type UserPlace = {
