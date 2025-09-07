@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -11,6 +12,7 @@ import {
   Star,
   UtensilsCrossed,
   Wallet,
+  Expand,
 } from 'lucide-react';
 import type { Photo, User } from '@/lib/types';
 import {
@@ -27,6 +29,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 type PhotoCardProps = {
@@ -66,7 +75,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl overflow-hidden shadow-lg">
+    <Card className="w-full max-w-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
       <CardHeader className="flex flex-row items-center gap-3 p-4">
         <Link href={`/profile/${user.id}`}>
           <Avatar>
@@ -91,16 +100,32 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
         </time>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="bg-muted">
-          <Image
-            src={photo.imageUrl}
-            alt={photo.caption}
-            width={1000}
-            height={600}
-            className="w-full h-auto object-cover"
-            data-ai-hint={photo.dataAiHint}
-          />
-        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="bg-muted relative group cursor-pointer">
+              <Image
+                src={photo.imageUrl}
+                alt={photo.caption}
+                width={1000}
+                height={600}
+                className="w-full h-auto object-cover"
+                data-ai-hint={photo.dataAiHint}
+              />
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Expand className="h-10 w-10 text-white" />
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl p-0">
+            <Image
+              src={photo.imageUrl}
+              alt={photo.caption}
+              width={1600}
+              height={900}
+              className="w-full h-auto object-contain rounded-lg"
+            />
+          </DialogContent>
+        </Dialog>
       </CardContent>
       <div className="p-4 space-y-2">
         <p className="text-sm">{photo.caption}</p>
@@ -153,12 +178,12 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
 
       <CardFooter className="p-4 border-t">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={handleLikeClick}>
-            <Heart className={cn("h-5 w-5 text-accent", isLiked && "fill-accent")} />
+          <Button variant="ghost" size="sm" className="flex items-center gap-2 group" onClick={handleLikeClick}>
+            <Heart className={cn("h-5 w-5 text-accent transition-all group-hover:scale-110", isLiked && "fill-accent")} />
             <span>{likeCount.toLocaleString()}</span>
           </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-accent" />
+          <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
+            <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
             <span>{photo.comments.toLocaleString()}</span>
           </Button>
         </div>

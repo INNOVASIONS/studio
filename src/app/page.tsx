@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -64,6 +65,32 @@ export default function Home() {
               Upload a Photo <Plus />
             </Button>
           </AddPostDialog>
+        </div>
+      </section>
+
+       <section className="mb-16">
+        <h2 className="font-headline text-4xl font-semibold tracking-tight mb-8 text-center">
+          AI-Powered Tools
+        </h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {featureCards.map((feature) => (
+            <Link key={feature.href} href={feature.href} className="block group">
+              <Card className="h-full flex flex-col transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-xl">
+                <CardHeader className="items-center text-center">
+                  <div className="p-3 bg-primary/10 rounded-full mb-2">
+                    <feature.icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <CardTitle className="font-headline text-2xl">{feature.title}</CardTitle>
+                  <CardDescription>{feature.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow flex items-end justify-center">
+                  <Button variant="ghost" className="w-full">
+                    {feature.cta} <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
       </section>
 

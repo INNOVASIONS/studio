@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -30,7 +31,7 @@ export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
                 <p className="text-muted-foreground text-lg">{user.handle}</p>
                 <div className="flex justify-center md:justify-start gap-6 my-4">
                     {stats.map(stat => (
-                        <div key={stat.label} className="text-center transition-opacity hover:opacity-80 cursor-pointer">
+                        <div key={stat.label} className="text-center transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer">
                             <p className="font-bold text-xl">{stat.value}</p>
                             <p className="text-sm text-muted-foreground">{stat.label}</p>
                         </div>
