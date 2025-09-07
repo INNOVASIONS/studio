@@ -27,7 +27,7 @@ export default function AuthPage() {
   const [activeTab, setActiveTab] = useState('login');
 
   const handleLogin = () => {
-    // This is a mock authentication check.
+    // This is a mock authentication check. It only works for one user.
     if (loginEmail.toLowerCase() === 'yourhandle@example.com' && loginPassword) {
       toast({
         title: 'Login Successful',
