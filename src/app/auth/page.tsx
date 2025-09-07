@@ -70,7 +70,7 @@ export default function AuthPage() {
       return;
     }
 
-    // Check if user already exists
+    // Check if user already exists (case-insensitive)
     if (registeredUsers.some(u => u.email.toLowerCase() === signupEmail.toLowerCase())) {
         toast({
             variant: 'destructive',
