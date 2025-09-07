@@ -21,14 +21,15 @@ import { useState } from 'react';
 export default function AuthPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
   const [activeTab, setActiveTab] = useState('login');
 
   const handleLogin = () => {
     // This is a mock authentication check.
     // In a real app, this would be a call to a server.
-    if (email === 'yourhandle@example.com' && password.length > 0) {
+    if (loginEmail === 'yourhandle@example.com' && loginPassword.length > 0) {
       toast({
         title: 'Login Successful',
         description: 'Welcome back!',
@@ -51,6 +52,7 @@ export default function AuthPage() {
         title: 'Account Created!',
         description: "You've been successfully signed up. Please log in.",
       });
+    setLoginEmail(signupEmail);
     setActiveTab('login');
   }
 
@@ -85,8 +87,8 @@ export default function AuthPage() {
                   id="login-email"
                   type="email"
                   placeholder="yourhandle@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -94,8 +96,8 @@ export default function AuthPage() {
                 <Input 
                     id="login-password" 
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
                 />
               </div>
             </CardContent>
@@ -131,7 +133,9 @@ export default function AuthPage() {
                 <Input
                   id="signup-email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="yourhandle@example.com"
+                  value={signupEmail}
+                  onChange={(e) => setSignupEmail(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
