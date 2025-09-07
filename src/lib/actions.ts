@@ -82,6 +82,8 @@ export async function handleCreatePost(
   const location = formData.get('location') as string;
   const transportDetails = formData.get('transportDetails') as string | undefined;
   const foodDetails = formData.get('foodDetails') as string | undefined;
+  const transportRating = parseInt(formData.get('transportRating') as string, 10) || undefined;
+  const foodRating = parseInt(formData.get('foodRating') as string, 10) || undefined;
   
   if (!photoDataUri || !caption || !location) {
     return { message: 'Photo, caption, and location are required.' };
@@ -95,6 +97,8 @@ export async function handleCreatePost(
       location,
       transportDetails,
       foodDetails,
+      transportRating,
+      foodRating,
     });
   } catch (error) {
     console.error(error);

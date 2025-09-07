@@ -18,6 +18,8 @@ export type Photo = {
   dataAiHint?: string;
   transportDetails?: string;
   foodDetails?: string;
+  transportRating?: number;
+  foodRating?: number;
 };
 
 export type UserPlace = {

@@ -8,6 +8,7 @@ import {
   Heart,
   MapPin,
   MessageCircle,
+  Star,
   UtensilsCrossed,
 } from 'lucide-react';
 import type { Photo, User } from '@/lib/types';
@@ -31,6 +32,20 @@ type PhotoCardProps = {
   photo: Photo;
   user: User;
 };
+
+const StarRatingDisplay = ({ rating }: { rating: number }) => (
+  <div className="flex items-center gap-0.5">
+    {[...Array(5)].map((_, i) => (
+      <Star
+        key={i}
+        className={cn(
+          'h-4 w-4',
+          i < rating ? 'text-accent fill-accent' : 'text-gray-300'
+        )}
+      />
+    ))}
+  </div>
+);
 
 export function PhotoCard({ photo, user }: PhotoCardProps) {
   const hasDetails = photo.transportDetails || photo.foodDetails;
@@ -92,6 +107,9 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                   <div className="flex items-center gap-2">
                     <Car className="h-4 w-4 text-accent" />
                     Transport Tips
+                    {photo.transportRating && (
+                      <StarRatingDisplay rating={photo.transportRating} />
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
@@ -105,6 +123,9 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                   <div className="flex items-center gap-2">
                     <UtensilsCrossed className="h-4 w-4 text-accent" />
                     Food Recommendations
+                    {photo.foodRating && (
+                      <StarRatingDisplay rating={photo.foodRating} />
+                    )}
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
