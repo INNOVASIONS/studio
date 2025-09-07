@@ -1,7 +1,8 @@
+
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Camera,
   Compass,
@@ -12,6 +13,7 @@ import {
   Menu,
   Plus,
   User,
+  LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -38,7 +40,12 @@ const navLinks = [
 
 export function AppHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const currentUser = getCurrentUser();
+
+  const handleLogout = () => {
+    router.push('/auth');
+  };
 
   const NavLink = ({
     href,
@@ -133,13 +140,16 @@ export function AppHeader() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/profile`}>
+                <Link href={`/profile/${currentUser.id}`}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
