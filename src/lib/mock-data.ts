@@ -42,7 +42,7 @@ let photos: Photo[] = [
     foodDetails: 'Pack a picnic! There are no shops nearby. For dinner, the "Alpine Inn" in the village has amazing fondue at a reasonable price.',
     foodRating: 5,
     foodCost: 40,
-    currency: 'CHF ',
+    currency: 'CHF',
   },
   {
     id: 2,
@@ -60,7 +60,7 @@ let photos: Photo[] = [
     foodDetails: 'Trdelník (chimney cake) from a street vendor is a must-try! For a cheap and hearty meal, find a local "jídelna" for traditional Czech food.',
     foodRating: 4,
     foodCost: 15,
-    currency: '€',
+    currency: 'EUR',
   },
   {
     id: 3,
@@ -78,7 +78,7 @@ let photos: Photo[] = [
     foodDetails: 'Warungs are small, family-owned eateries with delicious and incredibly cheap local food. Try the Nasi Goreng at Warung Murah!',
     foodRating: 5,
     foodCost: 50000,
-    currency: 'IDR ',
+    currency: 'IDR',
   },
   {
     id: 4,
@@ -96,7 +96,7 @@ let photos: Photo[] = [
     foodDetails: 'You can\'t go wrong with a classic slice of pizza for $1-3 from the thousands of slice shops. Food carts are also great for a cheap and quick bite.',
     foodRating: 3,
     foodCost: 10,
-    currency: '$',
+    currency: 'USD',
   },
   {
     id: 5,
@@ -110,7 +110,7 @@ let photos: Photo[] = [
     timestamp: '2w',
     transportDetails: 'A car is essential to explore the vast redwood parks. Rent one from a major airport for the best rates. Book ahead, especially in summer.',
     foodDetails: 'Stock up on groceries in a larger town before heading into the parks. The small general stores have limited options and are pricey. In-N-Out Burger on the way is a classic, affordable Californian meal.',
-    currency: '$',
+    currency: 'USD',
   },
   {
     id: 6,
@@ -118,13 +118,13 @@ let photos: Photo[] = [
     imageUrl: 'https://picsum.photos/id/103/1000/600',
     dataAiHint: 'desert landscape',
     caption: 'Endless dunes under the vast desert sky.',
-    location: 'Sahara Desert, Morocco',
+    location: 'Merzouga, Morocco',
     likes: 2788,
     comments: 201,
     timestamp: '3w',
     transportDetails: 'A 4x4 tour is the only way to go deep into the desert. Book with a reputable company that includes a driver. It\'s not a place for self-driving unless you\'re very experienced.',
     foodDetails: 'Meals are usually included with desert tours. Expect lots of tagine! It\'s delicious and authentic. Pack plenty of your own water and snacks for the long drives.',
-    currency: 'MAD ',
+    currency: 'MAD',
   },
     {
     id: 7,
@@ -142,7 +142,7 @@ let photos: Photo[] = [
     foodDetails: 'The restaurants right by the castle are touristy and expensive. Walk down to the village of Hohenschwangau for more traditional and affordable Bavarian food. A bratwurst and pretzel is a classic cheap lunch.',
     foodRating: 3,
     foodCost: 20,
-    currency: '€',
+    currency: 'EUR',
   },
   {
     id: 8,
@@ -160,7 +160,7 @@ let photos: Photo[] = [
     foodDetails: 'The food stalls in the main square, Djemaa el-Fna, are an amazing experience for dinner. Try various grilled meats and tagines. Be adventurous!',
     foodRating: 5,
     foodCost: 100,
-    currency: 'MAD ',
+    currency: 'MAD',
   },
 ];
 
