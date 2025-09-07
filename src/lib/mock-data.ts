@@ -26,6 +26,24 @@ const users: User[] = [
 ];
 
 let photos: Photo[] = [
+    {
+    id: 9,
+    userId: 1,
+    imageUrl: 'https://picsum.photos/id/10/1000/600',
+    dataAiHint: 'forest mountains',
+    caption: 'Took a trip to the mountains. The air was so fresh!',
+    location: 'Rocky Mountains, USA',
+    likes: 15,
+    comments: 2,
+    timestamp: '1d',
+    transportDetails: 'Drove up in a 4x4. The roads were a bit rough but the views were worth it.',
+    transportRating: 4,
+    transportCost: 100,
+    foodDetails: 'Packed our own sandwiches. Nothing beats a simple lunch with a view like this.',
+    foodRating: 3,
+    foodCost: 20,
+    currency: 'USD',
+  },
   {
     id: 1,
     userId: 2,
