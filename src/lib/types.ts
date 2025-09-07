@@ -4,6 +4,7 @@ export type User = {
   handle: string;
   avatarUrl: string;
   bio: string;
+  email: string;
 };
 
 export type Photo = {
