@@ -34,7 +34,7 @@ export default function AuthPage() {
 
   // Simulate a user database. Start with the default mock user.
   const [registeredUsers, setRegisteredUsers] = useState<UserCredentials[]>([
-    { email: 'yourhandle@example.com' }, // Default user doesn't need a password check
+    { email: 'yourhandle@example.com', password: 'password' }, // Default user
   ]);
 
   const handleLogin = () => {
@@ -42,8 +42,7 @@ export default function AuthPage() {
       (u) => u.email.toLowerCase() === loginEmail.toLowerCase()
     );
     
-    // For the default user, we only check for email. For new users, we check password.
-    const isPasswordCorrect = user && (user.password === undefined || user.password === loginPassword);
+    const isPasswordCorrect = user && user.password === loginPassword;
 
     if (user && isPasswordCorrect) {
       toast({
@@ -76,7 +75,7 @@ export default function AuthPage() {
         toast({
             variant: 'destructive',
             title: 'Sign Up Failed',
-            description: 'This email is already registered. Please log in.',
+            description: 'Account already exists.',
         });
         return;
     }
