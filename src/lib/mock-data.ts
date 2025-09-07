@@ -136,7 +136,9 @@ let photos: Photo[] = [
     comments: [],
     timestamp: '2w',
     transportDetails: 'A car is essential to explore the vast redwood parks. Rent one from a major airport for the best rates. Book ahead, especially in summer.',
+    transportRating: 3,
     foodDetails: 'Stock up on groceries in a larger town before heading into the parks. The small general stores have limited options and are pricey. In-N-Out Burger on the way is a classic, affordable Californian meal.',
+    foodRating: 4,
     currency: 'USD',
   },
   {
@@ -150,7 +152,9 @@ let photos: Photo[] = [
     comments: [],
     timestamp: '3w',
     transportDetails: 'A 4x4 tour is the only way to go deep into the desert. Book with a reputable company that includes a driver. It\'s not a place for self-driving unless you\'re very experienced.',
+    transportRating: 5,
     foodDetails: 'Meals are usually included with desert tours. Expect lots of tagine! It\'s delicious and authentic. Pack plenty of your own water and snacks for the long drives.',
+    foodRating: 4,
     currency: 'MAD',
   },
     {
