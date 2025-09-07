@@ -47,7 +47,7 @@ export default function AuthPage() {
 
   const handleSignUp = () => {
     // In a real app, this would create a new user.
-    // For this prototype, we'll just show a success message and redirect.
+    // For this prototype, we'll just show a success message and switch to the login tab.
      toast({
         title: 'Account Created!',
         description: "You've been successfully signed up. Please log in.",
