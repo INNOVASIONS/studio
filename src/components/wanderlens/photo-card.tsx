@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -73,12 +74,15 @@ const CostDisplay = ({ cost, currency }: { cost: number; currency?: string }) =>
 const CommentsDialog = ({
   photo,
   children,
+  comments,
+  onCommentAdded,
 }: {
   photo: Photo;
   children: React.ReactNode;
+  comments: Comment[];
+  onCommentAdded: (comment: Comment) => void;
 }) => {
   const currentUser = getCurrentUser();
-  const [comments, setComments] = useState<Comment[]>(photo.comments);
   const [newComment, setNewComment] = useState('');
 
   const handleCommentSubmit = (e: React.FormEvent) => {
@@ -96,7 +100,7 @@ const CommentsDialog = ({
       timestamp: 'Just now',
     };
 
-    setComments([...comments, commentToAdd]);
+    onCommentAdded(commentToAdd);
     setNewComment('');
   };
 
@@ -174,10 +178,15 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
   const hasDetails = photo.transportDetails || photo.foodDetails;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(photo.likes);
+  const [comments, setComments] = useState<Comment[]>(photo.comments);
 
   const handleLikeClick = () => {
     setIsLiked(!isLiked);
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
+  };
+  
+  const handleCommentAdded = (newComment: Comment) => {
+    setComments([...comments, newComment]);
   };
 
   return (
@@ -288,10 +297,10 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
             <Heart className={cn("h-5 w-5 text-accent transition-all group-hover:scale-110", isLiked && "fill-accent")} />
             <span>{likeCount.toLocaleString()}</span>
           </Button>
-          <CommentsDialog photo={photo}>
+          <CommentsDialog photo={photo} comments={comments} onCommentAdded={handleCommentAdded}>
             <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
               <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
-              <span>{photo.comments.length.toLocaleString()}</span>
+              <span>{comments.length.toLocaleString()}</span>
             </Button>
           </CommentsDialog>
         </div>
