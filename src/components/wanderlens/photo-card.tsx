@@ -232,6 +232,10 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
             </div>
           </DialogTrigger>
           <DialogContent className="max-w-4xl p-0">
+             <DialogHeader className="sr-only">
+                <DialogTitle>Enlarged photo: {photo.caption}</DialogTitle>
+                <DialogDescription>A larger view of the post image.</DialogDescription>
+            </DialogHeader>
             <Image
               src={photo.imageUrl}
               alt={photo.caption}

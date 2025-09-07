@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -252,8 +253,13 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
               </Alert>
             )}
 
-            <DialogFooter className="sticky bottom-0 bg-background pt-4">
-              <SubmitButton />
+            <DialogFooter className="sticky bottom-0 bg-background pt-4 flex sm:justify-between gap-2">
+                <DialogClose asChild>
+                    <Button type="button" variant="outline">
+                    Cancel
+                    </Button>
+                </DialogClose>
+                <SubmitButton />
             </DialogFooter>
           </form>
         </ScrollArea>
