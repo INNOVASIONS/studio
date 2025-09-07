@@ -23,6 +23,7 @@ export default function AuthPage() {
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [activeTab, setActiveTab] = useState('login');
 
   const handleLogin = () => {
     // This is a mock authentication check.
@@ -48,14 +49,14 @@ export default function AuthPage() {
     // For this prototype, we'll just show a success message and redirect.
      toast({
         title: 'Account Created!',
-        description: "You've been successfully signed up.",
+        description: "You've been successfully signed up. Please log in.",
       });
-    router.push('/');
+    setActiveTab('login');
   }
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
-      <Tabs defaultValue="login" className="w-full max-w-md">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full max-w-md">
         <div className="text-center mb-4">
           <Camera className="mx-auto h-8 w-8 text-primary" />
           <h1 className="font-headline text-3xl font-bold tracking-tight text-primary mt-2">
