@@ -1,5 +1,5 @@
 
-import type { User, Photo, UserPlace } from './types';
+import type { User, Photo, UserPlace, Comment } from './types';
 
 const users: User[] = [
   {
@@ -37,7 +37,10 @@ let photos: Photo[] = [
     caption: 'Took a trip to the mountains. The air was so fresh!',
     location: 'Rocky Mountains, USA',
     likes: 15,
-    comments: 2,
+    comments: [
+      { id: 1, user: users[2], text: 'Wow, incredible shot!', timestamp: '1d' },
+      { id: 2, user: users[1], text: 'Looks so peaceful.', timestamp: '1d' },
+    ],
     timestamp: '1d',
     transportDetails: 'Drove up in a 4x4. The roads were a bit rough but the views were worth it.',
     transportRating: 4,
@@ -55,7 +58,10 @@ let photos: Photo[] = [
     caption: 'Sunrise over the serene mountain lake. An unforgettable moment.',
     location: 'Alpine Lake, Switzerland',
     likes: 1204,
-    comments: 88,
+    comments: [
+       { id: 3, user: users[0], text: 'Adding this to my bucket list!', timestamp: '2d' },
+       { id: 4, user: users[2], text: 'Absolutely stunning.', timestamp: '2d' },
+    ],
     timestamp: '2d',
     transportDetails: 'Best way to get here is by train to the nearest town, then a local bus. The bus is scenic and much cheaper than a taxi!',
     transportRating: 4,
@@ -73,7 +79,7 @@ let photos: Photo[] = [
     caption: 'Getting lost in the charming cobblestone streets of the old city.',
     location: 'Prague, Czech Republic',
     likes: 2345,
-    comments: 152,
+    comments: [],
     timestamp: '3d',
     transportDetails: 'The city center is very walkable. For longer distances, the trams are efficient and affordable. A 24-hour pass is the best value.',
     transportRating: 5,
@@ -91,7 +97,7 @@ let photos: Photo[] = [
     caption: 'Golden hour at its finest. The sunsets here are pure magic.',
     location: 'Bali, Indonesia',
     likes: 3102,
-    comments: 230,
+    comments: [],
     timestamp: '5d',
     transportDetails: 'Renting a scooter is the most popular and cheapest way to get around. Alternatively, use ride-sharing apps like Gojek or Grab for the best prices on cars.',
     transportRating: 4,
@@ -109,7 +115,7 @@ let photos: Photo[] = [
     caption: 'The city that never sleeps, viewed from above.',
     location: 'New York City, USA',
     likes: 1890,
-    comments: 112,
+    comments: [],
     timestamp: '1w',
     transportDetails: 'The subway is the fastest and most cost-effective way to travel. Buy a MetroCard and load it up. Avoid taxis during rush hour.',
     transportRating: 4,
@@ -127,7 +133,7 @@ let photos: Photo[] = [
     caption: 'A peaceful walk through the ancient redwood forest.',
     location: 'California, USA',
     likes: 2056,
-    comments: 178,
+    comments: [],
     timestamp: '2w',
     transportDetails: 'A car is essential to explore the vast redwood parks. Rent one from a major airport for the best rates. Book ahead, especially in summer.',
     foodDetails: 'Stock up on groceries in a larger town before heading into the parks. The small general stores have limited options and are pricey. In-N-Out Burger on the way is a classic, affordable Californian meal.',
@@ -141,7 +147,7 @@ let photos: Photo[] = [
     caption: 'Endless dunes under the vast desert sky.',
     location: 'Merzouga, Morocco',
     likes: 2788,
-    comments: 201,
+    comments: [],
     timestamp: '3w',
     transportDetails: 'A 4x4 tour is the only way to go deep into the desert. Book with a reputable company that includes a driver. It\'s not a place for self-driving unless you\'re very experienced.',
     foodDetails: 'Meals are usually included with desert tours. Expect lots of tagine! It\'s delicious and authentic. Pack plenty of your own water and snacks for the long drives.',
@@ -155,7 +161,7 @@ let photos: Photo[] = [
     caption: 'Exploring fairytale castles in the German countryside.',
     location: 'Neuschwanstein Castle, Germany',
     likes: 4123,
-    comments: 340,
+    comments: [],
     timestamp: '1m',
     transportDetails: 'Take the train to Füssen, then bus 73 or 78 towards the castle. The Bayern-Ticket is a great deal for regional train travel for groups.',
     transportRating: 5,
@@ -173,7 +179,7 @@ let photos: Photo[] = [
     caption: 'The vibrant colors and smells of a local market.',
     location: 'Marrakech, Morocco',
     likes: 2987,
-    comments: 199,
+    comments: [],
     timestamp: '1m',
     transportDetails: 'The Medina (old city) is a maze best explored on foot. For destinations outside the walls, "petit taxis" are cheap, but make sure they use the meter!',
     transportRating: 3,
@@ -217,7 +223,7 @@ export const addPhoto = (photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 't
     const newPhoto: Photo = {
         id: photos.length > 0 ? Math.max(...photos.map(p => p.id)) + 1 : 1,
         likes: 0,
-        comments: 0,
+        comments: [],
         timestamp: 'Just now',
         ...photoData,
     };

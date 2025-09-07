@@ -7,6 +7,17 @@ export type User = {
   email: string;
 };
 
+export type Comment = {
+  id: number;
+  user: {
+    id: number;
+    name: string;
+    avatarUrl: string;
+  };
+  text: string;
+  timestamp: string;
+};
+
 export type Photo = {
   id: number;
   userId: number;
@@ -14,7 +25,7 @@ export type Photo = {
   caption: string;
   location: string;
   likes: number;
-  comments: number;
+  comments: Comment[];
   timestamp: string;
   dataAiHint?: string;
   transportDetails?: string;

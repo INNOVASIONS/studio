@@ -13,8 +13,9 @@ import {
   UtensilsCrossed,
   Wallet,
   Expand,
+  Send,
 } from 'lucide-react';
-import type { Photo, User } from '@/lib/types';
+import type { Photo, User, Comment } from '@/lib/types';
 import {
   Card,
   CardContent,
@@ -35,8 +36,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { getCurrentUser } from '@/lib/mock-data';
+import { ScrollArea } from '../ui/scroll-area';
+import { Input } from '../ui/input';
 
 type PhotoCardProps = {
   photo: Photo;
@@ -63,6 +69,106 @@ const CostDisplay = ({ cost, currency }: { cost: number; currency?: string }) =>
         <span>~{currency}{cost.toFixed(2)} per person</span>
     </div>
 );
+
+const CommentsDialog = ({
+  photo,
+  children,
+}: {
+  photo: Photo;
+  children: React.ReactNode;
+}) => {
+  const currentUser = getCurrentUser();
+  const [comments, setComments] = useState<Comment[]>(photo.comments);
+  const [newComment, setNewComment] = useState('');
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim() === '') return;
+
+    const commentToAdd: Comment = {
+      id: Math.random(),
+      user: {
+        id: currentUser.id,
+        name: currentUser.name,
+        avatarUrl: currentUser.avatarUrl,
+      },
+      text: newComment.trim(),
+      timestamp: 'Just now',
+    };
+
+    setComments([...comments, commentToAdd]);
+    setNewComment('');
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="sm:max-w-lg grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>Comments</DialogTitle>
+          <DialogDescription>
+            See what people are saying about this post.
+          </DialogDescription>
+        </DialogHeader>
+        <ScrollArea className="pr-6 -mr-6 border-y">
+          <div className="p-4 space-y-4">
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment.id} className="flex items-start gap-3">
+                  <Avatar className="h-8 w-8 border">
+                    <AvatarImage
+                      src={comment.user.avatarUrl}
+                      alt={comment.user.name}
+                    />
+                    <AvatarFallback>
+                      {comment.user.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="text-sm">
+                    <p>
+                      <span className="font-semibold">{comment.user.name}</span>{' '}
+                      <span className="text-muted-foreground">
+                        {comment.text}
+                      </span>
+                    </p>
+                    <time className="text-xs text-muted-foreground">
+                      {comment.timestamp}
+                    </time>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No comments yet. Be the first to share your thoughts!
+              </p>
+            )}
+          </div>
+        </ScrollArea>
+        <DialogFooter>
+          <form
+            onSubmit={handleCommentSubmit}
+            className="flex items-center gap-2 w-full"
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
+              <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <Input
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="flex-1"
+            />
+            <Button type="submit" size="icon" disabled={!newComment.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 
 export function PhotoCard({ photo, user }: PhotoCardProps) {
   const hasDetails = photo.transportDetails || photo.foodDetails;
@@ -182,10 +288,12 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
             <Heart className={cn("h-5 w-5 text-accent transition-all group-hover:scale-110", isLiked && "fill-accent")} />
             <span>{likeCount.toLocaleString()}</span>
           </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
-            <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
-            <span>{photo.comments.toLocaleString()}</span>
-          </Button>
+          <CommentsDialog photo={photo}>
+            <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
+              <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
+              <span>{photo.comments.length.toLocaleString()}</span>
+            </Button>
+          </CommentsDialog>
         </div>
       </CardFooter>
     </Card>
