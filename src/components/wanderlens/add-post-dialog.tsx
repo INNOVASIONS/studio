@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useActionState, useRef } from 'react';
@@ -21,6 +22,13 @@ import { Loader2, Plus, Star } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { ScrollArea } from '../ui/scroll-area';
 import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -66,15 +74,37 @@ const StarRating = ({
   );
 };
 
+const currencies = [
+  { value: 'USD', label: 'USD - United States Dollar' },
+  { value: 'EUR', label: 'EUR - Euro' },
+  { value: 'JPY', label: 'JPY - Japanese Yen' },
+  { value: 'GBP', label: 'GBP - British Pound' },
+  { value: 'INR', label: 'INR - Indian Rupee' },
+  { value: 'AUD', label: 'AUD - Australian Dollar' },
+  { value: 'CAD', label: 'CAD - Canadian Dollar' },
+  { value: 'CHF', label: 'CHF - Swiss Franc' },
+  { value: 'CNY', label: 'CNY - Chinese Yuan' },
+  { value: 'SEK', label: 'SEK - Swedish Krona' },
+  { value: 'NZD', label: 'NZD - New Zealand Dollar' },
+  { value: 'KRW', label: 'KRW - South Korean Won' },
+  { value: 'SGD', label: 'SGD - Singapore Dollar' },
+  { value: 'NOK', label: 'NOK - Norwegian Krone' },
+  { value: 'MXN', label: 'MXN - Mexican Peso' },
+  { value: 'BRL', label: 'BRL - Brazilian Real' },
+  { value: 'ZAR', label: 'ZAR - South African Rand' },
+];
+
 export function AddPostDialog({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const initialState: CreatePostState = { message: '' };
   const [state, dispatch] = useActionState(handleCreatePost, initialState);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const [transportRating, setTransportRating] = useState(0);
   const [foodRating, setFoodRating] = useState(0);
+  const [currency, setCurrency] = useState('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,8 +125,12 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
       setPreview(null);
       setTransportRating(0);
       setFoodRating(0);
+      setCurrency('');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
+      }
+      if (formRef.current) {
+        formRef.current.reset();
       }
     }
   }, [state.success]);
@@ -112,9 +146,10 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="pr-6 -mr-6">
-          <form action={dispatch} className="space-y-4">
+          <form action={dispatch} ref={formRef} className="space-y-4">
             <input type="hidden" name="transportRating" value={transportRating} />
             <input type="hidden" name="foodRating" value={foodRating} />
+            <input type="hidden" name="currency" value={currency} />
 
             <div className="space-y-2">
               <Label htmlFor="photo">Photo</Label>
@@ -163,13 +198,19 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="currency">Currency (Optional)</Label>
-              <Input
-                id="currency"
-                name="currency"
-                placeholder="e.g., USD, INR, EUR"
-              />
+              <Label htmlFor="currency-select">Currency (Optional)</Label>
+              <Select onValueChange={setCurrency}>
+                <SelectTrigger id="currency-select">
+                  <SelectValue placeholder="Select a currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {currencies.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
 
             <div className="space-y-4 border-t pt-4">
                 <div className="flex justify-between items-center">
