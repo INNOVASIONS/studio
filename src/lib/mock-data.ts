@@ -1,12 +1,13 @@
+
 import type { User, Photo, UserPlace } from './types';
 
 const users: User[] = [
   {
     id: 1,
-    name: 'Alex Wanderer',
-    handle: '@alexwanderer',
-    avatarUrl: 'https://picsum.photos/id/237/100/100',
-    bio: 'Chasing horizons and camera clicks. Roaming the globe one a a time.',
+    name: 'Your Name',
+    handle: '@yourhandle',
+    avatarUrl: 'https://picsum.photos/id/1005/100/100',
+    bio: 'Exploring the world and sharing my journey. All photos are my own!',
   },
   {
     id: 2,
@@ -27,7 +28,7 @@ const users: User[] = [
 let photos: Photo[] = [
   {
     id: 1,
-    userId: 1,
+    userId: 2,
     imageUrl: 'https://picsum.photos/id/1015/1000/600',
     dataAiHint: 'mountain lake',
     caption: 'Sunrise over the serene mountain lake. An unforgettable moment.',
