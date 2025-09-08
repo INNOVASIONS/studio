@@ -13,6 +13,7 @@ import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { addPhoto, getCurrentUser } from './mock-data';
+import fetch from 'node-fetch';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -125,35 +126,44 @@ export type TranslationState = {
     error?: string;
 };
 
+
+// Helper function to fetch an image from a URL and convert it to a data URI
+async function imageUrlToDataUri(url: string): Promise<string> {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
+    }
+    const imageBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    const base64Image = Buffer.from(imageBuffer).toString('base64');
+    return `data:${contentType};base64,${base64Image}`;
+}
+
 export async function handleTranslatePost(
-    prevState: TranslationState,
-    formData: FormData
+  input: Omit<TranslatePostInput, 'photoUrl'> & { photoUrl: string }
 ): Promise<TranslationState> {
-    const caption = formData.get('caption') as string;
-    const transportDetails = formData.get('transportDetails') as string;
-    const foodDetails = formData.get('foodDetails') as string;
-    const targetLanguage = formData.get('targetLanguage') as string;
+  const { caption, targetLanguage, photoUrl } = input;
 
-    if (!caption || !targetLanguage) {
-        return { error: 'Caption and target language are required.' };
+  if (!caption || !targetLanguage || !photoUrl) {
+    return { error: 'Caption, target language, and photo are required.' };
+  }
+
+  try {
+    // Although the model can accept a URL, converting to a data URI can be more reliable
+    // if there are potential access restrictions or redirects.
+    // For this implementation, we will pass the URL directly as our AI flow supports it.
+    const result = await translatePost(input);
+    return {
+      translatedCaption: result.translatedCaption,
+      translatedTransportDetails: result.translatedTransportDetails,
+      translatedFoodDetails: result.translatedFoodDetails,
+    };
+  } catch (e: any) {
+    console.error(e);
+    // Provide a more user-friendly error message
+    if (e.message.includes('FETCH_ERROR')) {
+      return { error: 'Could not retrieve the image for translation. Please try again later.' };
     }
-
-    try {
-        const input: TranslatePostInput = { 
-            caption, 
-            targetLanguage,
-        };
-        if (transportDetails) input.transportDetails = transportDetails;
-        if (foodDetails) input.foodDetails = foodDetails;
-
-        const result = await translatePost(input);
-        return { 
-            translatedCaption: result.translatedCaption,
-            translatedTransportDetails: result.translatedTransportDetails,
-            translatedFoodDetails: result.translatedFoodDetails,
-        };
-    } catch (e: any) {
-        console.error(e);
-        return { error: e.message || 'Failed to translate text.' };
-    }
+    return { error: e.message || 'An unexpected error occurred during translation.' };
+  }
 }

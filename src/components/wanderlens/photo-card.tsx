@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useActionState } from 'react';
+import { useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -41,270 +41,14 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogDescription,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { getCurrentUser } from '@/lib/mock-data';
 import { ScrollArea } from '../ui/scroll-area';
 import { Input } from '../ui/input';
-import { useFormStatus } from 'react-dom';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Label } from '../ui/label';
-import { TranslationState, handleTranslatePost } from '@/lib/actions';
-import { Separator } from '../ui/separator';
+import { handleTranslatePost, TranslationState } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
 
-type PhotoCardProps = {
-  photo: Photo;
-  user: User;
-};
-
-const languages = [
-    { value: 'Afrikaans', label: 'Afrikaans' },
-    { value: 'Albanian', label: 'Shqip' },
-    { value: 'Amharic', label: 'አማርኛ' },
-    { value: 'Arabic', label: 'العربية' },
-    { value: 'Armenian', label: 'Հայերեն' },
-    { value: 'Azerbaijani', label: 'Azərbaycan dili' },
-    { value: 'Basque', label: 'Euskara' },
-    { value: 'Belarusian', label: 'Беларуская' },
-    { value: 'Bengali', label: 'বাংলা' },
-    { value: 'Bosnian', label: 'Bosanski' },
-    { value: 'Bulgarian', label: 'Български' },
-    { value: 'Catalan', label: 'Català' },
-    { value: 'Cebuano', label: 'Cebuano' },
-    { value: 'Chichewa', label: 'Chichewa' },
-    { value: 'Chinese (Simplified)', label: '简体中文' },
-    { value: 'Chinese (Traditional)', label: '繁體中文' },
-    { value: 'Corsican', label: 'Corsu' },
-    { value: 'Croatian', label: 'Hrvatski' },
-    { value: 'Czech', label: 'Čeština' },
-    { value: 'Danish', label: 'Dansk' },
-    { value: 'Dutch', label: 'Nederlands' },
-    { value: 'English', label: 'English' },
-    { value: 'Esperanto', label: 'Esperanto' },
-    { value: 'Estonian', label: 'Eesti' },
-    { value: 'Filipino', label: 'Filipino' },
-    { value: 'Finnish', label: 'Suomi' },
-    { value: 'French', label: 'Français' },
-    { value: 'Frisian', label: 'Frysk' },
-    { value: 'Galician', label: 'Galego' },
-    { value: 'Georgian', label: 'ქართული' },
-    { value: 'German', label: 'Deutsch' },
-    { value: 'Greek', label: 'Ελληνικά' },
-    { value: 'Gujarati', label: 'ગુજરાતી' },
-    { value: 'Haitian Creole', label: 'Kreyòl Ayisyen' },
-    { value: 'Hausa', label: 'Hausa' },
-    { value: 'Hawaiian', label: 'ʻŌlelo Hawaiʻi' },
-    { value: 'Hebrew', label: 'עברית' },
-    { value: 'Hindi', label: 'हिन्दी' },
-    { value: 'Hmong', label: 'Hmong' },
-    { value: 'Hungarian', label: 'Magyar' },
-    { value: 'Icelandic', label: 'Íslenska' },
-    { value: 'Igbo', label: 'Igbo' },
-    { value: 'Indonesian', label: 'Bahasa Indonesia' },
-    { value: 'Irish', label: 'Gaeilge' },
-    { value: 'Italian', label: 'Italiano' },
-    { value: 'Japanese', label: '日本語' },
-    { value: 'Javanese', label: 'Basa Jawa' },
-    { value: 'Kannada', label: 'ಕನ್ನಡ' },
-    { value: 'Kazakh', label: 'Қазақ тілі' },
-    { value: 'Khmer', label: 'ខ្មែរ' },
-    { value: 'Kinyarwanda', label: 'Kinyarwanda' },
-    { value: 'Korean', label: '한국어' },
-    { value: 'Kurdish (Kurmanji)', label: 'Kurdî (Kurmancî)' },
-    { value: 'Kyrgyz', label: 'Кыргызча' },
-    { value: 'Lao', label: 'ລາວ' },
-    { value: 'Latin', label: 'Latina' },
-    { value: 'Latvian', label: 'Latviešu' },
-    { value: 'Lithuanian', label: 'Lietuvių' },
-    { value: 'Luxembourgish', label: 'Lëtzebuergesch' },
-    { value: 'Macedonian', label: 'Македонски' },
-    { value: 'Malagasy', label: 'Malagasy' },
-    { value: 'Malay', label: 'Bahasa Melayu' },
-    { value: 'Malayalam', label: 'മലയാളം' },
-    { value: 'Maltese', label: 'Malti' },
-    { value: 'Maori', label: 'Māori' },
-    { value: 'Marathi', label: 'मराठी' },
-    { value: 'Mongolian', label: 'Монгол' },
-    { value: 'Myanmar (Burmese)', label: 'ဗမာစာ' },
-    { value: 'Nepali', label: 'नेपाली' },
-    { value: 'Norwegian', label: 'Norsk' },
-    { value: 'Odia (Oriya)', label: 'ଓଡ଼ିଆ' },
-    { value: 'Pashto', label: 'پښتو' },
-    { value: 'Persian', label: 'فارسی' },
-    { value: 'Polish', label: 'Polski' },
-    { value: 'Portuguese', label: 'Português' },
-    { value: 'Punjabi', label: 'ਪੰਜਾਬੀ' },
-    { value: 'Romanian', label: 'Română' },
-    { value: 'Russian', label: 'Русский' },
-    { value: 'Samoan', label: 'Samoan' },
-    { value: 'Scots Gaelic', label: 'Gàidhlig' },
-    { value: 'Serbian', label: 'Српски' },
-    { value: 'Sesotho', label: 'Sesotho' },
-    { value: 'Shona', label: 'Shona' },
-    { value: 'Sindhi', label: 'سنڌي' },
-    { value: 'Sinhala', label: 'සිංහල' },
-    { value: 'Slovak', label: 'Slovenčina' },
-    { value: 'Slovenian', label: 'Slovenščina' },
-    { value: 'Somali', label: 'Soomaali' },
-    { value: 'Spanish', label: 'Español' },
-    { value: 'Sundanese', label: 'Basa Sunda' },
-    { value: 'Swahili', label: 'Kiswahili' },
-    { value: 'Swedish', label: 'Svenska' },
-    { value: 'Tajik', label: 'Тоҷикӣ' },
-    { value: 'Tamil', label: 'தமிழ்' },
-    { value: 'Tatar', label: 'Татар' },
-    { value: 'Telugu', label: 'తెలుగు' },
-    { value: 'Thai', label: 'ไทย' },
-    { value: 'Turkish', label: 'Türkçe' },
-    { value: 'Turkmen', label: 'Türkmençe' },
-    { value: 'Ukrainian', label: 'Українська' },
-    { value: 'Urdu', label: 'اردو' },
-    { value: 'Uyghur', label: 'ئۇيغۇرچە' },
-    { value: 'Uzbek', label: 'Oʻzbekcha' },
-    { value: 'Vietnamese', label: 'Tiếng Việt' },
-    { value: 'Welsh', label: 'Cymraeg' },
-    { value: 'Xhosa', label: 'isiXhosa' },
-    { value: 'Yiddish', label: 'ייִדיש' },
-    { value: 'Yoruba', label: 'Yorùbá' },
-    { value: 'Zulu', label: 'isiZulu' }
-];
-
-function TranslateSubmitButton() {
-    const { pending } = useFormStatus();
-    return (
-        <Button type="submit" disabled={pending}>
-            {pending ? (
-                <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Translating...
-                </>
-            ) : (
-                <>
-                    <Languages className="mr-2 h-4 w-4" />
-                    Translate
-                </>
-            )}
-        </Button>
-    )
-}
-
-const TranslatedContent = ({ title, content }: {title: string, content?: string}) => {
-    if (!content) return null;
-    return (
-        <div className="space-y-1 text-sm">
-            <h4 className="font-semibold">{title}</h4>
-            <p className="text-muted-foreground">{content}</p>
-        </div>
-    )
-}
-
-const OriginalContent = ({ title, content }: {title: string, content?: string}) => {
-    if (!content) return null;
-    return (
-        <div className="space-y-1 text-sm">
-            <h4 className="font-semibold">{title}</h4>
-            <p className="text-muted-foreground">{content}</p>
-        </div>
-    )
-}
-
-
-const TranslateDialog = ({ photo }: { photo: Photo }) => {
-    const initialState: TranslationState = {};
-    const [state, dispatch] = useActionState(handleTranslatePost, initialState);
-
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
-                    <Languages className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
-                <DialogHeader>
-                    <DialogTitle>Translate Post</DialogTitle>
-                    <DialogDescription>
-                        Select a language to translate the entire post.
-                    </DialogDescription>
-                </DialogHeader>
-                <ScrollArea className="pr-6 -mr-6">
-                    <form action={dispatch} className="space-y-4 pt-4">
-                        <input type="hidden" name="caption" value={photo.caption} />
-                        {photo.transportDetails && <input type="hidden" name="transportDetails" value={photo.transportDetails} />}
-                        {photo.foodDetails && <input type="hidden" name="foodDetails" value={photo.foodDetails} />}
-                        
-                        <div className="space-y-4 p-4 border rounded-md bg-muted">
-                            <h3 className='font-semibold text-sm'>Original Text</h3>
-                            <OriginalContent title="Caption" content={photo.caption} />
-                            <OriginalContent title="Transport Details" content={photo.transportDetails} />
-                            <OriginalContent title="Food Details" content={photo.foodDetails} />
-                        </div>
-                        
-                        <div className="space-y-2">
-                            <Label htmlFor="target-language">Translate to:</Label>
-                            <Select name="targetLanguage" required>
-                                <SelectTrigger id="target-language">
-                                    <SelectValue placeholder="Select a language" />
-                                </SelectTrigger>
-                                <SelectContent position="popper" className="max-h-60">
-                                    {languages.map((lang) => (
-                                        <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        
-                        {(state.translatedCaption || state.error) && (
-                             <div className="space-y-4 p-4 border rounded-md bg-accent/10">
-                                <h3 className='font-semibold text-sm text-primary'>Translated Text</h3>
-                                <TranslatedContent title="Caption" content={state.translatedCaption} />
-                                <TranslatedContent title="Transport Details" content={state.translatedTransportDetails} />
-                                <TranslatedContent title="Food Details" content={state.translatedFoodDetails} />
-                                 {state.error && (
-                                    <p className="text-sm font-medium text-destructive">{state.error}</p>
-                                )}
-                            </div>
-                        )}
-
-                        <DialogFooter className="sticky bottom-0 bg-background pt-4 pb-2">
-                            <DialogClose asChild>
-                            <Button type="button" variant="outline">Close</Button>
-                            </DialogClose>
-                            <TranslateSubmitButton />
-                        </DialogFooter>
-                    </form>
-                </ScrollArea>
-            </DialogContent>
-        </Dialog>
-    )
-}
-
-const StarRatingDisplay = ({ rating }: { rating: number }) => (
-  <div className="flex items-center gap-0.5">
-    {[...Array(5)].map((_, i) => (
-      <Star
-        key={i}
-        className={cn(
-          'h-4 w-4',
-          i < rating ? 'text-accent fill-accent' : 'text-gray-300'
-        )}
-      />
-    ))}
-  </div>
-);
-
-const CostDisplay = ({ cost, currency }: { cost?: number; currency?: string }) => {
-    if (cost === undefined || !currency) {
-        return null;
-    }
-    return (
-        <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium bg-muted px-2 py-1 rounded-md">
-            <Wallet className="h-4 w-4 text-accent" />
-            <span>~{currency} {cost.toLocaleString()} per person</span>
-        </div>
-    )
-};
 
 const CommentsDialog = ({
   photo,
@@ -405,12 +149,84 @@ const CommentsDialog = ({
   );
 };
 
+const StarRatingDisplay = ({ rating }: { rating: number }) => (
+    <div className="flex items-center gap-0.5">
+        {[...Array(5)].map((_, i) => (
+            <Star
+                key={i}
+                className={cn(
+                    'h-4 w-4',
+                    i < rating ? 'text-accent fill-accent' : 'text-gray-300'
+                )}
+            />
+        ))}
+    </div>
+);
 
-export function PhotoCard({ photo, user }: PhotoCardProps) {
+const CostDisplay = ({ cost, currency }: { cost?: number; currency?: string }) => {
+    if (cost === undefined || !currency) {
+        return null;
+    }
+    return (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium bg-muted px-2 py-1 rounded-md">
+            <Wallet className="h-4 w-4 text-accent" />
+            <span>~{currency} {cost.toLocaleString()} per person</span>
+        </div>
+    )
+};
+
+
+export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
   const hasDetails = photo.transportDetails || photo.foodDetails;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(photo.likes);
-  const [commentCount, setCommentCount] = useState(photo.comments.length);
+  const { toast } = useToast();
+
+  const [isTranslated, setIsTranslated] = useState(false);
+  const [translation, setTranslation] = useState<TranslationState | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  const onTranslate = async () => {
+    if (isTranslated) {
+      setIsTranslated(false);
+      return;
+    }
+
+    startTransition(async () => {
+      // Get user's browser language
+      const targetLanguage = navigator.language.split('-')[0];
+
+      const rating = photo.foodRating && photo.transportRating ? (photo.foodRating + photo.transportRating)/2 : (photo.foodRating || photo.transportRating);
+
+      const result = await handleTranslatePost({
+        caption: photo.caption,
+        transportDetails: photo.transportDetails,
+        foodDetails: photo.foodDetails,
+        targetLanguage,
+        photoUrl: photo.imageUrl,
+        rating,
+        transportCost: photo.transportCost,
+        foodCost: photo.foodCost,
+        currency: photo.currency,
+      });
+
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Translation Failed',
+          description: result.error,
+        });
+        return;
+      }
+      setTranslation(result);
+      setIsTranslated(true);
+    });
+  };
+
+  const caption = isTranslated ? translation?.translatedCaption : photo.caption;
+  const transportDetails = isTranslated ? translation?.translatedTransportDetails : photo.transportDetails;
+  const foodDetails = isTranslated ? translation?.translatedFoodDetails : photo.foodDetails;
+
 
   const handleLikeClick = () => {
     setIsLiked(!isLiked);
@@ -474,14 +290,22 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
           </DialogContent>
         </Dialog>
       </CardContent>
-      <div className="p-4 space-y-2">
-        <p className="text-sm">{photo.caption}</p>
+      <div className="p-4 space-y-3">
+        <p className="text-sm">{caption}</p>
+        <Button onClick={onTranslate} variant="link" size="sm" className="p-0 h-auto text-xs text-muted-foreground" disabled={isPending}>
+            {isPending 
+                ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Translating...</>
+                : isTranslated 
+                ? 'See Original' 
+                : 'Translate'
+            }
+        </Button>
       </div>
 
       {hasDetails && (
         <div className="px-4 pb-2">
           <Accordion type="multiple" className="w-full">
-            {photo.transportDetails && (
+            {transportDetails && (
               <AccordionItem value="transport">
                 <AccordionTrigger className="text-sm font-semibold hover:no-underline">
                   <div className="flex items-center gap-2">
@@ -493,12 +317,12 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
-                  <p>{photo.transportDetails}</p>
+                  <p>{transportDetails}</p>
                   <CostDisplay cost={photo.transportCost} currency={photo.currency} />
                 </AccordionContent>
               </AccordionItem>
             )}
-            {photo.foodDetails && (
+            {foodDetails && (
               <AccordionItem value="food">
                 <AccordionTrigger className="text-sm font-semibold hover:no-underline">
                   <div className="flex items-center gap-2">
@@ -510,7 +334,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
-                  <p>{photo.foodDetails}</p>
+                  <p>{foodDetails}</p>
                    <CostDisplay cost={photo.foodCost} currency={photo.currency} />
                 </AccordionContent>
               </AccordionItem>
@@ -528,12 +352,12 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
           <CommentsDialog photo={photo}>
             <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
               <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
-              <span>{commentCount.toLocaleString()}</span>
+              <span>{photo.comments.length.toLocaleString()}</span>
             </Button>
           </CommentsDialog>
         </div>
          <div className="flex items-center ml-auto">
-            <TranslateDialog photo={photo} />
+            {/* The old translate dialog is removed */}
         </div>
       </CardFooter>
     </Card>

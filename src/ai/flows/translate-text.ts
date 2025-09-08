@@ -6,7 +6,7 @@
  *
  * - translatePost - A function that handles the text translation process for a post.
  * - TranslatePostInput - The input type for the translatePost function.
- * - TranslatePostOutput - The return type for the translatePost function.
+ * - TranslatePostOutput - The return type for the translate-post function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -27,6 +27,14 @@ const TranslatePostInputSchema = z.object({
     .string()
     .optional()
     .describe('The food details to be translated.'),
+  photoUrl: z.string().url().describe("The public URL of the post's photo."),
+  rating: z
+    .number()
+    .optional()
+    .describe('An aggregate rating for the post (e.g., average of food and transport).'),
+  transportCost: z.number().optional().describe('The cost of transport.'),
+  foodCost: z.number().optional().describe('The cost of food.'),
+  currency: z.string().optional().describe('The currency for the costs (e.g., USD, EUR).'),
 });
 export type TranslatePostInput = z.infer<typeof TranslatePostInputSchema>;
 
@@ -53,20 +61,30 @@ const prompt = ai.definePrompt({
   name: 'translateTextPrompt',
   input: {schema: TranslatePostInputSchema},
   output: {schema: TranslatePostOutputSchema},
-  prompt: `Translate the following JSON object's text values into {{targetLanguage}}.
-Return a JSON object with the translated text. The keys for the translated fields must be "translatedCaption", "translatedTransportDetails", and "translatedFoodDetails".
-If a field is not provided in the input, do not include it in the output.
+  prompt: `You are a helpful translation assistant for a travel social media app. Your task is to translate the user's post content into {{targetLanguage}}.
 
-Input:
-{
-  "caption": "{{{caption}}}",
-  {{#if transportDetails}}
-  "transportDetails": "{{{transportDetails}}}",
-  {{/if}}
-  {{#if foodDetails}}
-  "foodDetails": "{{{foodDetails}}}"
-  {{/if}}
-}
+Use the provided context to make the translation more natural and accurate. The context includes a photo, user ratings, and costs. For example, if the photo is of a beach, use a more relaxed and descriptive tone. If costs are mentioned, ensure they are formatted correctly and are understandable in the target language and culture.
+
+**Context:**
+- **Photo:** A photo is available at the following URL. Analyze it for context (location, mood, objects). {{media url=photoUrl}}
+- **Overall Rating:** {{rating}}/5
+- **Currency for costs:** {{currency}}
+
+**Text to Translate:**
+
+- **Caption:** "{{{caption}}}"
+{{#if transportDetails}}
+- **Transport Details:** "{{{transportDetails}}}"
+  - **Transport Cost:** {{transportCost}}
+{{/if}}
+{{#if foodDetails}}
+- **Food Details:** "{{{foodDetails}}}"
+  - **Food Cost:** {{foodCost}}
+{{/if}}
+
+Please provide a JSON object with the translated text. The keys must be "translatedCaption", "translatedTransportDetails", and "translatedFoodDetails".
+Translate the text naturally, as a native speaker would write it for a social media post. Do not translate the keys of the JSON object.
+If a text field (like transportDetails) is not provided in the input, do not include its corresponding key in the output.
 
 Respond with only the translated JSON object.`,
 });
