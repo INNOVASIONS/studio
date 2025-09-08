@@ -8,6 +8,7 @@ import {
   imageBasedLocationFinder,
   ImageBasedLocationFinderInput,
 } from '@/ai/flows/image-based-location-finder';
+import { translateText, TranslateTextInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { addPhoto, getCurrentUser } from './mock-data';
@@ -114,4 +115,30 @@ export async function handleCreatePost(
   revalidatePath('/');
   revalidatePath('/profile');
   return { message: 'Post created successfully', success: true };
+}
+
+export type TranslationState = {
+    translatedText?: string;
+    error?: string;
+};
+
+export async function handleTranslateCaption(
+    prevState: TranslationState,
+    formData: FormData
+): Promise<TranslationState> {
+    const text = formData.get('text') as string;
+    const targetLanguage = formData.get('targetLanguage') as string;
+
+    if (!text || !targetLanguage) {
+        return { error: 'Text and target language are required.' };
+    }
+
+    try {
+        const input: TranslateTextInput = { text, targetLanguage };
+        const result = await translateText(input);
+        return { translatedText: result.translatedText };
+    } catch (e: any) {
+        console.error(e);
+        return { error: e.message || 'Failed to translate text.' };
+    }
 }

@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useActionState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -15,6 +15,8 @@ import {
   Wallet,
   Expand,
   Send,
+  Languages,
+  Loader2,
 } from 'lucide-react';
 import type { Photo, User, Comment } from '@/lib/types';
 import {
@@ -39,16 +41,111 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogDescription,
+  DialogClose,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { getCurrentUser } from '@/lib/mock-data';
 import { ScrollArea } from '../ui/scroll-area';
 import { Input } from '../ui/input';
+import { useFormStatus } from 'react-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Label } from '../ui/label';
+import { TranslationState, handleTranslateCaption } from '@/lib/actions';
 
 type PhotoCardProps = {
   photo: Photo;
   user: User;
 };
+
+const languages = [
+    { value: 'English', label: 'English' },
+    { value: 'Spanish', label: 'Español' },
+    { value: 'French', label: 'Français' },
+    { value: 'German', label: 'Deutsch' },
+    { value: 'Japanese', label: '日本語' },
+    { value: 'Chinese (Simplified)', label: '简体中文' },
+    { value: 'Hindi', label: 'हिन्दी' },
+    { value: 'Arabic', label: 'العربية' },
+    { value: 'Russian', label: 'Русский' },
+    { value: 'Portuguese', label: 'Português' },
+];
+
+function TranslateSubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button type="submit" disabled={pending}>
+            {pending ? (
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Translating...
+                </>
+            ) : (
+                <>
+                    <Languages className="mr-2 h-4 w-4" />
+                    Translate
+                </>
+            )}
+        </Button>
+    )
+}
+
+const TranslateDialog = ({ caption }: { caption: string }) => {
+    const initialState: TranslationState = {};
+    const [state, dispatch] = useActionState(handleTranslateCaption, initialState);
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
+                    <Languages className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Translate Caption</DialogTitle>
+                    <DialogDescription>
+                        Select a language to translate the post caption.
+                    </DialogDescription>
+                </DialogHeader>
+                <form action={dispatch} className="space-y-4">
+                    <input type="hidden" name="text" value={caption} />
+                    <div className="p-4 border rounded-md bg-muted text-muted-foreground text-sm">
+                        <p className="font-semibold mb-2">Original Caption:</p>
+                        {caption}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="target-language">Translate to:</Label>
+                        <Select name="targetLanguage" required>
+                            <SelectTrigger id="target-language">
+                                <SelectValue placeholder="Select a language" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {languages.map((lang) => (
+                                    <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    {state.translatedText && (
+                        <div className="p-4 border rounded-md bg-accent/10 text-primary text-sm">
+                            <p className="font-semibold mb-2">Translated Text:</p>
+                            {state.translatedText}
+                        </div>
+                    )}
+                    {state.error && (
+                        <p className="text-sm font-medium text-destructive">{state.error}</p>
+                    )}
+                    <DialogFooter>
+                        <DialogClose asChild>
+                           <Button type="button" variant="outline">Close</Button>
+                        </DialogClose>
+                        <TranslateSubmitButton />
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 const StarRatingDisplay = ({ rating }: { rating: number }) => (
   <div className="flex items-center gap-0.5">
@@ -307,6 +404,9 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
               <span>{comments.length.toLocaleString()}</span>
             </Button>
           </CommentsDialog>
+        </div>
+         <div className="flex items-center ml-auto">
+            <TranslateDialog caption={photo.caption} />
         </div>
       </CardFooter>
     </Card>
