@@ -15,6 +15,7 @@ import {
   Expand,
   Send,
   Loader2,
+  Languages,
 } from 'lucide-react';
 import type { Photo, User, Comment } from '@/lib/types';
 import {
@@ -289,14 +290,6 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
       </CardContent>
       <div className="p-4 space-y-2">
         <p className="text-sm">{caption}</p>
-        <Button onClick={onTranslate} variant="link" size="sm" className="p-0 h-auto text-xs text-muted-foreground" disabled={isPending}>
-            {isPending 
-                ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Translating...</>
-                : isTranslated 
-                ? 'See Original' 
-                : 'Translate'
-            }
-        </Button>
       </div>
 
       {hasDetails && (
@@ -340,7 +333,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
         </div>
       )}
 
-      <CardFooter className="p-4 border-t">
+      <CardFooter className="p-4 border-t flex justify-between items-center">
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <Button variant="ghost" size="sm" className="flex items-center gap-2 group" onClick={handleLikeClick}>
             <Heart className={cn("h-5 w-5 text-accent transition-all group-hover:scale-110", isLiked && "fill-accent")} />
@@ -353,6 +346,21 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
             </Button>
           </CommentsDialog>
         </div>
+         <Button onClick={onTranslate} variant="ghost" size="sm" className="text-muted-foreground" disabled={isPending}>
+            {isPending ? (
+                <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Translating...
+                </>
+            ) : isTranslated ? (
+                'See Original'
+            ) : (
+                <>
+                    <Languages className="h-4 w-4 mr-2" />
+                    Translate
+                </>
+            )}
+        </Button>
       </CardFooter>
     </Card>
   );
