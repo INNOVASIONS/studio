@@ -155,6 +155,7 @@ export function LanguageDialog({
   const handleTranslate = () => {
     if (selectedLanguage) {
       onSelectLanguage(selectedLanguage);
+      onOpenChange(false);
     }
   };
   
@@ -168,7 +169,7 @@ export function LanguageDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[80vh] flex flex-col">
+      <DialogContent className="max-h-[80vh] grid grid-rows-[auto_auto_1fr_auto]">
         <DialogHeader>
           <DialogTitle>Translate Post</DialogTitle>
           <DialogDescription>
@@ -184,9 +185,9 @@ export function LanguageDialog({
               className="pl-9"
           />
         </div>
-        <div className="flex-1 min-h-0">
-          <ScrollArea className="h-full">
-            <div className="px-1 py-2 space-y-1">
+        <div className="min-h-0">
+          <ScrollArea className="h-full pr-6 -mr-6">
+            <div className="py-2 space-y-1">
               {filteredLanguages.map(lang => (
                 <Button
                   key={lang.value}
@@ -206,7 +207,7 @@ export function LanguageDialog({
             </div>
           </ScrollArea>
         </div>
-        <DialogFooter className="mt-auto pt-4 border-t">
+        <DialogFooter className="pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
