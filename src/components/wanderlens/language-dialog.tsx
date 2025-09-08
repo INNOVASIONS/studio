@@ -184,27 +184,29 @@ export function LanguageDialog({
               className="pl-9"
           />
         </div>
-        <ScrollArea className="flex-1 -mx-6">
-          <div className="px-6 py-2 space-y-1">
-            {filteredLanguages.map(lang => (
-              <Button
-                key={lang.value}
-                variant={selectedLanguage === lang.value ? "secondary" : "ghost"}
-                className="w-full justify-start"
-                onClick={() => setSelectedLanguage(lang.value)}
-              >
-                {selectedLanguage === lang.value && <Check className="h-4 w-4 mr-2" />}
-                {lang.label}
-              </Button>
-            ))}
-             {filteredLanguages.length === 0 && (
-                <p className="text-center text-sm text-muted-foreground py-4">
-                    No languages found for "{searchTerm}".
-                </p>
-             )}
-          </div>
-        </ScrollArea>
-        <DialogFooter className="mt-auto">
+        <div className="flex-1 relative -mx-6">
+          <ScrollArea className="absolute h-full w-full">
+            <div className="px-6 py-2 space-y-1">
+              {filteredLanguages.map(lang => (
+                <Button
+                  key={lang.value}
+                  variant={selectedLanguage === lang.value ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  onClick={() => setSelectedLanguage(lang.value)}
+                >
+                  {selectedLanguage === lang.value && <Check className="h-4 w-4 mr-2" />}
+                  {lang.label}
+                </Button>
+              ))}
+              {filteredLanguages.length === 0 && (
+                  <p className="text-center text-sm text-muted-foreground py-4">
+                      No languages found for "{searchTerm}".
+                  </p>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+        <DialogFooter className="mt-auto pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
