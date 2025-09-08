@@ -14,7 +14,6 @@ import {
   Wallet,
   Expand,
   Send,
-  Languages,
   Loader2,
 } from 'lucide-react';
 import type { Photo, User, Comment } from '@/lib/types';
