@@ -192,16 +192,15 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
     }
 
     startTransition(async () => {
-      // Get user's browser language
-      const targetLanguage = navigator.language.split('-')[0];
+      const targetLanguage = navigator.language.split('-')[0] || 'en';
 
       const rating = photo.foodRating && photo.transportRating ? (photo.foodRating + photo.transportRating)/2 : (photo.foodRating || photo.transportRating);
 
       const result = await handleTranslatePost({
+        targetLanguage,
         caption: photo.caption,
         transportDetails: photo.transportDetails,
         foodDetails: photo.foodDetails,
-        targetLanguage,
         photoUrl: photo.imageUrl,
         rating,
         transportCost: photo.transportCost,

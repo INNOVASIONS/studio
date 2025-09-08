@@ -145,8 +145,8 @@ export async function handleTranslatePost(
   } catch (e: any) {
     console.error(e);
     // Provide a more user-friendly error message
-    if (e.message.includes('FETCH_ERROR')) {
-      return { error: 'Could not retrieve the image for translation. Please try again later.' };
+    if (e.message.includes('FETCH_ERROR') || e.message.includes('permission')) {
+      return { error: 'Could not retrieve the image for translation context. Please try again later.' };
     }
     return { error: e.message || 'An unexpected error occurred during translation.' };
   }
