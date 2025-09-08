@@ -237,8 +237,12 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
 
             <div className="space-y-4 border-t pt-4">
                 <div className="flex justify-between items-center">
-                    <Label htmlFor="foodDetails">Food Details (Optional)</Label>
+                    <Label>Food Details (Optional)</Label>
                     <StarRating rating={foodRating} setRating={setFoodRating} />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="restaurantName">Restaurant Name</Label>
+                    <Input id="restaurantName" name="restaurantName" placeholder="e.g., 'The Gilded Spoon'" />
                 </div>
                 <Textarea
                     id="foodDetails"
@@ -257,10 +261,14 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
                     <Switch id="hotel-switch" checked={showHotelDetails} onCheckedChange={setShowHotelDetails} />
                 </div>
                {showHotelDetails && (
-                 <>
+                 <div className='space-y-4'>
                     <div className="flex justify-between items-center">
-                        <Label htmlFor="hotelDetails">Hotel Details</Label>
+                        <Label>Hotel Details</Label>
                         <StarRating rating={hotelRating} setRating={setHotelRating} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="hotelName">Hotel Name</Label>
+                        <Input id="hotelName" name="hotelName" placeholder="e.g., 'The Grand Palace'" />
                     </div>
                     <Textarea
                         id="hotelDetails"
@@ -271,7 +279,7 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
                         <Label htmlFor="hotelCost">Hotel Cost (per night)</Label>
                         <Input id="hotelCost" name="hotelCost" type="number" step="0.01" placeholder="e.g., 150.00" />
                     </div>
-                 </>
+                 </div>
                )}
             </div>
 

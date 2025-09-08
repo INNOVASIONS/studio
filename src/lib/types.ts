@@ -38,6 +38,8 @@ export type Photo = {
   foodCost?: number;
   hotelCost?: number;
   currency?: string;
+  restaurantName?: string;
+  hotelName?: string;
 };
 
 export type UserPlace = {

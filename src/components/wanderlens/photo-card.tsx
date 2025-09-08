@@ -17,6 +17,7 @@ import {
   Loader2,
   Languages,
   Bed,
+  Building,
 } from 'lucide-react';
 import type { Photo, User, Comment } from '@/lib/types';
 import {
@@ -201,6 +202,8 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
         transportDetails: photo.transportDetails,
         foodDetails: photo.foodDetails,
         hotelDetails: photo.hotelDetails,
+        restaurantName: photo.restaurantName,
+        hotelName: photo.hotelName,
         photoUrl: photo.imageUrl,
         rating,
         transportCost: photo.transportCost,
@@ -219,6 +222,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
       }
       setTranslation(result);
       setIsTranslated(true);
+      setLangDialogVisible(false);
     });
   };
 
@@ -353,6 +357,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
+                   {photo.restaurantName && <p className='font-semibold text-foreground flex items-center gap-2'><Building className='h-4 w-4'/>{photo.restaurantName}</p>}
                   <p>{foodDetails}</p>
                    <CostDisplay cost={photo.foodCost} currency={photo.currency} />
                 </AccordionContent>
@@ -370,6 +375,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
+                   {photo.hotelName && <p className='font-semibold text-foreground flex items-center gap-2'><Building className='h-4 w-4'/>{photo.hotelName}</p>}
                   <p>{hotelDetails}</p>
                    <CostDisplay cost={photo.hotelCost} currency={photo.currency} />
                 </AccordionContent>

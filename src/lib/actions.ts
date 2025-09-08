@@ -86,6 +86,8 @@ export async function handleCreatePost(
   const transportDetails = formData.get('transportDetails') as string | undefined;
   const foodDetails = formData.get('foodDetails') as string | undefined;
   const hotelDetails = formData.get('hotelDetails') as string | undefined;
+  const restaurantName = formData.get('restaurantName') as string | undefined;
+  const hotelName = formData.get('hotelName') as string | undefined;
   const transportRating = parseInt(formData.get('transportRating') as string, 10) || undefined;
   const foodRating = parseInt(formData.get('foodRating') as string, 10) || undefined;
   const hotelRating = parseInt(formData.get('hotelRating') as string, 10) || undefined;
@@ -107,6 +109,8 @@ export async function handleCreatePost(
       transportDetails,
       foodDetails,
       hotelDetails,
+      restaurantName,
+      hotelName,
       transportRating,
       foodRating,
       hotelRating,
