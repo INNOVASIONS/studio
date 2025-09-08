@@ -237,6 +237,24 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
     }
   };
 
+  const TranslateButton = () => (
+     <Button onClick={handleTranslateClick} variant="ghost" size="sm" className="text-muted-foreground" disabled={isPending}>
+        {isPending ? (
+            <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Translating...
+            </>
+        ) : isTranslated ? (
+            'See Original'
+        ) : (
+            <>
+                <Languages className="h-4 w-4 mr-2" />
+                Translate
+            </>
+        )}
+    </Button>
+  )
+
   return (
     <Card className="w-full max-w-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
       <CardHeader className="flex flex-row items-center gap-3 p-4">
@@ -352,28 +370,19 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
             </Button>
           </CommentsDialog>
         </div>
-        <LanguageDialog 
-          open={isLangDialogVisible} 
+        
+        <LanguageDialog
+          open={isLangDialogVisible}
           onOpenChange={setLangDialogVisible}
           onSelectLanguage={onTranslate}
           isPending={isPending}
         >
-          <Button onClick={handleTranslateClick} variant="ghost" size="sm" className="text-muted-foreground" disabled={isPending}>
-              {isPending ? (
-                  <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Translating...
-                  </>
-              ) : isTranslated ? (
-                  'See Original'
-              ) : (
-                  <>
-                      <Languages className="h-4 w-4 mr-2" />
-                      Translate
-                  </>
-              )}
-          </Button>
+          {/* The trigger is now handled by the TranslateButton's onClick */}
+          <div />
         </LanguageDialog>
+
+        <TranslateButton />
+
       </CardFooter>
     </Card>
   );
