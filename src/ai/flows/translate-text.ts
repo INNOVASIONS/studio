@@ -39,6 +39,10 @@ const TranslatePostInputSchema = z.object({
     .string()
     .optional()
     .describe('The name of the hotel, if any.'),
+  transportName: z
+    .string()
+    .optional()
+    .describe('The name or number of the transport, if any (e.g., "Bus 7H").'),
   photoUrl: z.string().url().describe("The public URL of the post's photo."),
   rating: z
     .number()
@@ -92,6 +96,7 @@ Use the provided context to make the translation more natural and accurate. The 
 - **Caption:** "{{{caption}}}"
 {{#if transportDetails}}
 - **Transport Details:** "{{{transportDetails}}}"
+  {{#if transportName}}- **Transport Name/Number:** "{{{transportName}}}"{{/if}}
   - **Transport Cost:** {{transportCost}}
 {{/if}}
 {{#if foodDetails}}

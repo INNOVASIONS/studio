@@ -221,8 +221,12 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
 
             <div className="space-y-4 border-t pt-4">
                 <div className="flex justify-between items-center">
-                    <Label htmlFor="transportDetails">Transport Details (Optional)</Label>
+                    <Label>Transport Details (Optional)</Label>
                     <StarRating rating={transportRating} setRating={setTransportRating} />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="transportName">Transport Name/Number</Label>
+                    <Input id="transportName" name="transportName" placeholder="e.g., 'Bus 7H', 'Metro Line 2'" />
                 </div>
                 <Textarea
                     id="transportDetails"

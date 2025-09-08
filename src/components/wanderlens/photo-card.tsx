@@ -210,6 +210,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
         foodCost: photo.foodCost,
         hotelCost: photo.hotelCost,
         currency: photo.currency,
+        transportName: photo.transportName,
       });
 
       if (result.error) {
@@ -340,6 +341,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
+                  {photo.transportName && <p className='font-semibold text-foreground flex items-center gap-2'><Car className='h-4 w-4'/>{photo.transportName}</p>}
                   <p>{transportDetails}</p>
                   <CostDisplay cost={photo.transportCost} currency={photo.currency} />
                 </AccordionContent>
