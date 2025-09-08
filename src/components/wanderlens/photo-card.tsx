@@ -289,7 +289,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
           </DialogContent>
         </Dialog>
       </CardContent>
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-2">
         <p className="text-sm">{caption}</p>
         <Button onClick={onTranslate} variant="link" size="sm" className="p-0 h-auto text-xs text-muted-foreground" disabled={isPending}>
             {isPending 
