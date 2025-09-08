@@ -47,6 +47,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Input } from '../ui/input';
 import { handleTranslatePost, TranslationState } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
+import { LanguageDialog } from './language-dialog';
 
 
 const CommentsDialog = ({
@@ -184,16 +185,12 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
   const [isTranslated, setIsTranslated] = useState(false);
   const [translation, setTranslation] = useState<TranslationState | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isLangDialogVisible, setLangDialogVisible] = useState(false);
 
-  const onTranslate = async () => {
-    if (isTranslated) {
-      setIsTranslated(false);
-      return;
-    }
+  const onTranslate = (targetLanguage: string) => {
+    if (!targetLanguage) return;
 
     startTransition(async () => {
-      const targetLanguage = navigator.language.split('-')[0] || 'en';
-
       const rating = photo.foodRating && photo.transportRating ? (photo.foodRating + photo.transportRating)/2 : (photo.foodRating || photo.transportRating);
 
       const result = await handleTranslatePost({
@@ -231,6 +228,15 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
   };
   
+  const handleTranslateClick = () => {
+    if (isTranslated) {
+      setIsTranslated(false);
+      setTranslation(null);
+    } else {
+      setLangDialogVisible(true);
+    }
+  };
+
   return (
     <Card className="w-full max-w-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
       <CardHeader className="flex flex-row items-center gap-3 p-4">
@@ -346,21 +352,28 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
             </Button>
           </CommentsDialog>
         </div>
-         <Button onClick={onTranslate} variant="ghost" size="sm" className="text-muted-foreground" disabled={isPending}>
-            {isPending ? (
-                <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Translating...
-                </>
-            ) : isTranslated ? (
-                'See Original'
-            ) : (
-                <>
-                    <Languages className="h-4 w-4 mr-2" />
-                    Translate
-                </>
-            )}
-        </Button>
+        <LanguageDialog 
+          open={isLangDialogVisible} 
+          onOpenChange={setLangDialogVisible}
+          onSelectLanguage={onTranslate}
+          isPending={isPending}
+        >
+          <Button onClick={handleTranslateClick} variant="ghost" size="sm" className="text-muted-foreground" disabled={isPending}>
+              {isPending ? (
+                  <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Translating...
+                  </>
+              ) : isTranslated ? (
+                  'See Original'
+              ) : (
+                  <>
+                      <Languages className="h-4 w-4 mr-2" />
+                      Translate
+                  </>
+              )}
+          </Button>
+        </LanguageDialog>
       </CardFooter>
     </Card>
   );
