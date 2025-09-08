@@ -11,9 +11,11 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Loader2, Languages, Search, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Languages, Search, Check } from 'lucide-react';
 import { Input } from '../ui/input';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { ScrollArea } from '../ui/scroll-area';
+import { cn } from '@/lib/utils';
+
 
 const supportedLanguages = [
     { value: 'Afrikaans', label: 'Afrikaans' },
@@ -128,7 +130,6 @@ const supportedLanguages = [
 ];
 
 type LanguageDialogProps = {
-  children: React.ReactNode;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectLanguage: (language: string) => void;
@@ -136,87 +137,80 @@ type LanguageDialogProps = {
 };
 
 export function LanguageDialog({
-  children,
   open,
   onOpenChange,
   onSelectLanguage,
   isPending,
 }: LanguageDialogProps) {
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [searchResult, setSearchResult] = React.useState<{value: string, label: string} | null | undefined>(null);
+  const [selectedLanguage, setSelectedLanguage] = React.useState<string | null>(null);
+
+  const filteredLanguages = React.useMemo(() => {
+    if (!searchTerm) return supportedLanguages;
+    return supportedLanguages.filter(lang => 
+      lang.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm]);
 
   const handleTranslate = () => {
-    if (searchResult && searchResult.value) {
-      onSelectLanguage(searchResult.value);
+    if (selectedLanguage) {
+      onSelectLanguage(selectedLanguage);
     }
-    // The dialog will be closed by the parent component after the action is dispatched.
   };
   
-  const handleSearch = () => {
-      if (!searchTerm.trim()) {
-          setSearchResult(null);
-          return;
-      }
-      const result = supportedLanguages.find(lang => lang.label.toLowerCase().includes(searchTerm.toLowerCase()));
-      setSearchResult(result);
-  }
-
   // Reset state when dialog opens/closes
   React.useEffect(() => {
     if (!open) {
       setSearchTerm('');
-      setSearchResult(null);
+      setSelectedLanguage(null);
     }
   }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {children}
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Translate Post</DialogTitle>
           <DialogDescription>
-            Search for a language and translate this post.
+            Search for a language or select one from the list below.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-4">
-          <div className="flex gap-2">
-            <Input
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
               placeholder="Search for a language..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <Button onClick={handleSearch} type="button" variant="outline" size="icon">
-                <Search className="h-4 w-4" />
-            </Button>
-          </div>
-          {searchResult === undefined && (
-            <Alert variant="destructive">
-                <XCircle className="h-4 w-4" />
-                <AlertTitle>Not Found</AlertTitle>
-                <AlertDescription>
-                    The language "{searchTerm}" was not found. Please try another search.
-                </AlertDescription>
-            </Alert>
-          )}
-          {searchResult && (
-             <Alert>
-                <CheckCircle className="h-4 w-4" />
-                <AlertTitle>Language Found</AlertTitle>
-                <AlertDescription>
-                    Selected language: <strong>{searchResult.label}</strong>. Click Translate to continue.
-                </AlertDescription>
-            </Alert>
-          )}
+              className="pl-9"
+          />
         </div>
-        <DialogFooter>
+        <ScrollArea className="flex-1 -mx-6">
+          <div className="px-6 py-2 space-y-1">
+            {filteredLanguages.map(lang => (
+              <Button
+                key={lang.value}
+                variant={selectedLanguage === lang.value ? "secondary" : "ghost"}
+                className="w-full justify-start"
+                onClick={() => setSelectedLanguage(lang.value)}
+              >
+                {selectedLanguage === lang.value && <Check className="h-4 w-4 mr-2" />}
+                {lang.label}
+              </Button>
+            ))}
+             {filteredLanguages.length === 0 && (
+                <p className="text-center text-sm text-muted-foreground py-4">
+                    No languages found for "{searchTerm}".
+                </p>
+             )}
+          </div>
+        </ScrollArea>
+        <DialogFooter className="mt-auto">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
             onClick={handleTranslate}
-            disabled={!searchResult || isPending}
+            disabled={!selectedLanguage || isPending}
           >
             {isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
