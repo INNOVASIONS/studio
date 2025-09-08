@@ -85,10 +85,13 @@ export async function handleCreatePost(
   const currency = formData.get('currency') as string | undefined;
   const transportDetails = formData.get('transportDetails') as string | undefined;
   const foodDetails = formData.get('foodDetails') as string | undefined;
+  const hotelDetails = formData.get('hotelDetails') as string | undefined;
   const transportRating = parseInt(formData.get('transportRating') as string, 10) || undefined;
   const foodRating = parseInt(formData.get('foodRating') as string, 10) || undefined;
+  const hotelRating = parseInt(formData.get('hotelRating') as string, 10) || undefined;
   const transportCost = parseFloat(formData.get('transportCost') as string) || undefined;
   const foodCost = parseFloat(formData.get('foodCost') as string) || undefined;
+  const hotelCost = parseFloat(formData.get('hotelCost') as string) || undefined;
   
   if (!photoDataUri || !caption || !location) {
     return { message: 'Photo, caption, and location are required.' };
@@ -103,10 +106,13 @@ export async function handleCreatePost(
       currency,
       transportDetails,
       foodDetails,
+      hotelDetails,
       transportRating,
       foodRating,
+      hotelRating,
       transportCost,
       foodCost,
+      hotelCost,
     });
   } catch (error) {
     console.error(error);
@@ -122,6 +128,7 @@ export type TranslationState = {
     translatedCaption?: string;
     translatedTransportDetails?: string;
     translatedFoodDetails?: string;
+    translatedHotelDetails?: string;
     error?: string;
 };
 
@@ -141,6 +148,7 @@ export async function handleTranslatePost(
       translatedCaption: result.translatedCaption,
       translatedTransportDetails: result.translatedTransportDetails,
       translatedFoodDetails: result.translatedFoodDetails,
+      translatedHotelDetails: result.translatedHotelDetails,
     };
   } catch (e: any)
 {

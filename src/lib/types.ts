@@ -30,10 +30,13 @@ export type Photo = {
   dataAiHint?: string;
   transportDetails?: string;
   foodDetails?: string;
+  hotelDetails?: string;
   transportRating?: number;
   foodRating?: number;
+  hotelRating?: number;
   transportCost?: number;
   foodCost?: number;
+  hotelCost?: number;
   currency?: string;
 };
 

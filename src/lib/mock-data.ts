@@ -48,6 +48,9 @@ let photos: Photo[] = [
     foodDetails: 'Packed our own sandwiches. Nothing beats a simple lunch with a view like this.',
     foodRating: 3,
     foodCost: 20,
+    hotelDetails: 'We camped at a nearby site. It was basic but had incredible star-gazing opportunities.',
+    hotelRating: 5,
+    hotelCost: 30,
     currency: 'USD',
   },
   {

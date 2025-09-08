@@ -27,6 +27,10 @@ const TranslatePostInputSchema = z.object({
     .string()
     .optional()
     .describe('The food details to be translated.'),
+  hotelDetails: z
+    .string()
+    .optional()
+    .describe('The hotel details to be translated.'),
   photoUrl: z.string().url().describe("The public URL of the post's photo."),
   rating: z
     .number()
@@ -34,6 +38,7 @@ const TranslatePostInputSchema = z.object({
     .describe('An aggregate rating for the post (e.g., average of food and transport).'),
   transportCost: z.number().optional().describe('The cost of transport.'),
   foodCost: z.number().optional().describe('The cost of food.'),
+  hotelCost: z.number().optional().describe('The cost of the hotel.'),
   currency: z.string().optional().describe('The currency for the costs (e.g., USD, EUR).'),
 });
 export type TranslatePostInput = z.infer<typeof TranslatePostInputSchema>;
@@ -48,6 +53,10 @@ const TranslatePostOutputSchema = z.object({
     .string()
     .optional()
     .describe('The translated food details.'),
+  translatedHotelDetails: z
+    .string()
+    .optional()
+    .describe('The translated hotel details.'),
 });
 export type TranslatePostOutput = z.infer<typeof TranslatePostOutputSchema>;
 
@@ -81,8 +90,13 @@ Use the provided context to make the translation more natural and accurate. The 
 - **Food Details:** "{{{foodDetails}}}"
   - **Food Cost:** {{foodCost}}
 {{/if}}
+{{#if hotelDetails}}
+- **Hotel Details:** "{{{hotelDetails}}}"
+  - **Hotel Cost:** {{hotelCost}}
+{{/if}}
 
-Please provide a JSON object with the translated text. The keys must be "translatedCaption", "translatedTransportDetails", and "translatedFoodDetails".
+
+Please provide a JSON object with the translated text. The keys must be "translatedCaption", "translatedTransportDetails", "translatedFoodDetails", and "translatedHotelDetails".
 Translate the text naturally, as a native speaker would write it for a social media post. Do not translate the keys of the JSON object.
 If a text field (like transportDetails) is not provided in the input, do not include its corresponding key in the output.
 

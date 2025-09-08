@@ -16,6 +16,7 @@ import {
   Send,
   Loader2,
   Languages,
+  Bed,
 } from 'lucide-react';
 import type { Photo, User, Comment } from '@/lib/types';
 import {
@@ -177,7 +178,7 @@ const CostDisplay = ({ cost, currency }: { cost?: number; currency?: string }) =
 
 
 export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
-  const hasDetails = photo.transportDetails || photo.foodDetails;
+  const hasDetails = photo.transportDetails || photo.foodDetails || photo.hotelDetails;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(photo.likes);
   const { toast } = useToast();
@@ -199,10 +200,12 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
         caption: photo.caption,
         transportDetails: photo.transportDetails,
         foodDetails: photo.foodDetails,
+        hotelDetails: photo.hotelDetails,
         photoUrl: photo.imageUrl,
         rating,
         transportCost: photo.transportCost,
         foodCost: photo.foodCost,
+        hotelCost: photo.hotelCost,
         currency: photo.currency,
       });
 
@@ -222,6 +225,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
   const caption = isTranslated ? translation?.translatedCaption : photo.caption;
   const transportDetails = isTranslated ? translation?.translatedTransportDetails : photo.transportDetails;
   const foodDetails = isTranslated ? translation?.translatedFoodDetails : photo.foodDetails;
+  const hotelDetails = isTranslated ? translation?.translatedHotelDetails : photo.hotelDetails;
 
 
   const handleLikeClick = () => {
@@ -354,6 +358,23 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
                 </AccordionContent>
               </AccordionItem>
             )}
+            {photo.hotelDetails && (
+              <AccordionItem value="hotel">
+                <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <Bed className="h-4 w-4 text-accent" />
+                    Hotel Details
+                    {photo.hotelRating && (
+                      <StarRatingDisplay rating={photo.hotelRating} />
+                    )}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground space-y-3">
+                  <p>{hotelDetails}</p>
+                   <CostDisplay cost={photo.hotelCost} currency={photo.currency} />
+                </AccordionContent>
+              </AccordionItem>
+            )}
           </Accordion>
         </div>
       )}
@@ -377,10 +398,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
           onOpenChange={setLangDialogVisible}
           onSelectLanguage={onTranslate}
           isPending={isPending}
-        >
-          {/* The trigger is now handled by the TranslateButton's onClick */}
-          <div />
-        </LanguageDialog>
+        />
 
         <TranslateButton />
 

@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '../ui/switch';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -105,7 +106,9 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
 
   const [transportRating, setTransportRating] = useState(0);
   const [foodRating, setFoodRating] = useState(0);
+  const [hotelRating, setHotelRating] = useState(0);
   const [currency, setCurrency] = useState('');
+  const [showHotelDetails, setShowHotelDetails] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -126,6 +129,8 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
       setPreview(null);
       setTransportRating(0);
       setFoodRating(0);
+      setHotelRating(0);
+      setShowHotelDetails(false);
       setCurrency('');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -150,6 +155,7 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
           <form action={dispatch} ref={formRef} className="space-y-4">
             <input type="hidden" name="transportRating" value={transportRating} />
             <input type="hidden" name="foodRating" value={foodRating} />
+            <input type="hidden" name="hotelRating" value={hotelRating} />
             <input type="hidden" name="currency" value={currency} />
 
             <div className="space-y-2">
@@ -243,6 +249,30 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
                     <Label htmlFor="foodCost">Food Cost (Optional)</Label>
                     <Input id="foodCost" name="foodCost" type="number" step="0.01" placeholder="e.g., 12.00" />
                 </div>
+            </div>
+
+            <div className="space-y-4 border-t pt-4">
+                <div className="flex justify-between items-center">
+                    <Label htmlFor="hotel-switch">Stayed in a hotel?</Label>
+                    <Switch id="hotel-switch" checked={showHotelDetails} onCheckedChange={setShowHotelDetails} />
+                </div>
+               {showHotelDetails && (
+                 <>
+                    <div className="flex justify-between items-center">
+                        <Label htmlFor="hotelDetails">Hotel Details</Label>
+                        <StarRating rating={hotelRating} setRating={setHotelRating} />
+                    </div>
+                    <Textarea
+                        id="hotelDetails"
+                        name="hotelDetails"
+                        placeholder="e.g., 'Amazing hotel with a great view and pool!'"
+                    />
+                    <div className="space-y-2">
+                        <Label htmlFor="hotelCost">Hotel Cost (per night)</Label>
+                        <Input id="hotelCost" name="hotelCost" type="number" step="0.01" placeholder="e.g., 150.00" />
+                    </div>
+                 </>
+               )}
             </div>
 
 
