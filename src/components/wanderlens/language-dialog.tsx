@@ -169,7 +169,7 @@ export function LanguageDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[80vh] grid grid-rows-[auto_auto_1fr_auto]">
+      <DialogContent className="h-[90vh] max-h-[600px] flex flex-col">
         <DialogHeader>
           <DialogTitle>Translate Post</DialogTitle>
           <DialogDescription>
@@ -185,8 +185,8 @@ export function LanguageDialog({
               className="pl-9"
           />
         </div>
-        <div className="min-h-0">
-          <ScrollArea className="h-full pr-6 -mr-6">
+        <div className="flex-1 min-h-0">
+          <ScrollArea className="h-full pr-4 -mr-4">
             <div className="py-2 space-y-1">
               {filteredLanguages.map(lang => (
                 <Button
