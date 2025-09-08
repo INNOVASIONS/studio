@@ -149,6 +149,7 @@ export function LanguageDialog({
     if (searchResult && searchResult.value) {
       onSelectLanguage(searchResult.value);
     }
+    // The dialog will be closed by the parent component after the action is dispatched.
   };
   
   const handleSearch = () => {

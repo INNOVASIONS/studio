@@ -189,6 +189,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
 
   const onTranslate = (targetLanguage: string) => {
     if (!targetLanguage) return;
+    setLangDialogVisible(false);
 
     startTransition(async () => {
       const rating = photo.foodRating && photo.transportRating ? (photo.foodRating + photo.transportRating)/2 : (photo.foodRating || photo.transportRating);
