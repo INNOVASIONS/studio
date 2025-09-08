@@ -355,9 +355,6 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
             </Button>
           </CommentsDialog>
         </div>
-         <div className="flex items-center ml-auto">
-            {/* The old translate dialog is removed */}
-        </div>
       </CardFooter>
     </Card>
   );

@@ -13,7 +13,6 @@ import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { addPhoto, getCurrentUser } from './mock-data';
-import fetch from 'node-fetch';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -127,20 +126,8 @@ export type TranslationState = {
 };
 
 
-// Helper function to fetch an image from a URL and convert it to a data URI
-async function imageUrlToDataUri(url: string): Promise<string> {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch image from ${url}: ${response.statusText}`);
-    }
-    const imageBuffer = await response.arrayBuffer();
-    const contentType = response.headers.get('content-type') || 'image/jpeg';
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
-    return `data:${contentType};base64,${base64Image}`;
-}
-
 export async function handleTranslatePost(
-  input: Omit<TranslatePostInput, 'photoUrl'> & { photoUrl: string }
+  input: TranslatePostInput
 ): Promise<TranslationState> {
   const { caption, targetLanguage, photoUrl } = input;
 
@@ -149,9 +136,6 @@ export async function handleTranslatePost(
   }
 
   try {
-    // Although the model can accept a URL, converting to a data URI can be more reliable
-    // if there are potential access restrictions or redirects.
-    // For this implementation, we will pass the URL directly as our AI flow supports it.
     const result = await translatePost(input);
     return {
       translatedCaption: result.translatedCaption,
