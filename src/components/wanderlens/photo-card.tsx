@@ -58,22 +58,115 @@ type PhotoCardProps = {
 };
 
 const languages = [
-    { value: 'English', label: 'English' },
-    { value: 'Spanish', label: 'Español' },
-    { value: 'French', label: 'Français' },
-    { value: 'German', label: 'Deutsch' },
-    { value: 'Japanese', label: '日本語' },
-    { value: 'Chinese (Simplified)', label: '简体中文' },
-    { value: 'Hindi', label: 'हिन्दी' },
+    { value: 'Afrikaans', label: 'Afrikaans' },
+    { value: 'Albanian', label: 'Shqip' },
+    { value: 'Amharic', label: 'አማርኛ' },
     { value: 'Arabic', label: 'العربية' },
-    { value: 'Russian', label: 'Русский' },
-    { value: 'Portuguese', label: 'Português' },
+    { value: 'Armenian', label: 'Հայերեն' },
+    { value: 'Azerbaijani', label: 'Azərbaycan dili' },
+    { value: 'Basque', label: 'Euskara' },
+    { value: 'Belarusian', label: 'Беларуская' },
     { value: 'Bengali', label: 'বাংলা' },
+    { value: 'Bosnian', label: 'Bosanski' },
+    { value: 'Bulgarian', label: 'Български' },
+    { value: 'Catalan', label: 'Català' },
+    { value: 'Cebuano', label: 'Cebuano' },
+    { value: 'Chichewa', label: 'Chichewa' },
+    { value: 'Chinese (Simplified)', label: '简体中文' },
+    { value: 'Chinese (Traditional)', label: '繁體中文' },
+    { value: 'Corsican', label: 'Corsu' },
+    { value: 'Croatian', label: 'Hrvatski' },
+    { value: 'Czech', label: 'Čeština' },
+    { value: 'Danish', label: 'Dansk' },
     { value: 'Dutch', label: 'Nederlands' },
+    { value: 'English', label: 'English' },
+    { value: 'Esperanto', label: 'Esperanto' },
+    { value: 'Estonian', label: 'Eesti' },
+    { value: 'Filipino', label: 'Filipino' },
+    { value: 'Finnish', label: 'Suomi' },
+    { value: 'French', label: 'Français' },
+    { value: 'Frisian', label: 'Frysk' },
+    { value: 'Galician', label: 'Galego' },
+    { value: 'Georgian', label: 'ქართული' },
+    { value: 'German', label: 'Deutsch' },
+    { value: 'Greek', label: 'Ελληνικά' },
+    { value: 'Gujarati', label: 'ગુજરાતી' },
+    { value: 'Haitian Creole', label: 'Kreyòl Ayisyen' },
+    { value: 'Hausa', label: 'Hausa' },
+    { value: 'Hawaiian', label: 'ʻŌlelo Hawaiʻi' },
+    { value: 'Hebrew', label: 'עברית' },
+    { value: 'Hindi', label: 'हिन्दी' },
+    { value: 'Hmong', label: 'Hmong' },
+    { value: 'Hungarian', label: 'Magyar' },
+    { value: 'Icelandic', label: 'Íslenska' },
+    { value: 'Igbo', label: 'Igbo' },
+    { value: 'Indonesian', label: 'Bahasa Indonesia' },
+    { value: 'Irish', label: 'Gaeilge' },
     { value: 'Italian', label: 'Italiano' },
+    { value: 'Japanese', label: '日本語' },
+    { value: 'Javanese', label: 'Basa Jawa' },
+    { value: 'Kannada', label: 'ಕನ್ನಡ' },
+    { value: 'Kazakh', label: 'Қазақ тілі' },
+    { value: 'Khmer', label: 'ខ្មែរ' },
+    { value: 'Kinyarwanda', label: 'Kinyarwanda' },
     { value: 'Korean', label: '한국어' },
+    { value: 'Kurdish (Kurmanji)', label: 'Kurdî (Kurmancî)' },
+    { value: 'Kyrgyz', label: 'Кыргызча' },
+    { value: 'Lao', label: 'ລາວ' },
+    { value: 'Latin', label: 'Latina' },
+    { value: 'Latvian', label: 'Latviešu' },
+    { value: 'Lithuanian', label: 'Lietuvių' },
+    { value: 'Luxembourgish', label: 'Lëtzebuergesch' },
+    { value: 'Macedonian', label: 'Македонски' },
+    { value: 'Malagasy', label: 'Malagasy' },
+    { value: 'Malay', label: 'Bahasa Melayu' },
+    { value: 'Malayalam', label: 'മലയാളം' },
+    { value: 'Maltese', label: 'Malti' },
+    { value: 'Maori', label: 'Māori' },
+    { value: 'Marathi', label: 'मराठी' },
+    { value: 'Mongolian', label: 'Монгол' },
+    { value: 'Myanmar (Burmese)', label: 'ဗမာစာ' },
+    { value: 'Nepali', label: 'नेपाली' },
+    { value: 'Norwegian', label: 'Norsk' },
+    { value: 'Odia (Oriya)', label: 'ଓଡ଼ିଆ' },
+    { value: 'Pashto', label: 'پښتو' },
+    { value: 'Persian', label: 'فارسی' },
+    { value: 'Polish', label: 'Polski' },
+    { value: 'Portuguese', label: 'Português' },
+    { value: 'Punjabi', label: 'ਪੰਜਾਬੀ' },
+    { value: 'Romanian', label: 'Română' },
+    { value: 'Russian', label: 'Русский' },
+    { value: 'Samoan', label: 'Samoan' },
+    { value: 'Scots Gaelic', label: 'Gàidhlig' },
+    { value: 'Serbian', label: 'Српски' },
+    { value: 'Sesotho', label: 'Sesotho' },
+    { value: 'Shona', label: 'Shona' },
+    { value: 'Sindhi', label: 'سنڌي' },
+    { value: 'Sinhala', label: 'සිංහල' },
+    { value: 'Slovak', label: 'Slovenčina' },
+    { value: 'Slovenian', label: 'Slovenščina' },
+    { value: 'Somali', label: 'Soomaali' },
+    { value: 'Spanish', label: 'Español' },
+    { value: 'Sundanese', label: 'Basa Sunda' },
+    { value: 'Swahili', label: 'Kiswahili' },
+    { value: 'Swedish', label: 'Svenska' },
+    { value: 'Tajik', label: 'Тоҷикӣ' },
+    { value: 'Tamil', label: 'தமிழ்' },
+    { value: 'Tatar', label: 'Татар' },
+    { value: 'Telugu', label: 'తెలుగు' },
+    { value: 'Thai', label: 'ไทย' },
     { value: 'Turkish', label: 'Türkçe' },
+    { value: 'Turkmen', label: 'Türkmençe' },
+    { value: 'Ukrainian', label: 'Українська' },
+    { value: 'Urdu', label: 'اردو' },
+    { value: 'Uyghur', label: 'ئۇيغۇرچە' },
+    { value: 'Uzbek', label: 'Oʻzbekcha' },
     { value: 'Vietnamese', label: 'Tiếng Việt' },
+    { value: 'Welsh', label: 'Cymraeg' },
+    { value: 'Xhosa', label: 'isiXhosa' },
+    { value: 'Yiddish', label: 'ייִדיש' },
+    { value: 'Yoruba', label: 'Yorùbá' },
+    { value: 'Zulu', label: 'isiZulu' }
 ];
 
 function TranslateSubmitButton() {
@@ -170,7 +263,7 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => (
 );
 
 const CostDisplay = ({ cost, currency }: { cost?: number; currency?: string }) => {
-    if (cost === undefined || currency === undefined) {
+    if (cost === undefined || !currency) {
         return null;
     }
     return (
@@ -184,15 +277,12 @@ const CostDisplay = ({ cost, currency }: { cost?: number; currency?: string }) =
 const CommentsDialog = ({
   photo,
   children,
-  comments,
-  onCommentAdded,
 }: {
   photo: Photo;
   children: React.ReactNode;
-  comments: Comment[];
-  onCommentAdded: (comment: Comment) => void;
 }) => {
   const currentUser = getCurrentUser();
+  const [comments, setComments] = useState<Comment[]>(photo.comments);
   const [newComment, setNewComment] = useState('');
 
   const handleCommentSubmit = (e: React.FormEvent) => {
@@ -210,7 +300,7 @@ const CommentsDialog = ({
       timestamp: 'Just now',
     };
 
-    onCommentAdded(commentToAdd);
+    setComments(prev => [...prev, commentToAdd]);
     setNewComment('');
   };
 
@@ -288,17 +378,13 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
   const hasDetails = photo.transportDetails || photo.foodDetails;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(photo.likes);
-  const [comments, setComments] = useState<Comment[]>(photo.comments);
+  const [commentCount, setCommentCount] = useState(photo.comments.length);
 
   const handleLikeClick = () => {
     setIsLiked(!isLiked);
     setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
   };
   
-  const handleCommentAdded = (newComment: Comment) => {
-    setComments([...comments, newComment]);
-  };
-
   return (
     <Card className="w-full max-w-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
       <CardHeader className="flex flex-row items-center gap-3 p-4">
@@ -407,10 +493,10 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
             <Heart className={cn("h-5 w-5 text-accent transition-all group-hover:scale-110", isLiked && "fill-accent")} />
             <span>{likeCount.toLocaleString()}</span>
           </Button>
-          <CommentsDialog photo={photo} comments={comments} onCommentAdded={handleCommentAdded}>
+          <CommentsDialog photo={photo}>
             <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
               <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
-              <span>{comments.length.toLocaleString()}</span>
+              <span>{commentCount.toLocaleString()}</span>
             </Button>
           </CommentsDialog>
         </div>
