@@ -304,7 +304,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
       {hasDetails && (
         <div className="px-4 pb-2">
           <Accordion type="multiple" className="w-full">
-            {transportDetails && (
+            {photo.transportDetails && (
               <AccordionItem value="transport">
                 <AccordionTrigger className="text-sm font-semibold hover:no-underline">
                   <div className="flex items-center gap-2">
@@ -321,7 +321,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
                 </AccordionContent>
               </AccordionItem>
             )}
-            {foodDetails && (
+            {photo.foodDetails && (
               <AccordionItem value="food">
                 <AccordionTrigger className="text-sm font-semibold hover:no-underline">
                   <div className="flex items-center gap-2">
