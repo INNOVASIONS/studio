@@ -184,9 +184,9 @@ export function LanguageDialog({
               className="pl-9"
           />
         </div>
-        <div className="flex-1 relative -mx-6">
-          <ScrollArea className="absolute h-full w-full">
-            <div className="px-6 py-2 space-y-1">
+        <div className="flex-1 min-h-0">
+          <ScrollArea className="h-full">
+            <div className="px-1 py-2 space-y-1">
               {filteredLanguages.map(lang => (
                 <Button
                   key={lang.value}
@@ -206,7 +206,7 @@ export function LanguageDialog({
             </div>
           </ScrollArea>
         </div>
-        <DialogFooter className="mt-auto pt-4">
+        <DialogFooter className="mt-auto pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
