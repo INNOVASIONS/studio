@@ -100,48 +100,50 @@ const TranslateDialog = ({ caption }: { caption: string }) => {
                     <Languages className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
                 <DialogHeader>
                     <DialogTitle>Translate Caption</DialogTitle>
                     <DialogDescription>
                         Select a language to translate the post caption.
                     </DialogDescription>
                 </DialogHeader>
-                <form action={dispatch} className="space-y-4">
-                    <input type="hidden" name="text" value={caption} />
-                    <div className="p-4 border rounded-md bg-muted text-muted-foreground text-sm">
-                        <p className="font-semibold mb-2">Original Caption:</p>
-                        {caption}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="target-language">Translate to:</Label>
-                        <Select name="targetLanguage" required>
-                            <SelectTrigger id="target-language">
-                                <SelectValue placeholder="Select a language" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {languages.map((lang) => (
-                                    <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    {state.translatedText && (
-                        <div className="p-4 border rounded-md bg-accent/10 text-primary text-sm">
-                            <p className="font-semibold mb-2">Translated Text:</p>
-                            {state.translatedText}
+                <ScrollArea className="pr-6 -mr-6">
+                    <form action={dispatch} className="space-y-4 pt-4">
+                        <input type="hidden" name="text" value={caption} />
+                        <div className="p-4 border rounded-md bg-muted text-muted-foreground text-sm">
+                            <p className="font-semibold mb-2">Original Caption:</p>
+                            {caption}
                         </div>
-                    )}
-                    {state.error && (
-                        <p className="text-sm font-medium text-destructive">{state.error}</p>
-                    )}
-                    <DialogFooter>
-                        <DialogClose asChild>
-                           <Button type="button" variant="outline">Close</Button>
-                        </DialogClose>
-                        <TranslateSubmitButton />
-                    </DialogFooter>
-                </form>
+                        <div className="space-y-2">
+                            <Label htmlFor="target-language">Translate to:</Label>
+                            <Select name="targetLanguage" required>
+                                <SelectTrigger id="target-language">
+                                    <SelectValue placeholder="Select a language" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {languages.map((lang) => (
+                                        <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {state.translatedText && (
+                            <div className="p-4 border rounded-md bg-accent/10 text-primary text-sm">
+                                <p className="font-semibold mb-2">Translated Text:</p>
+                                {state.translatedText}
+                            </div>
+                        )}
+                        {state.error && (
+                            <p className="text-sm font-medium text-destructive">{state.error}</p>
+                        )}
+                        <DialogFooter className="sticky bottom-0 bg-background pt-4 pb-2">
+                            <DialogClose asChild>
+                            <Button type="button" variant="outline">Close</Button>
+                            </DialogClose>
+                            <TranslateSubmitButton />
+                        </DialogFooter>
+                    </form>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     )
@@ -363,7 +365,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
                   <p>{photo.transportDetails}</p>
-                  {photo.transportCost && (
+                  {photo.transportCost && photo.currency && (
                       <CostDisplay cost={photo.transportCost} currency={photo.currency} />
                   )}
                 </AccordionContent>
@@ -382,7 +384,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
                   <p>{photo.foodDetails}</p>
-                  {photo.foodCost && (
+                  {photo.foodCost && photo.currency && (
                         <CostDisplay cost={photo.foodCost} currency={photo.currency} />
                     )}
                 </AccordionContent>
