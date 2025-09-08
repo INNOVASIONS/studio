@@ -142,11 +142,12 @@ export async function handleTranslatePost(
       translatedTransportDetails: result.translatedTransportDetails,
       translatedFoodDetails: result.translatedFoodDetails,
     };
-  } catch (e: any) {
-    console.error(e);
+  } catch (e: any)
+{
+    console.error('Translation action failed:', e);
     // Provide a more user-friendly error message
-    if (e.message.includes('FETCH_ERROR') || e.message.includes('permission')) {
-      return { error: 'Could not retrieve the image for translation context. Please try again later.' };
+    if (e.message.includes('FETCH_ERROR') || e.message.includes('permission') || e.message.includes('CORS')) {
+      return { error: 'Could not retrieve the image for translation context due to a network or permission issue. Please try again later.' };
     }
     return { error: e.message || 'An unexpected error occurred during translation.' };
   }
