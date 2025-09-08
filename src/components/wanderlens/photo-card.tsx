@@ -50,7 +50,8 @@ import { Input } from '../ui/input';
 import { useFormStatus } from 'react-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Label } from '../ui/label';
-import { TranslationState, handleTranslateCaption } from '@/lib/actions';
+import { TranslationState, handleTranslatePost } from '@/lib/actions';
+import { Separator } from '../ui/separator';
 
 type PhotoCardProps = {
   photo: Photo;
@@ -188,9 +189,30 @@ function TranslateSubmitButton() {
     )
 }
 
-const TranslateDialog = ({ caption }: { caption: string }) => {
+const TranslatedContent = ({ title, content }: {title: string, content?: string}) => {
+    if (!content) return null;
+    return (
+        <div className="space-y-1 text-sm">
+            <h4 className="font-semibold">{title}</h4>
+            <p className="text-muted-foreground">{content}</p>
+        </div>
+    )
+}
+
+const OriginalContent = ({ title, content }: {title: string, content?: string}) => {
+    if (!content) return null;
+    return (
+        <div className="space-y-1 text-sm">
+            <h4 className="font-semibold">{title}</h4>
+            <p className="text-muted-foreground">{content}</p>
+        </div>
+    )
+}
+
+
+const TranslateDialog = ({ photo }: { photo: Photo }) => {
     const initialState: TranslationState = {};
-    const [state, dispatch] = useActionState(handleTranslateCaption, initialState);
+    const [state, dispatch] = useActionState(handleTranslatePost, initialState);
 
     return (
         <Dialog>
@@ -201,18 +223,24 @@ const TranslateDialog = ({ caption }: { caption: string }) => {
             </DialogTrigger>
             <DialogContent className="grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
                 <DialogHeader>
-                    <DialogTitle>Translate Caption</DialogTitle>
+                    <DialogTitle>Translate Post</DialogTitle>
                     <DialogDescription>
-                        Select a language to translate the post caption.
+                        Select a language to translate the entire post.
                     </DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="pr-6 -mr-6">
                     <form action={dispatch} className="space-y-4 pt-4">
-                        <input type="hidden" name="text" value={caption} />
-                        <div className="p-4 border rounded-md bg-muted text-muted-foreground text-sm">
-                            <p className="font-semibold mb-2">Original Caption:</p>
-                            {caption}
+                        <input type="hidden" name="caption" value={photo.caption} />
+                        {photo.transportDetails && <input type="hidden" name="transportDetails" value={photo.transportDetails} />}
+                        {photo.foodDetails && <input type="hidden" name="foodDetails" value={photo.foodDetails} />}
+                        
+                        <div className="space-y-4 p-4 border rounded-md bg-muted">
+                            <h3 className='font-semibold text-sm'>Original Text</h3>
+                            <OriginalContent title="Caption" content={photo.caption} />
+                            <OriginalContent title="Transport Details" content={photo.transportDetails} />
+                            <OriginalContent title="Food Details" content={photo.foodDetails} />
                         </div>
+                        
                         <div className="space-y-2">
                             <Label htmlFor="target-language">Translate to:</Label>
                             <Select name="targetLanguage" required>
@@ -226,15 +254,19 @@ const TranslateDialog = ({ caption }: { caption: string }) => {
                                 </SelectContent>
                             </Select>
                         </div>
-                        {state.translatedText && (
-                            <div className="p-4 border rounded-md bg-accent/10 text-primary text-sm">
-                                <p className="font-semibold mb-2">Translated Text:</p>
-                                {state.translatedText}
+                        
+                        {(state.translatedCaption || state.error) && (
+                             <div className="space-y-4 p-4 border rounded-md bg-accent/10">
+                                <h3 className='font-semibold text-sm text-primary'>Translated Text</h3>
+                                <TranslatedContent title="Caption" content={state.translatedCaption} />
+                                <TranslatedContent title="Transport Details" content={state.translatedTransportDetails} />
+                                <TranslatedContent title="Food Details" content={state.translatedFoodDetails} />
+                                 {state.error && (
+                                    <p className="text-sm font-medium text-destructive">{state.error}</p>
+                                )}
                             </div>
                         )}
-                        {state.error && (
-                            <p className="text-sm font-medium text-destructive">{state.error}</p>
-                        )}
+
                         <DialogFooter className="sticky bottom-0 bg-background pt-4 pb-2">
                             <DialogClose asChild>
                             <Button type="button" variant="outline">Close</Button>
@@ -501,7 +533,7 @@ export function PhotoCard({ photo, user }: PhotoCardProps) {
           </CommentsDialog>
         </div>
          <div className="flex items-center ml-auto">
-            <TranslateDialog caption={photo.caption} />
+            <TranslateDialog photo={photo} />
         </div>
       </CardFooter>
     </Card>

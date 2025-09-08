@@ -1,3 +1,4 @@
+
 'use server';
 
 import {
@@ -8,7 +9,7 @@ import {
   imageBasedLocationFinder,
   ImageBasedLocationFinderInput,
 } from '@/ai/flows/image-based-location-finder';
-import { translateText, TranslateTextInput } from '@/ai/flows/translate-text';
+import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { addPhoto, getCurrentUser } from './mock-data';
@@ -118,25 +119,39 @@ export async function handleCreatePost(
 }
 
 export type TranslationState = {
-    translatedText?: string;
+    translatedCaption?: string;
+    translatedTransportDetails?: string;
+    translatedFoodDetails?: string;
     error?: string;
 };
 
-export async function handleTranslateCaption(
+export async function handleTranslatePost(
     prevState: TranslationState,
     formData: FormData
 ): Promise<TranslationState> {
-    const text = formData.get('text') as string;
+    const caption = formData.get('caption') as string;
+    const transportDetails = formData.get('transportDetails') as string;
+    const foodDetails = formData.get('foodDetails') as string;
     const targetLanguage = formData.get('targetLanguage') as string;
 
-    if (!text || !targetLanguage) {
-        return { error: 'Text and target language are required.' };
+    if (!caption || !targetLanguage) {
+        return { error: 'Caption and target language are required.' };
     }
 
     try {
-        const input: TranslateTextInput = { text, targetLanguage };
-        const result = await translateText(input);
-        return { translatedText: result.translatedText };
+        const input: TranslatePostInput = { 
+            caption, 
+            targetLanguage,
+        };
+        if (transportDetails) input.transportDetails = transportDetails;
+        if (foodDetails) input.foodDetails = foodDetails;
+
+        const result = await translatePost(input);
+        return { 
+            translatedCaption: result.translatedCaption,
+            translatedTransportDetails: result.translatedTransportDetails,
+            translatedFoodDetails: result.translatedFoodDetails,
+        };
     } catch (e: any) {
         console.error(e);
         return { error: e.message || 'Failed to translate text.' };
