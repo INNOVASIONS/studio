@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
 import {
@@ -21,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Loader2, Languages } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
+import { Input } from '../ui/input';
 
 const supportedLanguages = [
     { value: 'Afrikaans', label: 'Afrikaans' },
@@ -150,17 +150,21 @@ export function LanguageDialog({
   isPending,
 }: LanguageDialogProps) {
   const [selectedLanguage, setSelectedLanguage] = React.useState('');
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const handleTranslate = () => {
     if (selectedLanguage) {
       onSelectLanguage(selectedLanguage);
-      onOpenChange(false); // Close dialog on translate
+      onOpenChange(false);
     }
   };
 
+  const filteredLanguages = supportedLanguages.filter((lang) =>
+    lang.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Translate Post</DialogTitle>
@@ -168,18 +172,29 @@ export function LanguageDialog({
             Select a language to translate this post into.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="py-4 space-y-4">
+          <Input
+            placeholder="Search for a language..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <Select onValueChange={setSelectedLanguage} value={selectedLanguage}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Choose a language..." />
             </SelectTrigger>
             <SelectContent>
               <ScrollArea className="h-72">
-                {supportedLanguages.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value}>
-                    {lang.label}
-                  </SelectItem>
-                ))}
+                {filteredLanguages.length > 0 ? (
+                  filteredLanguages.map((lang) => (
+                    <SelectItem key={lang.value} value={lang.value}>
+                      {lang.label}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    No languages found.
+                  </div>
+                )}
               </ScrollArea>
             </SelectContent>
           </Select>
