@@ -12,7 +12,8 @@ import {
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { addPhoto, getCurrentUser } from './mock-data';
+import { addPhoto, getCurrentUser, addJourney } from './mock-data';
+import { VisitedPlace } from './types';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -165,4 +166,66 @@ export async function handleTranslatePost(
     }
     return { error: e.message || 'An unexpected error occurred during translation.' };
   }
+}
+
+export type CreateJourneyState = {
+  message?: string;
+  success?: boolean;
+  error?: string;
+};
+
+
+// Helper function to read file as Data URL
+async function readFileAsDataURL(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString('base64');
+  return `data:${file.type};base64,${base64}`;
+}
+
+
+export async function handleCreateJourney(
+  prevState: CreateJourneyState,
+  formData: FormData
+): Promise<CreateJourneyState> {
+  const currentUser = getCurrentUser();
+
+  try {
+    const visitedPlacesData = JSON.parse(formData.get('visited-places-data') as string);
+    
+    // This is a simplified representation. In a real app, you would handle file uploads properly.
+    // For this mock implementation, we assume the client sends data URIs or we reconstruct them.
+    const visitedPlaces: VisitedPlace[] = visitedPlacesData.map((p: any) => ({
+        name: p.name,
+        description: p.description,
+        photos: [] // In a real app, you'd handle file uploads and get URLs here
+    }))
+    
+    const journeyData = {
+      userId: currentUser.id,
+      placeVisited: formData.get('place-visited') as string,
+      startDate: new Date(formData.get('start-date') as string),
+      endDate: new Date(formData.get('end-date') as string),
+      travelers: parseInt(formData.get('travelers') as string, 10),
+      transportMode: formData.get('transport-mode') as string | undefined,
+      transportCost: parseFloat(formData.get('transport-cost') as string) || undefined,
+      transportCurrency: formData.get('transport-currency') as string | undefined,
+      transportDetails: formData.get('transport-details') as string | undefined,
+      hotelName: formData.get('hotel-name') as string | undefined,
+      hotelPhotos: [], // Handle file uploads
+      hotelDuration: parseInt(formData.get('hotel-duration') as string, 10) || undefined,
+      hotelCost: parseFloat(formData.get('hotel-cost') as string) || undefined,
+      hotelCurrency: formData.get('hotel-currency') as string | undefined,
+      hotelReview: formData.get('hotel-review') as string | undefined,
+      visitedPlaces: visitedPlaces,
+    };
+
+    addJourney(journeyData);
+
+  } catch (error: any) {
+    console.error('Failed to create journey:', error);
+    return { error: 'Failed to process journey data. ' + error.message };
+  }
+
+  revalidatePath('/journeys');
+  redirect('/journeys');
 }

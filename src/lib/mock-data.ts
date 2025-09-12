@@ -1,5 +1,5 @@
 
-import type { User, Photo, UserPlace, Comment } from './types';
+import type { User, Photo, UserPlace, Comment, Journey } from './types';
 
 const users: User[] = [
   {
@@ -310,6 +310,8 @@ let userPlaces: UserPlace[] = [
     }
 ];
 
+let journeys: Journey[] = [];
+
 export const getUsers = () => users;
 export const getUserById = (id: number) => users.find((user) => user.id === id);
 export const getCurrentUser = () => users[0];
@@ -333,4 +335,15 @@ export const addUserPlace = (place: Omit<UserPlace, 'id'>) => {
     const newPlace = { ...place, id: userPlaces.length + 1 };
     userPlaces = [...userPlaces, newPlace];
     return newPlace;
+};
+
+export const getJourneys = () => journeys;
+
+export const addJourney = (journeyData: Omit<Journey, 'id'>) => {
+    const newJourney: Journey = {
+        id: journeys.length > 0 ? Math.max(...journeys.map(j => j.id)) + 1 : 1,
+        ...journeyData,
+    };
+    journeys = [newJourney, ...journeys];
+    return newJourney;
 };

@@ -15,6 +15,7 @@ import {
   User,
   LogOut,
   Route,
+  BookCopy,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -34,10 +35,11 @@ import { AddPostDialog } from '../wanderlens/add-post-dialog';
 const navLinks = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/discover', label: 'Discover', icon: Compass },
+  { href: '/journeys', label: 'Journeys', icon: BookCopy },
+  { href: '/create-journey', label: 'Create Journey', icon: Route },
   { href: '/itinerary-generator', label: 'Itinerary AI', icon: FileText },
   { href: '/location-finder', label: 'Location AI', icon: Globe },
   { href: '/nearby-places', label: 'Nearby', icon: Map },
-  { href: '/create-journey', label: 'Create Journey', icon: Route },
 ];
 
 export function AppHeader() {

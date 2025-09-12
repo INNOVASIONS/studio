@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,19 +10,37 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '../ui/separator';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon, Bus } from 'lucide-react';
+import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon, Bus, Loader2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { handleCreateJourney, CreateJourneyState } from '@/lib/actions';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 type VisitedPlace = {
   name: string;
-  photos: FileList | null;
+  photos: File[] | null;
   description: string;
 };
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending} className="w-full">
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Creating...
+        </>
+      ) : (
+        'Create Journey'
+      )}
+    </Button>
+  );
+}
 
 const currencies = [
   { value: 'USD', label: 'USD - United States Dollar' },
@@ -60,6 +79,9 @@ const initialVisitedPlace = { name: '', photos: null, description: '' };
 
 export function CreateJourneyForm() {
   const { toast } = useToast();
+  const initialState: CreateJourneyState = {};
+  const [state, dispatch] = useActionState(handleCreateJourney, initialState);
+  
   const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([initialVisitedPlace]);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -75,58 +97,21 @@ export function CreateJourneyForm() {
     setVisitedPlaces(newPlaces);
   };
 
-  const handlePlaceChange = (index: number, field: keyof VisitedPlace, value: string | FileList | null) => {
+  const handlePlaceChange = (index: number, field: 'name' | 'description' , value: string) => {
     const newPlaces = [...visitedPlaces];
-    if (field === 'photos' && value instanceof FileList) {
-      newPlaces[index][field] = value;
-    } else if (typeof value === 'string') {
-        (newPlaces[index] as any)[field] = value;
-    }
+    newPlaces[index][field] = value;
     setVisitedPlaces(newPlaces);
   };
-
-  const resetForm = (formElement: HTMLFormElement) => {
-    formElement.reset();
-    setVisitedPlaces([initialVisitedPlace]);
-    setStartDate(undefined);
-    setEndDate(undefined);
-    setTransportCurrency('');
-    setHotelCurrency('');
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-
-    const data = {
-        placeVisited: formData.get('place-visited'),
-        startDate: startDate,
-        endDate: endDate,
-        travelers: formData.get('travelers'),
-        transportMode: formData.get('transport-mode'),
-        transportCost: formData.get('transport-cost'),
-        transportCurrency: transportCurrency,
-        transportDetails: formData.get('transport-details'),
-        hotelName: formData.get('hotel-name'),
-        hotelPhotos: formData.get('hotel-photos'),
-        hotelDuration: formData.get('hotel-duration'),
-        hotelCost: formData.get('hotel-cost'),
-        hotelCurrency: hotelCurrency,
-        hotelReview: formData.get('hotel-review'),
-        visitedPlaces: visitedPlaces,
-    };
-    
-    // In a real app, you would send this 'data' object to your server/API
-    console.log("Journey Data:", data);
-
-    toast({
+  
+  useEffect(() => {
+    if (state.success) {
+      toast({
         title: "Journey Created!",
         description: "Your new travel journey has been successfully saved.",
-    });
+      });
+    }
+  }, [state.success, toast]);
 
-    resetForm(form);
-  };
 
   return (
     <Card className="max-w-4xl mx-auto shadow-lg">
@@ -137,7 +122,16 @@ export function CreateJourneyForm() {
             </CardDescription>
         </CardHeader>
         <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form action={dispatch} className="space-y-6">
+                {/* Hidden input to pass complex state to server action */}
+                <input 
+                    type="hidden" 
+                    name="visited-places-data" 
+                    value={JSON.stringify(visitedPlaces.map(p => ({name: p.name, description: p.description})))} 
+                />
+                 <input type="hidden" name="start-date" value={startDate?.toISOString() ?? ''} />
+                 <input type="hidden" name="end-date" value={endDate?.toISOString() ?? ''} />
+
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="space-y-2">
                         <Label htmlFor="place-visited">Place Visited</Label>
@@ -229,7 +223,7 @@ export function CreateJourneyForm() {
                         <div className="grid grid-cols-2 gap-2">
                              <div className="space-y-2">
                                 <Label htmlFor="transport-currency">Currency</Label>
-                                <Select onValueChange={setTransportCurrency}>
+                                <Select name="transport-currency" onValueChange={setTransportCurrency}>
                                     <SelectTrigger id="transport-currency">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
@@ -274,7 +268,8 @@ export function CreateJourneyForm() {
                          <div className="grid grid-cols-2 gap-2">
                              <div className="space-y-2">
                                 <Label htmlFor="hotel-currency">Currency</Label>
-                                <Select onValueChange={setHotelCurrency}>
+                                <Select name="hotel-currency" onValuecha
+nge={setHotelCurrency}>
                                     <SelectTrigger id="hotel-currency">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
@@ -323,7 +318,7 @@ export function CreateJourneyForm() {
                                             id={`place-photos-${index}`}
                                             type="file"
                                             multiple
-                                            onChange={(e) => handlePlaceChange(index, 'photos', e.target.files)}
+                                            name={`place-photos-${index}`}
                                         />
                                     </div>
                                 </div>
@@ -357,8 +352,14 @@ export function CreateJourneyForm() {
                     </Button>
                 </div>
 
+                {state?.error && (
+                    <Alert variant="destructive">
+                        <AlertTitle>Error Creating Journey</AlertTitle>
+                        <AlertDescription>{state.error}</AlertDescription>
+                    </Alert>
+                )}
 
-                <Button type="submit" className="w-full">Create Journey</Button>
+                <SubmitButton />
             </form>
         </CardContent>
     </Card>

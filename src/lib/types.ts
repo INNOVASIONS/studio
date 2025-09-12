@@ -52,3 +52,29 @@ export type UserPlace = {
   lng: number;
   addedBy: string;
 };
+
+export type VisitedPlace = {
+  name: string;
+  photos: string[]; // Store as data URIs or URLs
+  description: string;
+};
+
+export type Journey = {
+  id: number;
+  userId: number;
+  placeVisited: string;
+  startDate?: Date;
+  endDate?: Date;
+  travelers: number;
+  transportMode?: string;
+  transportCost?: number;
+  transportCurrency?: string;
+  transportDetails?: string;
+  hotelName?: string;
+  hotelPhotos: string[]; // Store as data URIs or URLs
+  hotelDuration?: number;
+  hotelCost?: number;
+  hotelCurrency?: string;
+  hotelReview?: string;
+  visitedPlaces: VisitedPlace[];
+};
