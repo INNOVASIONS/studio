@@ -137,10 +137,6 @@ export function CreateJourneyForm() {
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-2">
-                                <Label htmlFor="transport-cost">Transport Cost</Label>
-                                <Input id="transport-cost" name="transport-cost" type="number" placeholder="e.g., 500" />
-                            </div>
-                            <div className="space-y-2">
                                 <Label htmlFor="transport-currency">Currency</Label>
                                 <Select onValueChange={setTransportCurrency}>
                                     <SelectTrigger id="transport-currency">
@@ -152,6 +148,10 @@ export function CreateJourneyForm() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="transport-cost">Transport Cost</Label>
+                                <Input id="transport-cost" name="transport-cost" type="number" placeholder="e.g., 500" />
                             </div>
                         </div>
                     </div>
@@ -179,10 +179,6 @@ export function CreateJourneyForm() {
                             <Input id="hotel-duration" name="hotel-duration" type="number" placeholder="e.g., 6" />
                         </div>
                          <div className="grid grid-cols-2 gap-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="hotel-cost">Hotel Cost</Label>
-                                <Input id="hotel-cost" name="hotel-cost" type="number" placeholder="e.g., 1200" />
-                            </div>
                              <div className="space-y-2">
                                 <Label htmlFor="hotel-currency">Currency</Label>
                                 <Select onValueChange={setHotelCurrency}>
@@ -195,6 +191,10 @@ export function CreateJourneyForm() {
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="hotel-cost">Hotel Cost</Label>
+                                <Input id="hotel-cost" name="hotel-cost" type="number" placeholder="e.g., 1200" />
                             </div>
                         </div>
                      </div>
