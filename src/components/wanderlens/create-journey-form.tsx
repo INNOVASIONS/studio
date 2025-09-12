@@ -9,7 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '../ui/separator';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle } from 'lucide-react';
+import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Calendar } from '../ui/calendar';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 type VisitedPlace = {
   name: string;
@@ -19,6 +23,7 @@ type VisitedPlace = {
 
 export function CreateJourneyForm() {
   const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([{ name: '', photos: null, description: '' }]);
+  const [date, setDate] = useState<Date>();
 
   const handleAddPlace = () => {
     setVisitedPlaces([...visitedPlaces, { name: '', photos: null, description: '' }]);
@@ -49,10 +54,35 @@ export function CreateJourneyForm() {
         </CardHeader>
         <CardContent>
             <form className="space-y-6">
-                <div className="grid md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="space-y-2 lg:col-span-2">
                         <Label htmlFor="place-visited">Place Visited</Label>
                         <Input id="place-visited" name="place-visited" placeholder="e.g., Paris, France" required />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="start-date">Start Date</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !date && "text-muted-foreground"
+                                )}
+                                >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                mode="single"
+                                selected={date}
+                                onSelect={setDate}
+                                initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="trip-duration">Trip Duration (days)</Label>
