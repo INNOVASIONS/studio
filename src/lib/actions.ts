@@ -95,6 +95,8 @@ export async function handleCreatePost(
   const transportCost = parseFloat(formData.get('transportCost') as string) || undefined;
   const foodCost = parseFloat(formData.get('foodCost') as string) || undefined;
   const hotelCost = parseFloat(formData.get('hotelCost') as string) || undefined;
+  const attractionName = formData.get('attractionName') as string | undefined;
+  const entryFeeCost = parseFloat(formData.get('entryFeeCost') as string) || undefined;
   
   if (!photoDataUri || !caption || !location) {
     return { message: 'Photo, caption, and location are required.' };
@@ -119,6 +121,8 @@ export async function handleCreatePost(
       transportCost,
       foodCost,
       hotelCost,
+      attractionName,
+      entryFeeCost,
     });
   } catch (error) {
     console.error(error);

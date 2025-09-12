@@ -262,6 +262,8 @@ let photos: Photo[] = [
     hotelRating: 4,
     hotelCost: 90,
     currency: 'EUR',
+    attractionName: 'Neuschwanstein Castle',
+    entryFeeCost: 17.50,
   },
   {
     id: 8,

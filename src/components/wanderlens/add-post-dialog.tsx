@@ -109,6 +109,7 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
   const [hotelRating, setHotelRating] = useState(0);
   const [currency, setCurrency] = useState('');
   const [showHotelDetails, setShowHotelDetails] = useState(false);
+  const [showEntryFee, setShowEntryFee] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -131,6 +132,7 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
       setFoodRating(0);
       setHotelRating(0);
       setShowHotelDetails(false);
+      setShowEntryFee(false);
       setCurrency('');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -282,6 +284,25 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
                     <div className="space-y-2">
                         <Label htmlFor="hotelCost">Hotel Cost (per night)</Label>
                         <Input id="hotelCost" name="hotelCost" type="number" step="0.01" placeholder="e.g., 150.00" />
+                    </div>
+                 </div>
+               )}
+            </div>
+
+            <div className="space-y-4 border-t pt-4">
+                <div className="flex justify-between items-center">
+                    <Label htmlFor="entry-fee-switch">Paid an Entry Fee?</Label>
+                    <Switch id="entry-fee-switch" checked={showEntryFee} onCheckedChange={setShowEntryFee} />
+                </div>
+               {showEntryFee && (
+                 <div className='space-y-4'>
+                    <div className="space-y-2">
+                        <Label htmlFor="attractionName">Attraction/Place Name</Label>
+                        <Input id="attractionName" name="attractionName" placeholder="e.g., 'Louvre Museum'" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="entryFeeCost">Entry Fee Cost</Label>
+                        <Input id="entryFeeCost" name="entryFeeCost" type="number" step="0.01" placeholder="e.g., 17.00" />
                     </div>
                  </div>
                )}

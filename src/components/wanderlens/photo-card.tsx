@@ -18,6 +18,7 @@ import {
   Languages,
   Bed,
   Building,
+  Ticket,
 } from 'lucide-react';
 import type { Photo, User, Comment } from '@/lib/types';
 import {
@@ -165,21 +166,21 @@ const StarRatingDisplay = ({ rating }: { rating: number }) => (
     </div>
 );
 
-const CostDisplay = ({ cost, currency }: { cost?: number; currency?: string }) => {
+const CostDisplay = ({ cost, currency, label = "per person" }: { cost?: number; currency?: string, label?: string }) => {
     if (cost === undefined || !currency) {
         return null;
     }
     return (
         <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium bg-muted px-2 py-1 rounded-md">
             <Wallet className="h-4 w-4 text-accent" />
-            <span>~{currency} {cost.toLocaleString()} per person</span>
+            <span>~{currency} {cost.toLocaleString()} {label}</span>
         </div>
     )
 };
 
 
 export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
-  const hasDetails = photo.transportDetails || photo.foodDetails || photo.hotelDetails;
+  const hasDetails = photo.transportDetails || photo.foodDetails || photo.hotelDetails || photo.entryFeeCost;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(photo.likes);
   const { toast } = useToast();
@@ -379,7 +380,21 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
                 <AccordionContent className="text-sm text-muted-foreground space-y-3">
                    {photo.hotelName && <p className='font-semibold text-foreground flex items-center gap-2'><Building className='h-4 w-4'/>{photo.hotelName}</p>}
                   <p>{hotelDetails}</p>
-                   <CostDisplay cost={photo.hotelCost} currency={photo.currency} />
+                   <CostDisplay cost={photo.hotelCost} currency={photo.currency} label="per night" />
+                </AccordionContent>
+              </AccordionItem>
+            )}
+            {photo.entryFeeCost && (
+              <AccordionItem value="entry-fee">
+                <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="h-4 w-4 text-accent" />
+                    Attraction / Entry Fee
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground space-y-3">
+                   {photo.attractionName && <p className='font-semibold text-foreground flex items-center gap-2'><MapPin className='h-4 w-4'/>{photo.attractionName}</p>}
+                   <CostDisplay cost={photo.entryFeeCost} currency={photo.currency} />
                 </AccordionContent>
               </AccordionItem>
             )}

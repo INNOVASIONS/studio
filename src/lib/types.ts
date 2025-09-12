@@ -41,6 +41,8 @@ export type Photo = {
   restaurantName?: string;
   hotelName?: string;
   transportName?: string;
+  attractionName?: string;
+  entryFeeCost?: number;
 };
 
 export type UserPlace = {
