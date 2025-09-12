@@ -11,7 +11,7 @@ import {
 } from '@/ai/flows/image-based-location-finder';
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
-import { addPhoto, getCurrentUser, addJourney } from './mock-data';
+import { addPhoto, getCurrentUser, addJourney, deletePhoto } from './mock-data';
 import { VisitedPlace } from './types';
 
 export type ItineraryState = {
@@ -242,4 +242,28 @@ export async function handleCreateJourney(
 
   revalidatePath('/create-journey');
   return { success: true, message: "Journey created!"}
+}
+
+export type DeletePostState = {
+  error?: string;
+  success?: boolean;
+};
+
+export async function handleDeletePost(
+  photoId: number
+): Promise<DeletePostState> {
+  if (typeof photoId !== 'number') {
+    return { error: 'Invalid Photo ID.' };
+  }
+
+  try {
+    deletePhoto(photoId);
+  } catch (error: any) {
+    return { error: error.message };
+  }
+
+  revalidatePath('/profile');
+  revalidatePath('/');
+  revalidatePath('/discover');
+  return { success: true };
 }

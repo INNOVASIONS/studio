@@ -333,6 +333,19 @@ export const addPhoto = (photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 't
     return newPhoto;
 };
 
+export const deletePhoto = (photoId: number) => {
+  const photoIndex = photos.findIndex((p) => p.id === photoId);
+  if (photoIndex === -1) {
+    throw new Error('Photo not found');
+  }
+  // Ensure only the current user can delete their own photos
+  const currentUser = getCurrentUser();
+  if (photos[photoIndex].userId !== currentUser.id) {
+    throw new Error('You are not authorized to delete this post.');
+  }
+  photos.splice(photoIndex, 1);
+};
+
 export const addUserPlace = (place: Omit<UserPlace, 'id'>) => {
     const newPlace = { ...place, id: userPlaces.length + 1 };
     userPlaces = [...userPlaces, newPlace];

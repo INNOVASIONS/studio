@@ -19,6 +19,7 @@ import {
   Bed,
   Building,
   Ticket,
+  Trash2,
 } from 'lucide-react';
 import type { Photo, User, Comment } from '@/lib/types';
 import {
@@ -44,11 +45,22 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { getCurrentUser } from '@/lib/mock-data';
 import { ScrollArea } from '../ui/scroll-area';
 import { Input } from '../ui/input';
-import { handleTranslatePost, TranslationState } from '@/lib/actions';
+import { handleTranslatePost, TranslationState, handleDeletePost } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { LanguageDialog } from './language-dialog';
 
@@ -190,6 +202,9 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
   const [isPending, startTransition] = useTransition();
   const [isLangDialogVisible, setLangDialogVisible] = useState(false);
 
+  const currentUser = getCurrentUser();
+  const isOwner = user.id === currentUser.id;
+
   const onTranslate = (targetLanguage: string) => {
     if (!targetLanguage) return;
     setLangDialogVisible(false);
@@ -248,6 +263,26 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
     }
   };
 
+  const [isDeletePending, startDeleteTransition] = useTransition();
+
+  const onDeletePost = () => {
+    startDeleteTransition(async () => {
+      const result = await handleDeletePost(photo.id);
+      if (result.error) {
+        toast({
+          variant: 'destructive',
+          title: 'Deletion Failed',
+          description: result.error,
+        });
+      } else {
+        toast({
+          title: 'Post Deleted',
+          description: 'Your post has been successfully removed.',
+        });
+      }
+    });
+  };
+
   const TranslateButton = () => (
      <Button onClick={handleTranslateClick} variant="ghost" size="sm" className="text-muted-foreground" disabled={isPending}>
         {isPending ? (
@@ -287,9 +322,35 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
             <span>{photo.location}</span>
           </div>
         </div>
-        <time className="ml-auto text-xs text-muted-foreground">
-          {photo.timestamp}
-        </time>
+        <div className="ml-auto flex items-center gap-2">
+            <time className="text-xs text-muted-foreground">
+            {photo.timestamp}
+            </time>
+             {isOwner && (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure you want to delete this post?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your post and remove its data from our servers.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={onDeletePost} disabled={isDeletePending}>
+                                {isDeletePending ? <Loader2 className="animate-spin" /> : 'Delete'}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+        </div>
+
       </CardHeader>
       <CardContent className="p-0">
         <Dialog>
