@@ -58,7 +58,8 @@ const AutoRickshawIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export function CreateJourneyForm() {
   const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([{ name: '', photos: null, description: '' }]);
-  const [date, setDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const [transportCurrency, setTransportCurrency] = useState<string>('');
   const [hotelCurrency, setHotelCurrency] = useState<string>('');
 
@@ -92,7 +93,7 @@ export function CreateJourneyForm() {
         <CardContent>
             <form className="space-y-6">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="space-y-2 lg:col-span-3">
+                    <div className="space-y-2">
                         <Label htmlFor="place-visited">Place Visited</Label>
                         <Input id="place-visited" name="place-visited" placeholder="e.g., Paris, France" required />
                     </div>
@@ -104,28 +105,55 @@ export function CreateJourneyForm() {
                                 variant={"outline"}
                                 className={cn(
                                     "w-full justify-start text-left font-normal",
-                                    !date && "text-muted-foreground"
+                                    !startDate && "text-muted-foreground"
                                 )}
                                 >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
                                 <Calendar
                                 mode="single"
-                                selected={date}
-                                onSelect={setDate}
+                                selected={startDate}
+                                onSelect={setStartDate}
+                                disabled={(date) =>
+                                  date > new Date() || (endDate ? date > endDate : false)
+                                }
                                 initialFocus
                                 />
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="trip-duration">Trip Duration (days)</Label>
-                        <Input id="trip-duration" name="trip-duration" type="number" placeholder="e.g., 7" required />
+                     <div className="space-y-2">
+                        <Label htmlFor="end-date">End Date</Label>
+                         <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !endDate && "text-muted-foreground"
+                                )}
+                                >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                mode="single"
+                                selected={endDate}
+                                onSelect={setEndDate}
+                                disabled={(date) =>
+                                    date > new Date() || (startDate ? date < startDate : false)
+                                }
+                                initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 lg:col-span-3">
                         <Label htmlFor="travelers">Number of Travelers</Label>
                         <Input id="travelers" name="travelers" type="number" placeholder="e.g., 2" required />
                     </div>
