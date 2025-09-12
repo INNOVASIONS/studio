@@ -131,6 +131,7 @@ export async function handleCreatePost(
 
   revalidatePath('/');
   revalidatePath('/profile');
+  revalidatePath('/discover');
   return { message: 'Post created successfully', success: true };
 }
 
