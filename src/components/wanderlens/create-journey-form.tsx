@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -8,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '../ui/separator';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon, Bus, Truck } from 'lucide-react';
+import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon, Bus } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
@@ -39,6 +40,29 @@ const currencies = [
   { value: 'BRL', label: 'BRL - Brazilian Real' },
   { value: 'ZAR', label: 'ZAR - South African Rand' },
 ];
+
+const AutoRickshawIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+        <path d="M14 18V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8"/>
+        <path d="M6 18h2.3a1 1 0 0 0 .9-.6L11 14"/>
+        <path d="m11 14-2.5 4"/>
+        <path d="M14 18h4"/>
+        <path d="M19 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+        <path d="M4.5 10H10"/>
+    </svg>
+);
+
 
 export function CreateJourneyForm() {
   const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([{ name: '', photos: null, description: '' }]);
@@ -131,7 +155,7 @@ export function CreateJourneyForm() {
                                     <SelectItem value="train"><Train className="inline-block mr-2" /> Train</SelectItem>
                                     <SelectItem value="car"><Car className="inline-block mr-2" /> Car</SelectItem>
                                     <SelectItem value="bus"><Bus className="inline-block mr-2" /> Bus</SelectItem>
-                                    <SelectItem value="auto-rickshaw"><Truck className="inline-block mr-2" /> Auto-rickshaw</SelectItem>
+                                    <SelectItem value="auto-rickshaw"><AutoRickshawIcon className="inline-block mr-2" /> Auto-rickshaw</SelectItem>
                                     <SelectItem value="ship"><Ship className="inline-block mr-2" /> Ship/Ferry</SelectItem>
                                 </SelectContent>
                             </Select>
