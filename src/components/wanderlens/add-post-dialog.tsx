@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '../ui/switch';
+import { RupeeIcon } from './rupee-icon';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -214,7 +215,11 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
                 </SelectTrigger>
                 <SelectContent>
                   {currencies.map((c) => (
-                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    <SelectItem key={c.value} value={c.value}>
+                      <div className="flex items-center gap-2">
+                        {c.value === 'INR' ? <RupeeIcon /> : null} {c.label}
+                      </div>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

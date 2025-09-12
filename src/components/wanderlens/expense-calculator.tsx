@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { Separator } from '../ui/separator';
 import { ScrollArea } from '../ui/scroll-area';
+import { RupeeIcon } from './rupee-icon';
 
 const currencies = [
   { value: 'USD', label: '$ USD' },
@@ -109,6 +110,9 @@ export function ExpenseCalculator() {
   }, [expenses]);
   
   const selectedCurrencySymbol = useMemo(() => {
+     if (currency === 'INR') {
+      return <RupeeIcon className="inline-block h-4 w-4" />;
+    }
     return currencies.find(c => c.value === currency)?.label.split(' ')[0] || '$';
   }, [currency]);
 
@@ -177,7 +181,7 @@ export function ExpenseCalculator() {
               {expenseCategories.map((category) => (
                 <div key={category.id} className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">{category.label}</span>
-                  <span className="font-medium">
+                  <span className="font-medium flex items-center gap-1">
                     {selectedCurrencySymbol}
                     {(expenses[category.id] || 0).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
@@ -194,7 +198,7 @@ export function ExpenseCalculator() {
                     <CircleDollarSign className="h-6 w-6 text-primary"/>
                     Grand Total
                 </span>
-                <span className="text-3xl font-bold text-primary">
+                <span className="text-3xl font-bold text-primary flex items-center gap-1">
                     {selectedCurrencySymbol}
                     {totalExpense.toLocaleString(undefined, {
                     minimumFractionDigits: 2,

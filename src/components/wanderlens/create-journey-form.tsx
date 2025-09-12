@@ -19,6 +19,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { handleCreateJourney, CreateJourneyState } from '@/lib/actions';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { RupeeIcon } from './rupee-icon';
 
 type VisitedPlace = {
   name: string;
@@ -234,7 +235,11 @@ export function CreateJourneyForm() {
                                     <SelectContent>
                                       <ScrollArea className="h-60">
                                         {currencies.map((c) => (
-                                        <SelectItem key={c.value} value={c.value}>{c.value}</SelectItem>
+                                        <SelectItem key={c.value} value={c.value}>
+                                           <div className="flex items-center gap-2">
+                                            {c.value === 'INR' ? <RupeeIcon /> : null} {c.label.split(' - ')[0]}
+                                           </div>
+                                        </SelectItem>
                                         ))}
                                       </ScrollArea>
                                     </SelectContent>
@@ -279,7 +284,11 @@ export function CreateJourneyForm() {
                                     <SelectContent>
                                       <ScrollArea className="h-60">
                                         {currencies.map((c) => (
-                                        <SelectItem key={c.value} value={c.value}>{c.value}</SelectItem>
+                                        <SelectItem key={c.value} value={c.value}>
+                                          <div className="flex items-center gap-2">
+                                            {c.value === 'INR' ? <RupeeIcon /> : null} {c.label.split(' - ')[0]}
+                                           </div>
+                                        </SelectItem>
                                         ))}
                                       </ScrollArea>
                                     </SelectContent>
