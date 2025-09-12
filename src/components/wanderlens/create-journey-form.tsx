@@ -21,9 +21,30 @@ type VisitedPlace = {
   description: string;
 };
 
+const currencies = [
+  { value: 'USD', label: 'USD - United States Dollar' },
+  { value: 'EUR', label: 'EUR - Euro' },
+  { value: 'JPY', label: 'JPY - Japanese Yen' },
+  { value: 'GBP', label: 'GBP - British Pound' },
+  { value: 'INR', label: 'INR - Indian Rupee' },
+  { value: 'AUD', label: 'AUD - Australian Dollar' },
+  { value: 'CAD', label: 'CAD - Canadian Dollar' },
+  { value: 'CHF', label: 'CHF - Swiss Franc' },
+  { value: 'CNY', label: 'CNY - Chinese Yuan' },
+  { value: 'SEK', label: 'SEK - Swedish Krona' },
+  { value: 'NZD', label: 'NZD - New Zealand Dollar' },
+  { value: 'KRW', label: 'KRW - South Korean Won' },
+  { value: 'SGD', label: 'SGD - Singapore Dollar' },
+  { value: 'NOK', label: 'NOK - Norwegian Krone' },
+  { value: 'MXN', label: 'MXN - Mexican Peso' },
+  { value: 'BRL', label: 'BRL - Brazilian Real' },
+  { value: 'ZAR', label: 'ZAR - South African Rand' },
+];
+
 export function CreateJourneyForm() {
   const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([{ name: '', photos: null, description: '' }]);
   const [date, setDate] = useState<Date>();
+  const [currency, setCurrency] = useState<string>('');
 
   const handleAddPlace = () => {
     setVisitedPlaces([...visitedPlaces, { name: '', photos: null, description: '' }]);
@@ -54,8 +75,8 @@ export function CreateJourneyForm() {
         </CardHeader>
         <CardContent>
             <form className="space-y-6">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="space-y-2 lg:col-span-2">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-2 lg:col-span-3">
                         <Label htmlFor="place-visited">Place Visited</Label>
                         <Input id="place-visited" name="place-visited" placeholder="e.g., Paris, France" required />
                     </div>
@@ -91,6 +112,19 @@ export function CreateJourneyForm() {
                     <div className="space-y-2">
                         <Label htmlFor="travelers">Number of Travelers</Label>
                         <Input id="travelers" name="travelers" type="number" placeholder="e.g., 2" required />
+                    </div>
+                    <div className="space-y-2 lg:col-span-3">
+                      <Label htmlFor="currency-select">Currency for Costs</Label>
+                        <Select onValueChange={setCurrency}>
+                            <SelectTrigger id="currency-select">
+                                <SelectValue placeholder="Select a currency for all costs" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {currencies.map((c) => (
+                                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 
