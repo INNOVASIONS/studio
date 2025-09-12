@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,9 +9,35 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '../ui/separator';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Car, Hotel, Plane, Ship, Train } from 'lucide-react';
+import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle } from 'lucide-react';
+
+type VisitedPlace = {
+  name: string;
+  photos: FileList | null;
+  description: string;
+};
 
 export function CreateJourneyForm() {
+  const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([{ name: '', photos: null, description: '' }]);
+
+  const handleAddPlace = () => {
+    setVisitedPlaces([...visitedPlaces, { name: '', photos: null, description: '' }]);
+  };
+
+  const handleRemovePlace = (index: number) => {
+    const newPlaces = visitedPlaces.filter((_, i) => i !== index);
+    setVisitedPlaces(newPlaces);
+  };
+
+  const handlePlaceChange = (index: number, field: keyof VisitedPlace, value: string | FileList | null) => {
+    const newPlaces = [...visitedPlaces];
+    if (field === 'photos' && value instanceof FileList) {
+      newPlaces[index][field] = value;
+    } else if (typeof value === 'string') {
+        (newPlaces[index] as any)[field] = value;
+    }
+    setVisitedPlaces(newPlaces);
+  };
 
   return (
     <Card className="max-w-4xl mx-auto shadow-lg">
@@ -98,8 +125,59 @@ export function CreateJourneyForm() {
                 <Separator />
 
                  <div>
-                    <h3 className="text-lg font-medium mb-4">Visited Places</h3>
-                    <p className="text-sm text-muted-foreground">A repeatable section for visited places with photos will go here.</p>
+                    <h3 className="text-lg font-medium mb-2">Visited Places</h3>
+                    <div className="space-y-6">
+                        {visitedPlaces.map((place, index) => (
+                            <div key={index} className="space-y-4 border p-4 rounded-md relative bg-muted/20">
+                                <h4 className="font-semibold">Stop #{index + 1}</h4>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor={`place-name-${index}`}>Place Name</Label>
+                                        <Input
+                                            id={`place-name-${index}`}
+                                            value={place.name}
+                                            onChange={(e) => handlePlaceChange(index, 'name', e.target.value)}
+                                            placeholder="e.g., Eiffel Tower"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor={`place-photos-${index}`}>Photos</Label>
+                                        <Input
+                                            id={`place-photos-${index}`}
+                                            type="file"
+                                            multiple
+                                            onChange={(e) => handlePlaceChange(index, 'photos', e.target.files)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`place-description-${index}`}>Description</Label>
+                                    <Textarea
+                                        id={`place-description-${index}`}
+                                        value={place.description}
+                                        onChange={(e) => handlePlaceChange(index, 'description', e.target.value)}
+                                        placeholder="Briefly describe your experience here..."
+                                    />
+                                </div>
+                                {visitedPlaces.length > 1 && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
+                                        onClick={() => handleRemovePlace(index)}
+                                    >
+                                        <XCircle className="h-5 w-5" />
+                                        <span className="sr-only">Remove Place</span>
+                                    </Button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                     <Button type="button" variant="outline" onClick={handleAddPlace} className="mt-4">
+                        <PlusCircle className="mr-2" />
+                        Add Another Place
+                    </Button>
                 </div>
 
 
