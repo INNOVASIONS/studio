@@ -44,7 +44,8 @@ const currencies = [
 export function CreateJourneyForm() {
   const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([{ name: '', photos: null, description: '' }]);
   const [date, setDate] = useState<Date>();
-  const [currency, setCurrency] = useState<string>('');
+  const [transportCurrency, setTransportCurrency] = useState<string>('');
+  const [hotelCurrency, setHotelCurrency] = useState<string>('');
 
   const handleAddPlace = () => {
     setVisitedPlaces([...visitedPlaces, { name: '', photos: null, description: '' }]);
@@ -113,19 +114,6 @@ export function CreateJourneyForm() {
                         <Label htmlFor="travelers">Number of Travelers</Label>
                         <Input id="travelers" name="travelers" type="number" placeholder="e.g., 2" required />
                     </div>
-                    <div className="space-y-2 lg:col-span-3">
-                      <Label htmlFor="currency-select">Currency for Costs</Label>
-                        <Select onValueChange={setCurrency}>
-                            <SelectTrigger id="currency-select">
-                                <SelectValue placeholder="Select a currency for all costs" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {currencies.map((c) => (
-                                <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
                 </div>
 
                 <Separator />
@@ -147,9 +135,24 @@ export function CreateJourneyForm() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="transport-cost">Transport Cost (total)</Label>
-                            <Input id="transport-cost" name="transport-cost" type="number" placeholder="e.g., 500" />
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="transport-cost">Transport Cost</Label>
+                                <Input id="transport-cost" name="transport-cost" type="number" placeholder="e.g., 500" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="transport-currency">Currency</Label>
+                                <Select onValueChange={setTransportCurrency}>
+                                    <SelectTrigger id="transport-currency">
+                                        <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {currencies.map((c) => (
+                                        <SelectItem key={c.value} value={c.value}>{c.value}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
                     <div className="mt-4 space-y-2">
@@ -175,9 +178,24 @@ export function CreateJourneyForm() {
                             <Label htmlFor="hotel-duration">Duration of Stay (nights)</Label>
                             <Input id="hotel-duration" name="hotel-duration" type="number" placeholder="e.g., 6" />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="hotel-cost">Hotel Cost (total)</Label>
-                            <Input id="hotel-cost" name="hotel-cost" type="number" placeholder="e.g., 1200" />
+                         <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-2">
+                                <Label htmlFor="hotel-cost">Hotel Cost</Label>
+                                <Input id="hotel-cost" name="hotel-cost" type="number" placeholder="e.g., 1200" />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="hotel-currency">Currency</Label>
+                                <Select onValueChange={setHotelCurrency}>
+                                    <SelectTrigger id="hotel-currency">
+                                        <SelectValue placeholder="Select" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {currencies.map((c) => (
+                                        <SelectItem key={c.value} value={c.value}>{c.value}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                      </div>
                      <div className="mt-4 space-y-2">
