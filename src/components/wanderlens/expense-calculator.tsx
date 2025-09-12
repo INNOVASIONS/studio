@@ -138,7 +138,11 @@ export function ExpenseCalculator() {
                 <SelectContent>
                   <ScrollArea className="h-60">
                     {currencies.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                      <SelectItem key={c.value} value={c.value}>
+                        <div className="flex items-center gap-1.5">
+                            {c.value === 'INR' ? <RupeeIcon /> : c.label.split(' ')[0]} {c.label.split(' ')[1]}
+                        </div>
+                      </SelectItem>
                     ))}
                   </ScrollArea>
                 </SelectContent>
