@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '../ui/separator';
 import { Textarea } from '../ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon } from 'lucide-react';
+import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon, Bus, Truck } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
@@ -131,12 +130,14 @@ export function CreateJourneyForm() {
                                     <SelectItem value="plane"><Plane className="inline-block mr-2" /> Plane</SelectItem>
                                     <SelectItem value="train"><Train className="inline-block mr-2" /> Train</SelectItem>
                                     <SelectItem value="car"><Car className="inline-block mr-2" /> Car</SelectItem>
+                                    <SelectItem value="bus"><Bus className="inline-block mr-2" /> Bus</SelectItem>
+                                    <SelectItem value="auto-rickshaw"><Truck className="inline-block mr-2" /> Auto-rickshaw</SelectItem>
                                     <SelectItem value="ship"><Ship className="inline-block mr-2" /> Ship/Ferry</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="space-y-2">
+                             <div className="space-y-2">
                                 <Label htmlFor="transport-currency">Currency</Label>
                                 <Select onValueChange={setTransportCurrency}>
                                     <SelectTrigger id="transport-currency">
