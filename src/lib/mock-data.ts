@@ -1,7 +1,7 @@
 
 import type { User, Photo, UserPlace, Comment, Journey } from './types';
 
-const users: User[] = [
+let users: User[] = [
   {
     id: 1,
     name: 'Your Name',
@@ -317,6 +317,17 @@ let journeys: Journey[] = [];
 export const getUsers = () => users;
 export const getUserById = (id: number) => users.find((user) => user.id === id);
 export const getCurrentUser = () => users[0];
+
+export const updateUser = (userId: number, data: Partial<Omit<User, 'id' | 'email' | 'avatarUrl'>>) => {
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+        throw new Error('User not found');
+    }
+    const updatedUser = { ...users[userIndex], ...data };
+    users[userIndex] = updatedUser;
+    return updatedUser;
+};
+
 export const getPhotos = () => photos;
 export const getPhotosByUserId = (userId: number) => photos.filter((photo) => photo.userId === userId);
 export const getUserPlaces = () => userPlaces;

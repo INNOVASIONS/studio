@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { User } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { EditProfileDialog } from './edit-profile-dialog';
+import { getCurrentUser } from '@/lib/mock-data';
+import { Pencil } from 'lucide-react';
 
 type ProfileHeaderProps = {
     user: User;
@@ -13,6 +16,8 @@ type ProfileHeaderProps = {
 
 export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
     const [isFollowing, setIsFollowing] = useState(false);
+    const currentUser = getCurrentUser();
+    const isCurrentUserProfile = user.id === currentUser.id;
 
     const stats = [
         { label: "Posts", value: photosCount },
@@ -39,10 +44,21 @@ export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
                 </div>
                 <p className="max-w-md text-sm">{user.bio}</p>
                  <div className="mt-4 flex justify-center md:justify-start gap-2">
-                    <Button onClick={() => setIsFollowing(!isFollowing)} variant={isFollowing ? 'secondary' : 'default'}>
-                        {isFollowing ? 'Following' : 'Follow'}
-                    </Button>
-                    <Button variant="outline">Message</Button>
+                    {isCurrentUserProfile ? (
+                        <EditProfileDialog user={user}>
+                            <Button variant="outline">
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Edit Profile
+                            </Button>
+                        </EditProfileDialog>
+                    ) : (
+                        <>
+                            <Button onClick={() => setIsFollowing(!isFollowing)} variant={isFollowing ? 'secondary' : 'default'}>
+                                {isFollowing ? 'Following' : 'Follow'}
+                            </Button>
+                            <Button variant="outline">Message</Button>
+                        </>
+                    )}
                  </div>
             </div>
         </div>

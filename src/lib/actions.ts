@@ -11,8 +11,8 @@ import {
 } from '@/ai/flows/image-based-location-finder';
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
-import { addPhoto, getCurrentUser, addJourney, deletePhoto } from './mock-data';
-import { VisitedPlace } from './types';
+import { addPhoto, getCurrentUser, addJourney, deletePhoto, updateUser } from './mock-data';
+import { VisitedPlace, User } from './types';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -265,5 +265,35 @@ export async function handleDeletePost(
   revalidatePath('/profile');
   revalidatePath('/');
   revalidatePath('/discover');
+  return { success: true };
+}
+
+export type UpdateProfileState = {
+  error?: string;
+  success?: boolean;
+};
+
+export async function handleUpdateProfile(
+  prevState: UpdateProfileState,
+  formData: FormData
+): Promise<UpdateProfileState> {
+  const name = formData.get('name') as string;
+  const handle = formData.get('handle') as string;
+  const bio = formData.get('bio') as string;
+  const currentUser = getCurrentUser();
+
+  if (!name || !handle) {
+    return { error: 'Name and handle are required.' };
+  }
+
+  try {
+    updateUser(currentUser.id, { name, handle, bio });
+  } catch (e: any) {
+    console.error(e);
+    return { error: e.message };
+  }
+
+  revalidatePath(`/profile/${currentUser.id}`);
+  revalidatePath('/profile');
   return { success: true };
 }
