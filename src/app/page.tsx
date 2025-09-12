@@ -8,6 +8,7 @@ import {
   Globe,
   Map,
   Plus,
+  Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPhotos, getUsers } from '@/lib/mock-data';
@@ -36,6 +37,13 @@ const featureCards = [
         description: "Discover restaurants and points of interest near you or at your next destination.",
         href: "/nearby-places",
         cta: "Explore Nearby",
+    },
+    {
+        icon: Wallet,
+        title: "Trip Expense Calculator",
+        description: "Track your travel spending on accommodation, food, transport, and more.",
+        href: "/trip-expenses",
+        cta: "Calculate Expenses",
     },
 ]
 
@@ -72,7 +80,7 @@ export default function Home() {
         <h2 className="font-headline text-4xl font-semibold tracking-tight mb-8 text-center">
           AI-Powered Tools
         </h2>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {featureCards.map((feature) => (
             <Link key={feature.href} href={feature.href} className="block group">
               <Card className="h-full flex flex-col transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-xl">

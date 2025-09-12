@@ -16,6 +16,7 @@ import {
   LogOut,
   Route,
   BookCopy,
+  Wallet,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ const navLinks = [
   { href: '/itinerary-generator', label: 'Itinerary AI', icon: FileText },
   { href: '/location-finder', label: 'Location AI', icon: Globe },
   { href: '/nearby-places', label: 'Nearby', icon: Map },
+  { href: '/trip-expenses', label: 'Trip Expenses', icon: Wallet },
 ];
 
 export function AppHeader() {
