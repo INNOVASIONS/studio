@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { ScrollArea } from '../ui/scroll-area';
 
 type VisitedPlace = {
   name: string;
@@ -159,9 +160,11 @@ export function CreateJourneyForm() {
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                      <ScrollArea className="h-60">
                                         {currencies.map((c) => (
                                         <SelectItem key={c.value} value={c.value}>{c.value}</SelectItem>
                                         ))}
+                                      </ScrollArea>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -202,9 +205,11 @@ export function CreateJourneyForm() {
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent>
+                                      <ScrollArea className="h-60">
                                         {currencies.map((c) => (
                                         <SelectItem key={c.value} value={c.value}>{c.value}</SelectItem>
                                         ))}
+                                      </ScrollArea>
                                     </SelectContent>
                                 </Select>
                             </div>
