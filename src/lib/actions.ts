@@ -11,7 +11,6 @@ import {
 } from '@/ai/flows/image-based-location-finder';
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { addPhoto, getCurrentUser, addJourney } from './mock-data';
 import { VisitedPlace } from './types';
 
@@ -226,6 +225,6 @@ export async function handleCreateJourney(
     return { error: 'Failed to process journey data. ' + error.message };
   }
 
-  revalidatePath('/journeys');
-  redirect('/journeys');
+  revalidatePath('/create-journey');
+  return { success: true, message: "Journey created!"}
 }

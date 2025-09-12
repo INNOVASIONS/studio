@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useActionState } from 'react';
+import { useState, useEffect, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,12 +81,11 @@ export function CreateJourneyForm() {
   const { toast } = useToast();
   const initialState: CreateJourneyState = {};
   const [state, dispatch] = useActionState(handleCreateJourney, initialState);
+  const formRef = useRef<HTMLFormElement>(null);
   
   const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([initialVisitedPlace]);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [transportCurrency, setTransportCurrency] = useState<string>('');
-  const [hotelCurrency, setHotelCurrency] = useState<string>('');
 
   const handleAddPlace = () => {
     setVisitedPlaces([...visitedPlaces, initialVisitedPlace]);
@@ -109,8 +108,13 @@ export function CreateJourneyForm() {
         title: "Journey Created!",
         description: "Your new travel journey has been successfully saved.",
       });
+      // Reset form fields
+      formRef.current?.reset();
+      setVisitedPlaces([initialVisitedPlace]);
+      setStartDate(undefined);
+      setEndDate(undefined);
     }
-  }, [state.success, toast]);
+  }, [state, toast]);
 
 
   return (
@@ -122,7 +126,7 @@ export function CreateJourneyForm() {
             </CardDescription>
         </CardHeader>
         <CardContent>
-            <form action={dispatch} className="space-y-6">
+            <form action={dispatch} ref={formRef} className="space-y-6">
                 {/* Hidden input to pass complex state to server action */}
                 <input 
                     type="hidden" 
@@ -223,7 +227,7 @@ export function CreateJourneyForm() {
                         <div className="grid grid-cols-2 gap-2">
                              <div className="space-y-2">
                                 <Label htmlFor="transport-currency">Currency</Label>
-                                <Select name="transport-currency" onValueChange={setTransportCurrency}>
+                                <Select name="transport-currency">
                                     <SelectTrigger id="transport-currency">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
@@ -268,8 +272,7 @@ export function CreateJourneyForm() {
                          <div className="grid grid-cols-2 gap-2">
                              <div className="space-y-2">
                                 <Label htmlFor="hotel-currency">Currency</Label>
-                                <Select name="hotel-currency" onValuecha
-nge={setHotelCurrency}>
+                                <Select name="hotel-currency">
                                     <SelectTrigger id="hotel-currency">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
