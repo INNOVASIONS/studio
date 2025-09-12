@@ -15,6 +15,7 @@ import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 
 type VisitedPlace = {
   name: string;
@@ -55,16 +56,18 @@ const AutoRickshawIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
+const initialVisitedPlace = { name: '', photos: null, description: '' };
 
 export function CreateJourneyForm() {
-  const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([{ name: '', photos: null, description: '' }]);
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  const { toast } = useToast();
+  const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([initialVisitedPlace]);
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
   const [transportCurrency, setTransportCurrency] = useState<string>('');
   const [hotelCurrency, setHotelCurrency] = useState<string>('');
 
   const handleAddPlace = () => {
-    setVisitedPlaces([...visitedPlaces, { name: '', photos: null, description: '' }]);
+    setVisitedPlaces([...visitedPlaces, initialVisitedPlace]);
   };
 
   const handleRemovePlace = (index: number) => {
@@ -82,6 +85,49 @@ export function CreateJourneyForm() {
     setVisitedPlaces(newPlaces);
   };
 
+  const resetForm = (formElement: HTMLFormElement) => {
+    formElement.reset();
+    setVisitedPlaces([initialVisitedPlace]);
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setTransportCurrency('');
+    setHotelCurrency('');
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const data = {
+        placeVisited: formData.get('place-visited'),
+        startDate: startDate,
+        endDate: endDate,
+        travelers: formData.get('travelers'),
+        transportMode: formData.get('transport-mode'),
+        transportCost: formData.get('transport-cost'),
+        transportCurrency: transportCurrency,
+        transportDetails: formData.get('transport-details'),
+        hotelName: formData.get('hotel-name'),
+        hotelPhotos: formData.get('hotel-photos'),
+        hotelDuration: formData.get('hotel-duration'),
+        hotelCost: formData.get('hotel-cost'),
+        hotelCurrency: hotelCurrency,
+        hotelReview: formData.get('hotel-review'),
+        visitedPlaces: visitedPlaces,
+    };
+    
+    // In a real app, you would send this 'data' object to your server/API
+    console.log("Journey Data:", data);
+
+    toast({
+        title: "Journey Created!",
+        description: "Your new travel journey has been successfully saved.",
+    });
+
+    resetForm(form);
+  };
+
   return (
     <Card className="max-w-4xl mx-auto shadow-lg">
         <CardHeader>
@@ -91,7 +137,7 @@ export function CreateJourneyForm() {
             </CardDescription>
         </CardHeader>
         <CardContent>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="space-y-2">
                         <Label htmlFor="place-visited">Place Visited</Label>
@@ -118,7 +164,7 @@ export function CreateJourneyForm() {
                                 selected={startDate}
                                 onSelect={setStartDate}
                                 disabled={(date) =>
-                                  (endDate ? date > endDate : false)
+                                    endDate ? date > endDate : false
                                 }
                                 initialFocus
                                 />
@@ -146,7 +192,7 @@ export function CreateJourneyForm() {
                                 selected={endDate}
                                 onSelect={setEndDate}
                                 disabled={(date) =>
-                                    (startDate ? date < startDate : false)
+                                    startDate ? date < startDate : false
                                 }
                                 initialFocus
                                 />
@@ -166,7 +212,7 @@ export function CreateJourneyForm() {
                     <div className="grid md:grid-cols-2 gap-6">
                          <div className="space-y-2">
                             <Label htmlFor="transport-mode">Mode of Transport</Label>
-                            <Select>
+                            <Select name="transport-mode">
                                 <SelectTrigger id="transport-mode">
                                     <SelectValue placeholder="Select transport type" />
                                 </SelectTrigger>
