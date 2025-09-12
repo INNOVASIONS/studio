@@ -190,15 +190,26 @@ export async function handleCreateJourney(
 
   try {
     const visitedPlacesData = JSON.parse(formData.get('visited-places-data') as string);
+
+    const visitedPlacesPromises = visitedPlacesData.map(async (p: any, index: number) => {
+        const photos: File[] = formData.getAll(`place-photos-${index}`) as File[];
+        const photoUrls = await Promise.all(
+            photos.filter(photo => photo.size > 0).map(photo => readFileAsDataURL(photo))
+        );
+        return {
+            name: p.name,
+            description: p.description,
+            photos: photoUrls
+        };
+    });
     
-    // This is a simplified representation. In a real app, you would handle file uploads properly.
-    // For this mock implementation, we assume the client sends data URIs or we reconstruct them.
-    const visitedPlaces: VisitedPlace[] = visitedPlacesData.map((p: any) => ({
-        name: p.name,
-        description: p.description,
-        photos: [] // In a real app, you'd handle file uploads and get URLs here
-    }))
-    
+    const visitedPlaces: VisitedPlace[] = await Promise.all(visitedPlacesPromises);
+
+    const hotelPhotosFiles: File[] = formData.getAll('hotel-photos') as File[];
+    const hotelPhotoUrls = await Promise.all(
+        hotelPhotosFiles.filter(photo => photo.size > 0).map(photo => readFileAsDataURL(photo))
+    );
+
     const journeyData = {
       userId: currentUser.id,
       placeVisited: formData.get('place-visited') as string,
@@ -210,7 +221,7 @@ export async function handleCreateJourney(
       transportCurrency: formData.get('transport-currency') as string | undefined,
       transportDetails: formData.get('transport-details') as string | undefined,
       hotelName: formData.get('hotel-name') as string | undefined,
-      hotelPhotos: [], // Handle file uploads
+      hotelPhotos: hotelPhotoUrls,
       hotelDuration: parseInt(formData.get('hotel-duration') as string, 10) || undefined,
       hotelCost: parseFloat(formData.get('hotel-cost') as string) || undefined,
       hotelCurrency: formData.get('hotel-currency') as string | undefined,

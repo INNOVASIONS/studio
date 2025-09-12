@@ -1,12 +1,22 @@
 
 'use client';
 
+import Image from 'next/image';
 import type { Journey, User } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Calendar, Users, Plane, Train, Car, Ship, Bus, Hotel, MapPin, Wallet, BookOpen } from 'lucide-react';
+import { Calendar, Users, Plane, Train, Car, Ship, Bus, Hotel, MapPin, Wallet, BookOpen, Image as ImageIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import { cn } from '@/lib/utils';
+
 
 const AutoRickshawIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -48,6 +58,40 @@ const DetailSection = ({ title, icon: Icon, children }: { title: string, icon: R
     </div>
 )
 
+const ImageCarousel = ({ images, alt }: { images: string[], alt: string }) => {
+    if (!images || images.length === 0) {
+        return (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <ImageIcon className="h-4 w-4" />
+                <span>No photos uploaded.</span>
+            </div>
+        );
+    }
+    
+    return (
+         <Carousel className="w-full max-w-sm" opts={{loop: true}}>
+            <CarouselContent>
+                {images.map((src, index) => (
+                    <CarouselItem key={index}>
+                        <div className="p-1">
+                            <Card className="overflow-hidden">
+                                <CardContent className="flex aspect-video items-center justify-center p-0">
+                                    <Image src={src} alt={`${alt} photo ${index + 1}`} width={400} height={225} className="object-cover w-full h-full" />
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </CarouselItem>
+                ))}
+            </CarouselContent>
+            {images.length > 1 && (
+                <>
+                    <CarouselPrevious className="ml-12" />
+                    <CarouselNext className="mr-12"/>
+                </>
+            )}
+        </Carousel>
+    )
+}
 
 export function JourneyCard({ journey, user }: { journey: Journey, user: User }) {
   const TransportIcon = journey.transportMode ? transportIcons[journey.transportMode] : Car;
@@ -91,9 +135,10 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
                     )}
                 </DetailSection>
             )}
-            {journey.hotelReview && (
+            {journey.hotelName && (
                  <DetailSection title="Hotel Review" icon={Hotel}>
-                    <p>"{journey.hotelReview}"</p>
+                    {journey.hotelReview && <p>"{journey.hotelReview}"</p>}
+                    <ImageCarousel images={journey.hotelPhotos} alt={journey.hotelName} />
                     {journey.hotelCost && journey.hotelCurrency && (
                         <p className="flex items-center gap-2 pt-2"><Wallet className="h-4 w-4"/>~{journey.hotelCurrency} {journey.hotelCost} / night</p>
                     )}
@@ -103,8 +148,8 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
       </CardContent>
       {journey.visitedPlaces && journey.visitedPlaces.length > 0 && (
           <CardFooter className="p-0">
-            <Accordion type="single" collapsible className="w-full bg-muted/20">
-                <AccordionItem value="item-1">
+            <Accordion type="single" collapsible className="w-full bg-muted/20" defaultValue='item-0'>
+                <AccordionItem value="item-0">
                     <AccordionTrigger className="px-4 md:px-6 py-3 font-headline text-lg hover:no-underline">
                         <div className="flex items-center gap-2">
                            <BookOpen className="h-5 w-5 text-primary"/>
@@ -114,9 +159,12 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
                     <AccordionContent className="p-4 md:p-6 pt-0">
                         <div className="space-y-4">
                             {journey.visitedPlaces.map((place, index) => (
-                                <div key={index} className="p-3 rounded-md border bg-background">
+                                <div key={index} className="p-3 rounded-md border bg-background space-y-3">
                                     <h5 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-accent"/>{place.name}</h5>
-                                    <p className="text-sm text-muted-foreground pl-6">{place.description}</p>
+                                    {place.description && <p className="text-sm text-muted-foreground pl-6">{place.description}</p>}
+                                    <div className="pl-6">
+                                       <ImageCarousel images={place.photos} alt={place.name} />
+                                    </div>
                                 </div>
                             ))}
                         </div>
