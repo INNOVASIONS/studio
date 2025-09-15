@@ -61,6 +61,13 @@ export type VisitedPlace = {
   description: string;
 };
 
+export type DailyActivity = {
+  day: number;
+  date: string; // Store date as ISO string
+  places: VisitedPlace[];
+};
+
+
 export type Journey = {
   id: number;
   userId: number;
@@ -78,5 +85,5 @@ export type Journey = {
   hotelCost?: number;
   hotelCurrency?: string;
   hotelReview?: string;
-  visitedPlaces: VisitedPlace[];
+  dailyActivities: DailyActivity[];
 };

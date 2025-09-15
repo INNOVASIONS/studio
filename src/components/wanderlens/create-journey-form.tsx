@@ -14,18 +14,24 @@ import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon, Bus,
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, eachDayOfInterval, differenceInDays } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { handleCreateJourney, CreateJourneyState } from '@/lib/actions';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { RupeeIcon } from './rupee-icon';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 type VisitedPlace = {
   name: string;
-  photos: File[] | null;
   description: string;
 };
+
+type DailyActivityState = {
+    day: number;
+    date: Date;
+    places: VisitedPlace[];
+}
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -76,7 +82,7 @@ const AutoRickshawIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-const initialVisitedPlace = { name: '', photos: null, description: '' };
+const initialPlace = { name: '', description: '' };
 
 export function CreateJourneyForm() {
   const { toast } = useToast();
@@ -84,23 +90,43 @@ export function CreateJourneyForm() {
   const [state, dispatch] = useActionState(handleCreateJourney, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   
-  const [visitedPlaces, setVisitedPlaces] = useState<VisitedPlace[]>([initialVisitedPlace]);
+  const [dailyActivities, setDailyActivities] = useState<DailyActivityState[]>([]);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
 
-  const handleAddPlace = () => {
-    setVisitedPlaces([...visitedPlaces, initialVisitedPlace]);
+  useEffect(() => {
+    if (startDate && endDate && endDate >= startDate) {
+      const days = eachDayOfInterval({ start: startDate, end: endDate });
+      const newDailyActivities: DailyActivityState[] = days.map((date, i) => {
+        const existingDay = dailyActivities.find(d => format(d.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'));
+        return existingDay || { day: i + 1, date, places: [initialPlace] };
+      });
+      setDailyActivities(newDailyActivities);
+    } else {
+      setDailyActivities([]);
+    }
+  }, [startDate, endDate]);
+
+
+  const handleAddPlace = (dayIndex: number) => {
+    const newDailyActivities = [...dailyActivities];
+    newDailyActivities[dayIndex].places.push(initialPlace);
+    setDailyActivities(newDailyActivities);
   };
 
-  const handleRemovePlace = (index: number) => {
-    const newPlaces = visitedPlaces.filter((_, i) => i !== index);
-    setVisitedPlaces(newPlaces);
+  const handleRemovePlace = (dayIndex: number, placeIndex: number) => {
+    const newDailyActivities = [...dailyActivities];
+    newDailyActivities[dayIndex].places = newDailyActivities[dayIndex].places.filter((_, i) => i !== placeIndex);
+    setDailyActivities(newDaily4s);
   };
 
-  const handlePlaceChange = (index: number, field: 'name' | 'description' , value: string) => {
-    const newPlaces = [...visitedPlaces];
-    newPlaces[index][field] = value;
-    setVisitedPlaces(newPlaces);
+  const handlePlaceChange = (dayIndex: number, placeIndex: number, field: 'name' | 'description', value: string) => {
+    const newDailyActivities = [...dailyActivities];
+    newDailyActivities[dayIndex].places[placeIndex] = {
+        ...newDailyActivities[dayIndex].places[placeIndex],
+        [field]: value,
+    };
+    setDailyActivities(newDailyActivities);
   };
   
   useEffect(() => {
@@ -109,11 +135,10 @@ export function CreateJourneyForm() {
         title: "Journey Created!",
         description: "Your new travel journey has been successfully saved.",
       });
-      // Reset form fields
       formRef.current?.reset();
-      setVisitedPlaces([initialVisitedPlace]);
       setStartDate(undefined);
       setEndDate(undefined);
+      setDailyActivities([]);
     }
   }, [state, toast]);
 
@@ -128,11 +153,13 @@ export function CreateJourneyForm() {
         </CardHeader>
         <CardContent>
             <form action={dispatch} ref={formRef} className="space-y-6">
-                {/* Hidden input to pass complex state to server action */}
                 <input 
                     type="hidden" 
-                    name="visited-places-data" 
-                    value={JSON.stringify(visitedPlaces.map(p => ({name: p.name, description: p.description})))} 
+                    name="daily-activities-data" 
+                    value={JSON.stringify(dailyActivities.map(day => ({
+                        ...day,
+                        date: day.date.toISOString(),
+                    })))} 
                 />
                  <input type="hidden" name="start-date" value={startDate?.toISOString() ?? ''} />
                  <input type="hidden" name="end-date" value={endDate?.toISOString() ?? ''} />
@@ -163,7 +190,7 @@ export function CreateJourneyForm() {
                                 selected={startDate}
                                 onSelect={setStartDate}
                                 disabled={(date) =>
-                                    endDate ? date > endDate : false
+                                    endDate ? date > endDate || date > new Date() : date > new Date()
                                 }
                                 initialFocus
                                 />
@@ -191,7 +218,7 @@ export function CreateJourneyForm() {
                                 selected={endDate}
                                 onSelect={setEndDate}
                                 disabled={(date) =>
-                                    startDate ? date < startDate : false
+                                    startDate ? date < startDate || date > new Date() : date > new Date()
                                 }
                                 initialFocus
                                 />
@@ -200,7 +227,7 @@ export function CreateJourneyForm() {
                     </div>
                     <div className="space-y-2 lg:col-span-3">
                         <Label htmlFor="travelers">Number of Travelers</Label>
-                        <Input id="travelers" name="travelers" type="number" placeholder="e.g., 2" required />
+                        <Input id="travelers" name="travelers" type="number" placeholder="e.g., 2" required min="1" />
                     </div>
                 </div>
 
@@ -307,65 +334,82 @@ export function CreateJourneyForm() {
                 </div>
 
                 <Separator />
-
+                
                  <div>
-                    <h3 className="text-lg font-medium mb-2">Visited Places</h3>
-                    <div className="space-y-6">
-                        {visitedPlaces.map((place, index) => (
-                            <div key={index} className="space-y-4 border p-4 rounded-md relative bg-muted/20">
-                                <h4 className="font-semibold">Stop #{index + 1}</h4>
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <Label htmlFor={`place-name-${index}`}>Place Name</Label>
-                                        <Input
-                                            id={`place-name-${index}`}
-                                            value={place.name}
-                                            onChange={(e) => handlePlaceChange(index, 'name', e.target.value)}
-                                            placeholder="e.g., Eiffel Tower"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor={`place-photos-${index}`}>Photos</Label>
-                                        <Input
-                                            id={`place-photos-${index}`}
-                                            type="file"
-                                            multiple
-                                            name={`place-photos-${index}`}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor={`place-description-${index}`}>Description</Label>
-                                    <Textarea
-                                        id={`place-description-${index}`}
-                                        value={place.description}
-                                        onChange={(e) => handlePlaceChange(index, 'description', e.target.value)}
-                                        placeholder="Briefly describe your experience here..."
-                                    />
-                                </div>
-                                {visitedPlaces.length > 1 && (
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
-                                        onClick={() => handleRemovePlace(index)}
-                                    >
-                                        <XCircle className="h-5 w-5" />
-                                        <span className="sr-only">Remove Place</span>
-                                    </Button>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                     <Button type="button" variant="outline" onClick={handleAddPlace} className="mt-4">
-                        <PlusCircle className="mr-2" />
-                        Add Another Place
-                    </Button>
+                    <h3 className="text-lg font-medium mb-2">Daily Itinerary</h3>
+                    {dailyActivities.length > 0 ? (
+                        <Accordion type="multiple" className="w-full space-y-4" defaultValue={['day-0']}>
+                            {dailyActivities.map((day, dayIndex) => (
+                                <AccordionItem key={dayIndex} value={`day-${dayIndex}`} className="border-none">
+                                    <AccordionTrigger className="flex w-full items-center justify-between rounded-md bg-muted/50 px-4 py-3 text-lg font-semibold text-primary hover:no-underline">
+                                        Day {day.day}: {format(day.date, 'PPP')}
+                                    </AccordionTrigger>
+                                    <AccordionContent className="p-4 border border-t-0 rounded-b-md">
+                                        <div className="space-y-6">
+                                            {day.places.map((place, placeIndex) => (
+                                                <div key={placeIndex} className="space-y-4 border p-4 rounded-md relative bg-background">
+                                                    <h4 className="font-semibold">Stop #{placeIndex + 1}</h4>
+                                                    <div className="grid md:grid-cols-2 gap-6">
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor={`day-${dayIndex}-place-${placeIndex}-name`}>Place Name</Label>
+                                                            <Input
+                                                                id={`day-${dayIndex}-place-${placeIndex}-name`}
+                                                                value={place.name}
+                                                                onChange={(e) => handlePlaceChange(dayIndex, placeIndex, 'name', e.target.value)}
+                                                                placeholder="e.g., Eiffel Tower"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label htmlFor={`day-${dayIndex}-place-${placeIndex}-photos`}>Photos</Label>
+                                                            <Input
+                                                                id={`day-${dayIndex}-place-${placeIndex}-photos`}
+                                                                name={`day-${dayIndex}-place-${placeIndex}-photos`}
+                                                                type="file"
+                                                                multiple
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor={`day-${dayIndex}-place-${placeIndex}-description`}>Description</Label>
+                                                        <Textarea
+                                                            id={`day-${dayIndex}-place-${placeIndex}-description`}
+                                                            value={place.description}
+                                                            onChange={(e) => handlePlaceChange(dayIndex, placeIndex, 'description', e.target.value)}
+                                                            placeholder="Briefly describe your experience here..."
+                                                        />
+                                                    </div>
+                                                    {day.places.length > 1 && (
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
+                                                            onClick={() => handleRemovePlace(dayIndex, placeIndex)}
+                                                        >
+                                                            <XCircle className="h-5 w-5" />
+                                                            <span className="sr-only">Remove Place</span>
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            ))}
+                                             <Button type="button" variant="outline" onClick={() => handleAddPlace(dayIndex)} className="mt-4">
+                                                <PlusCircle className="mr-2" />
+                                                Add Stop to Day {day.day}
+                                            </Button>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    ) : (
+                        <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+                           <p>Please select a start and end date to begin planning your itinerary.</p>
+                        </div>
+                    )}
                 </div>
 
                 {state?.error && (
-                    <Alert variant="destructive">
+                    <Alert variant="destructive" className="mt-4">
                         <AlertTitle>Error Creating Journey</AlertTitle>
                         <AlertDescription>{state.error}</AlertDescription>
                     </Alert>

@@ -146,28 +146,40 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
             )}
         </div>
       </CardContent>
-      {journey.visitedPlaces && journey.visitedPlaces.length > 0 && (
+      {journey.dailyActivities && journey.dailyActivities.length > 0 && (
           <CardFooter className="p-0">
-            <Accordion type="single" collapsible className="w-full bg-muted/20" defaultValue='item-0'>
+            <Accordion type="single" collapsible className="w-full bg-muted/20" defaultValue='day-0'>
                 <AccordionItem value="item-0">
                     <AccordionTrigger className="px-4 md:px-6 py-3 font-headline text-lg hover:no-underline">
                         <div className="flex items-center gap-2">
                            <BookOpen className="h-5 w-5 text-primary"/>
-                            Stops & Stories ({journey.visitedPlaces.length})
+                            Daily Itinerary ({journey.dailyActivities.length} {journey.dailyActivities.length > 1 ? 'Days' : 'Day'})
                         </div>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 md:p-6 pt-0">
-                        <div className="space-y-4">
-                            {journey.visitedPlaces.map((place, index) => (
-                                <div key={index} className="p-3 rounded-md border bg-background space-y-3">
-                                    <h5 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-accent"/>{place.name}</h5>
-                                    {place.description && <p className="text-sm text-muted-foreground pl-6">{place.description}</p>}
-                                    <div className="pl-6">
-                                       <ImageCarousel images={place.photos} alt={place.name} />
-                                    </div>
-                                </div>
+                        <Accordion type="multiple" className="w-full space-y-2">
+                            {journey.dailyActivities.map((day, dayIndex) => (
+                                <AccordionItem key={dayIndex} value={`day-${dayIndex}`} className="border-none">
+                                    <AccordionTrigger className="flex w-full items-center justify-between rounded-md bg-muted/50 px-4 py-2 text-md font-semibold text-primary/80 hover:no-underline">
+                                        Day {day.day}: {format(new Date(day.date), 'MMMM do')}
+                                    </AccordionTrigger>
+                                    <AccordionContent className="p-4 space-y-4">
+                                        {day.places.map((place, placeIndex) => (
+                                            <div key={placeIndex} className="p-3 rounded-md border bg-background space-y-3">
+                                                <h5 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-accent"/>{place.name}</h5>
+                                                {place.description && <p className="text-sm text-muted-foreground pl-6">{place.description}</p>}
+                                                <div className="pl-6">
+                                                   <ImageCarousel images={place.photos} alt={place.name} />
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {day.places.length === 0 || (day.places.length === 1 && !day.places[0].name) ? (
+                                            <p className='text-sm text-muted-foreground text-center py-4'>No activities logged for this day.</p>
+                                        ): null}
+                                    </AccordionContent>
+                                </AccordionItem>
                             ))}
-                        </div>
+                        </Accordion>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

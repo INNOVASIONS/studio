@@ -12,7 +12,7 @@ import {
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
 import { addPhoto, getCurrentUser, addJourney, deletePhoto, updateUser } from './mock-data';
-import { VisitedPlace, User } from './types';
+import { DailyActivity, VisitedPlace } from './types';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -194,21 +194,30 @@ export async function handleCreateJourney(
   const currentUser = getCurrentUser();
 
   try {
-    const visitedPlacesData = JSON.parse(formData.get('visited-places-data') as string);
+    const dailyActivitiesData = JSON.parse(formData.get('daily-activities-data') as string);
 
-    const visitedPlacesPromises = visitedPlacesData.map(async (p: any, index: number) => {
-        const photos: File[] = formData.getAll(`place-photos-${index}`) as File[];
-        const photoUrls = await Promise.all(
-            photos.filter(photo => photo.size > 0).map(photo => readFileAsDataURL(photo))
-        );
+    const dailyActivitiesPromises = dailyActivitiesData.map(async (day: any, dayIndex: number) => {
+        const placesPromises = day.places.map(async (place: any, placeIndex: number) => {
+            const photos: File[] = formData.getAll(`day-${dayIndex}-place-${placeIndex}-photos`) as File[];
+            const photoUrls = await Promise.all(
+                photos.filter(photo => photo.size > 0).map(photo => readFileAsDataURL(photo))
+            );
+            return {
+                name: place.name,
+                description: place.description,
+                photos: photoUrls
+            };
+        });
+        const resolvedPlaces: VisitedPlace[] = await Promise.all(placesPromises);
+
         return {
-            name: p.name,
-            description: p.description,
-            photos: photoUrls
+            day: day.day,
+            date: day.date,
+            places: resolvedPlaces,
         };
     });
-    
-    const visitedPlaces: VisitedPlace[] = await Promise.all(visitedPlacesPromises);
+
+    const dailyActivities: DailyActivity[] = await Promise.all(dailyActivitiesPromises);
 
     const hotelPhotosFiles: File[] = formData.getAll('hotel-photos') as File[];
     const hotelPhotoUrls = await Promise.all(
@@ -231,7 +240,7 @@ export async function handleCreateJourney(
       hotelCost: parseFloat(formData.get('hotel-cost') as string) || undefined,
       hotelCurrency: formData.get('hotel-currency') as string | undefined,
       hotelReview: formData.get('hotel-review') as string | undefined,
-      visitedPlaces: visitedPlaces,
+      dailyActivities: dailyActivities,
     };
 
     addJourney(journeyData);
