@@ -190,7 +190,7 @@ export function CreateJourneyForm() {
                                 selected={startDate}
                                 onSelect={setStartDate}
                                 disabled={(date) =>
-                                    endDate ? date > endDate || date > new Date() : date > new Date()
+                                    endDate ? date > endDate : false
                                 }
                                 initialFocus
                                 />
@@ -218,7 +218,7 @@ export function CreateJourneyForm() {
                                 selected={endDate}
                                 onSelect={setEndDate}
                                 disabled={(date) =>
-                                    startDate ? date < startDate || date > new Date() : date > new Date()
+                                    startDate ? date < startDate : false
                                 }
                                 initialFocus
                                 />
