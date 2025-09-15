@@ -1,8 +1,9 @@
 
 'use client';
 
-import React, { useEffect, useActionState, useRef } from 'react';
+import React, { useEffect, useActionState, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,10 +19,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { handleUpdateProfile, UpdateProfileState } from '@/lib/actions';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Camera } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { User } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -49,6 +51,18 @@ export function EditProfileDialog({
   const [state, dispatch] = useActionState(handleUpdateProfile, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     if (state.success) {
@@ -58,7 +72,11 @@ export function EditProfileDialog({
         description: 'Your changes have been saved successfully.',
       });
     }
-  }, [state, toast]);
+    // Reset preview when dialog opens
+    if (!open) {
+      setAvatarPreview(null);
+    }
+  }, [state, toast, open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -71,6 +89,28 @@ export function EditProfileDialog({
           </DialogDescription>
         </DialogHeader>
         <form ref={formRef} action={dispatch} className="space-y-4 py-4">
+          <input type="hidden" name="avatarUrl" value={avatarPreview || ''} />
+
+          <div className="space-y-2 flex flex-col items-center">
+            <Label htmlFor="avatar-upload" className="cursor-pointer">
+              <div className="relative group">
+                <Avatar className="h-32 w-32 border-4 border-muted shadow-md">
+                  <AvatarImage src={avatarPreview || user.avatarUrl} alt={user.name} />
+                  <AvatarFallback className="text-4xl">{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="h-8 w-8 text-white" />
+                </div>
+              </div>
+            </Label>
+            <Input id="avatar-upload" name="avatar" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+             <Button type="button" variant="link" size="sm" asChild>
+                <Label htmlFor="avatar-upload" className="cursor-pointer">
+                    Change profile photo
+                </Label>
+            </Button>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" defaultValue={user.name} required />

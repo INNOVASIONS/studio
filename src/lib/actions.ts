@@ -290,6 +290,7 @@ export async function handleUpdateProfile(
   const name = formData.get('name') as string;
   const handle = formData.get('handle') as string;
   const bio = formData.get('bio') as string;
+  const avatarUrl = formData.get('avatarUrl') as string | undefined;
   const currentUser = getCurrentUser();
 
   if (!name || !handle) {
@@ -297,7 +298,11 @@ export async function handleUpdateProfile(
   }
 
   try {
-    updateUser(currentUser.id, { name, handle, bio });
+    const userData: { name: string; handle: string; bio: string; avatarUrl?: string } = { name, handle, bio };
+    if (avatarUrl) {
+      userData.avatarUrl = avatarUrl;
+    }
+    updateUser(currentUser.id, userData);
   } catch (e: any) {
     console.error(e);
     return { error: e.message };
@@ -305,7 +310,7 @@ export async function handleUpdateProfile(
 
   revalidatePath(`/profile/${currentUser.id}`);
   revalidatePath('/profile');
+  // Revalidate layout to update header avatar
+  revalidatePath('/', 'layout');
   return { success: true };
 }
-
-    
