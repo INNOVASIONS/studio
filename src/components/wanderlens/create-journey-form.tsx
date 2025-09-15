@@ -117,7 +117,7 @@ export function CreateJourneyForm() {
   const handleRemovePlace = (dayIndex: number, placeIndex: number) => {
     const newDailyActivities = [...dailyActivities];
     newDailyActivities[dayIndex].places = newDailyActivities[dayIndex].places.filter((_, i) => i !== placeIndex);
-    setDailyActivities(newDaily4s);
+    setDailyActivities(newDailyActivities);
   };
 
   const handlePlaceChange = (dayIndex: number, placeIndex: number, field: 'name' | 'description', value: string) => {
