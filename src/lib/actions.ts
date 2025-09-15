@@ -290,7 +290,7 @@ export async function handleUpdateProfile(
   const name = formData.get('name') as string;
   const handle = formData.get('handle') as string;
   const bio = formData.get('bio') as string;
-  const avatarUrl = formData.get('avatarUrl') as string | undefined;
+  const avatarDataUri = formData.get('avatarDataUri') as string | undefined;
   const currentUser = getCurrentUser();
 
   if (!name || !handle) {
@@ -299,8 +299,8 @@ export async function handleUpdateProfile(
 
   try {
     const userData: { name: string; handle: string; bio: string; avatarUrl?: string } = { name, handle, bio };
-    if (avatarUrl) {
-      userData.avatarUrl = avatarUrl;
+    if (avatarDataUri) {
+      userData.avatarUrl = avatarDataUri;
     }
     updateUser(currentUser.id, userData);
   } catch (e: any) {

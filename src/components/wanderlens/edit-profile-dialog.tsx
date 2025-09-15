@@ -89,7 +89,7 @@ export function EditProfileDialog({
           </DialogDescription>
         </DialogHeader>
         <form ref={formRef} action={dispatch} className="space-y-4 py-4">
-          <input type="hidden" name="avatarUrl" value={avatarPreview || ''} />
+          <input type="hidden" name="avatarDataUri" value={avatarPreview || ''} />
 
           <div className="space-y-2 flex flex-col items-center">
             <Label htmlFor="avatar-upload" className="cursor-pointer">
