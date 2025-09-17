@@ -1,4 +1,6 @@
 
+'use server';
+
 import type { User, Photo, UserPlace, Comment, Journey } from './types';
 
 let users: User[] = [
@@ -318,7 +320,7 @@ export const getUsers = () => users;
 export const getUserById = (id: number) => users.find((user) => user.id === id);
 export const getCurrentUser = () => users[0];
 
-export const updateUser = (userId: number, data: Partial<Omit<User, 'id' | 'email' | 'avatarUrl'>>) => {
+export async function updateUser(userId: number, data: Partial<Omit<User, 'id' | 'email'>>) {
     const userIndex = users.findIndex(u => u.id === userId);
     if (userIndex === -1) {
         throw new Error('User not found');
@@ -332,7 +334,7 @@ export const getPhotos = () => photos;
 export const getPhotosByUserId = (userId: number) => photos.filter((photo) => photo.userId === userId);
 export const getUserPlaces = () => userPlaces;
 
-export const addPhoto = (photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'>) => {
+export async function addPhoto(photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'>) {
     const newPhoto: Photo = {
         id: photos.length > 0 ? Math.max(...photos.map(p => p.id)) + 1 : 1,
         likes: 0,
@@ -344,7 +346,7 @@ export const addPhoto = (photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 't
     return newPhoto;
 };
 
-export const deletePhoto = (photoId: number) => {
+export async function deletePhoto(photoId: number) {
   const photoIndex = photos.findIndex((p) => p.id === photoId);
   if (photoIndex === -1) {
     throw new Error('Photo not found');
@@ -357,7 +359,7 @@ export const deletePhoto = (photoId: number) => {
   photos.splice(photoIndex, 1);
 };
 
-export const addUserPlace = (place: Omit<UserPlace, 'id'>) => {
+export async function addUserPlace(place: Omit<UserPlace, 'id'>) {
     const newPlace = { ...place, id: userPlaces.length + 1 };
     userPlaces = [...userPlaces, newPlace];
     return newPlace;
@@ -365,7 +367,7 @@ export const addUserPlace = (place: Omit<UserPlace, 'id'>) => {
 
 export const getJourneys = () => journeys;
 
-export const addJourney = (journeyData: Omit<Journey, 'id'>) => {
+export async function addJourney(journeyData: Omit<Journey, 'id'>) {
     const newJourney: Journey = {
         id: journeys.length > 0 ? Math.max(...journeys.map(j => j.id)) + 1 : 1,
         ...journeyData,
