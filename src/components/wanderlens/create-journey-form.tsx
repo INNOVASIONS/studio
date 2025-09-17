@@ -14,7 +14,7 @@ import { Car, Hotel, Plane, Ship, Train, PlusCircle, XCircle, CalendarIcon, Bus,
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Calendar } from '../ui/calendar';
 import { cn } from '@/lib/utils';
-import { format, eachDayOfInterval, differenceInDays } from 'date-fns';
+import { format, eachDayOfInterval } from 'date-fns';
 import { ScrollArea } from '../ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { handleCreateJourney, CreateJourneyState } from '@/lib/actions';
@@ -421,5 +421,3 @@ export function CreateJourneyForm() {
     </Card>
   );
 }
-
-    

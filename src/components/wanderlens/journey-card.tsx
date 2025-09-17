@@ -103,9 +103,6 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
 
   const formatDateRange = () => {
     if (!journey.startDate || !journey.endDate) return 'Date not specified';
-    // The browser's timezone can be inconsistent.
-    // By assuming the user's local timezone for parsing, we avoid hydration errors
-    // where the server (UTC) and client (local) would render different days.
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const zonedStartDate = toZonedTime(new Date(journey.startDate), timeZone);
     const zonedEndDate = toZonedTime(new Date(journey.endDate), timeZone);
@@ -115,7 +112,6 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
 
   const handleLikeClick = () => {
     setIsLiked(!isLiked);
-    // In a real app, you'd also update the like count on the server
   };
 
   return (
