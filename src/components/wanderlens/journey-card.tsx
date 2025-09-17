@@ -204,6 +204,11 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
                                             place.name && <div key={placeIndex} className="p-2 rounded-md border bg-background/50 space-y-2">
                                                 <h5 className="font-semibold flex items-center gap-2 text-foreground"><MapPin className="h-4 w-4 text-accent"/>{place.name}</h5>
                                                 {place.description && <p className="text-xs text-muted-foreground pl-6">{place.description}</p>}
+                                                {place.photos && place.photos.length > 0 && (
+                                                    <div className="pt-2">
+                                                        <ImageCarousel images={place.photos} alt={`Photos of ${place.name}`} />
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                         {day.places.length === 0 || (day.places.length === 1 && !day.places[0].name) ? (
