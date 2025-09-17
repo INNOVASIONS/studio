@@ -229,8 +229,8 @@ export async function handleCreateJourney(
     const journeyData = {
       userId: currentUser.id,
       placeVisited: formData.get('place-visited') as string,
-      startDate: new Date(formData.get('start-date') as string),
-      endDate: new Date(formData.get('end-date') as string),
+      startDate: formData.get('start-date') as string,
+      endDate: formData.get('end-date') as string,
       travelers: parseInt(formData.get('travelers') as string, 10),
       transportMode: formData.get('transport-mode') as string | undefined,
       transportCost: parseFloat(formData.get('transport-cost') as string) || undefined,

@@ -8,7 +8,8 @@ import type { Journey, User } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Calendar, Users, Plane, Train, Car, Ship, Bus, Hotel, MapPin, Wallet, BookOpen, Heart, MessageCircle, Expand } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, parseISO, toDate } from 'date-fns';
+import { utcToZonedTime } from 'date-fns-tz';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import {
   Carousel,
@@ -97,11 +98,19 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
       day.places.flatMap(place => place.photos || [])
     ),
   ];
-  const TransportIcon = (journey.transportMode && transportIcons[journey.transportMode]) ? transportIcons[journey.transportMode] : Car;
+  const TransportIcon = (journey.transportMode && transportIcons[journey.transportMode]) || Car;
+
 
   const formatDateRange = () => {
     if (!journey.startDate || !journey.endDate) return 'Date not specified';
-    return `${format(new Date(journey.startDate), 'd MMM yyyy')} - ${format(new Date(journey.endDate), 'd MMM yyyy')}`;
+    // The browser's timezone can be inconsistent.
+    // By assuming the user's local timezone for parsing, we avoid hydration errors
+    // where the server (UTC) and client (local) would render different days.
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const zonedStartDate = utcToZonedTime(new Date(journey.startDate), timeZone);
+    const zonedEndDate = utcToZonedTime(new Date(journey.endDate), timeZone);
+
+    return `${format(zonedStartDate, 'd MMM yyyy')} - ${format(zonedEndDate, 'd MMM yyyy')}`;
   };
 
   const handleLikeClick = () => {

@@ -73,8 +73,8 @@ export type Journey = {
   id: number;
   userId: number;
   placeVisited: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;
   travelers: number;
   transportMode?: string;
   transportCost?: number;
