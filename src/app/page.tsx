@@ -11,7 +11,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getPhotos, getUsers } from '@/lib/mock-data';
+import { getPhotos, getUsers, getCurrentUser } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AddPostDialog } from '@/components/wanderlens/add-post-dialog';
@@ -47,9 +47,10 @@ const featureCards = [
     },
 ]
 
-export default function Home() {
-  const photos = getPhotos();
-  const users = getUsers();
+export default async function Home() {
+  const photos = await getPhotos();
+  const users = await getUsers();
+  const currentUser = await getCurrentUser();
 
   const findUser = (userId: number) => users.find((u) => u.id === userId);
 
@@ -110,7 +111,7 @@ export default function Home() {
           {photos.map((photo) => {
             const user = findUser(photo.userId);
             return user ? (
-              <PhotoCard key={photo.id} photo={photo} user={user} />
+              <PhotoCard key={photo.id} photo={photo} user={user} currentUser={currentUser}/>
             ) : null;
           })}
         </div>

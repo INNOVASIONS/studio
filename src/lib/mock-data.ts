@@ -316,9 +316,9 @@ let userPlaces: UserPlace[] = [
 
 let journeys: Journey[] = [];
 
-export const getUsers = () => users;
-export const getUserById = (id: number) => users.find((user) => user.id === id);
-export const getCurrentUser = () => users[0];
+export async function getUsers() { return users; }
+export async function getUserById(id: number) { return users.find((user) => user.id === id); }
+export async function getCurrentUser() { return users[0]; }
 
 export async function updateUser(userId: number, data: Partial<Omit<User, 'id' | 'email'>>) {
     const userIndex = users.findIndex(u => u.id === userId);
@@ -330,9 +330,9 @@ export async function updateUser(userId: number, data: Partial<Omit<User, 'id' |
     return updatedUser;
 };
 
-export const getPhotos = () => photos;
-export const getPhotosByUserId = (userId: number) => photos.filter((photo) => photo.userId === userId);
-export const getUserPlaces = () => userPlaces;
+export async function getPhotos() { return photos; }
+export async function getPhotosByUserId(userId: number) { return photos.filter((photo) => photo.userId === userId); }
+export async function getUserPlaces() { return userPlaces; }
 
 export async function addPhoto(photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'>) {
     const newPhoto: Photo = {
@@ -352,7 +352,7 @@ export async function deletePhoto(photoId: number) {
     throw new Error('Photo not found');
   }
   // Ensure only the current user can delete their own photos
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
   if (photos[photoIndex].userId !== currentUser.id) {
     throw new Error('You are not authorized to delete this post.');
   }
@@ -365,7 +365,7 @@ export async function addUserPlace(place: Omit<UserPlace, 'id'>) {
     return newPlace;
 };
 
-export const getJourneys = () => journeys;
+export async function getJourneys() { return journeys; }
 
 export async function addJourney(journeyData: Omit<Journey, 'id'>) {
     const newJourney: Journey = {

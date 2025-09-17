@@ -78,7 +78,7 @@ export async function handleCreatePost(
   prevState: CreatePostState,
   formData: FormData,
 ): Promise<CreatePostState> {
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
   const photoDataUri = formData.get('photoDataUri') as string;
   const caption = formData.get('caption') as string;
   const location = formData.get('location') as string;
@@ -103,7 +103,7 @@ export async function handleCreatePost(
   }
 
   try {
-    addPhoto({
+    await addPhoto({
       userId: currentUser.id,
       imageUrl: photoDataUri, // Using data URI directly as mock data
       caption,
@@ -191,7 +191,7 @@ export async function handleCreateJourney(
   prevState: CreateJourneyState,
   formData: FormData
 ): Promise<CreateJourneyState> {
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
 
   try {
     const dailyActivitiesData = JSON.parse(formData.get('daily-activities-data') as string);
@@ -245,7 +245,7 @@ export async function handleCreateJourney(
       dailyActivities: dailyActivities,
     };
 
-    addJourney(journeyData);
+    await addJourney(journeyData);
 
   } catch (error: any) {
     console.error('Failed to create journey:', error);
@@ -269,7 +269,7 @@ export async function handleDeletePost(
   }
 
   try {
-    deletePhoto(photoId);
+    await deletePhoto(photoId);
   } catch (error: any) {
     return { error: error.message };
   }
@@ -293,7 +293,7 @@ export async function handleUpdateProfile(
   const handle = formData.get('handle') as string;
   const bio = formData.get('bio') as string;
   const avatarDataUri = formData.get('avatarDataUri') as string | undefined;
-  const currentUser = getCurrentUser();
+  const currentUser = await getCurrentUser();
 
   if (!name || !handle) {
     return { error: 'Name and handle are required.' };
@@ -304,7 +304,7 @@ export async function handleUpdateProfile(
     if (avatarDataUri) {
       userData.avatarUrl = avatarDataUri;
     }
-    updateUser(currentUser.id, userData);
+    await updateUser(currentUser.id, userData);
   } catch (e: any) {
     console.error(e);
     return { error: e.message };
@@ -316,7 +316,3 @@ export async function handleUpdateProfile(
   revalidatePath('/', 'layout');
   return { success: true };
 }
-
-    
-
-    

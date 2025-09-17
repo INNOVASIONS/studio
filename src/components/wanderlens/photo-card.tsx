@@ -68,11 +68,12 @@ import { LanguageDialog } from './language-dialog';
 const CommentsDialog = ({
   photo,
   children,
+  currentUser,
 }: {
   photo: Photo;
   children: React.ReactNode;
+  currentUser: User;
 }) => {
-  const currentUser = getCurrentUser();
   const [comments, setComments] = useState<Comment[]>(photo.comments);
   const [newComment, setNewComment] = useState('');
 
@@ -191,7 +192,7 @@ const CostDisplay = ({ cost, currency, label = "per person" }: { cost?: number; 
 };
 
 
-export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
+export function PhotoCard({ photo, user, currentUser }: { photo: Photo, user: User, currentUser: User }) {
   const hasDetails = photo.transportDetails || photo.foodDetails || photo.hotelDetails || photo.entryFeeCost;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(photo.likes);
@@ -201,8 +202,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
   const [translation, setTranslation] = useState<TranslationState | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isLangDialogVisible, setLangDialogVisible] = useState(false);
-
-  const currentUser = getCurrentUser();
+  
   const isOwner = user.id === currentUser.id;
 
   const onTranslate = (targetLanguage: string) => {
@@ -469,7 +469,7 @@ export function PhotoCard({ photo, user }: { photo: Photo, user: User }) {
             <Heart className={cn("h-5 w-5 text-accent transition-all group-hover:scale-110", isLiked && "fill-accent")} />
             <span>{likeCount.toLocaleString()}</span>
           </Button>
-          <CommentsDialog photo={photo}>
+          <CommentsDialog photo={photo} currentUser={currentUser}>
             <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
               <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
               <span>{photo.comments.length.toLocaleString()}</span>

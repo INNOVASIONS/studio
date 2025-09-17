@@ -3,9 +3,9 @@ import { getJourneys, getCurrentUser } from '@/lib/mock-data';
 import { JourneyCard } from '@/components/wanderlens/journey-card';
 import { Separator } from '@/components/ui/separator';
 
-export default function CreateJourneyPage() {
-  const journeys = getJourneys();
-  const currentUser = getCurrentUser();
+export default async function CreateJourneyPage() {
+  const journeys = await getJourneys();
+  const currentUser = await getCurrentUser();
 
   return (
     <div className="container mx-auto px-4 py-8">

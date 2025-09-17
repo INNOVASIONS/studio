@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,17 @@ type ProfileHeaderProps = {
 
 export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
     const [isFollowing, setIsFollowing] = useState(false);
-    const currentUser = getCurrentUser();
-    const isCurrentUserProfile = user.id === currentUser.id;
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        async function fetchUser() {
+            const u = await getCurrentUser();
+            setCurrentUser(u);
+        }
+        fetchUser();
+    }, [])
+
+    const isCurrentUserProfile = user.id === currentUser?.id;
 
     const stats = [
         { label: "Posts", value: photosCount },

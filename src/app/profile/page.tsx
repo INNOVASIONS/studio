@@ -2,9 +2,9 @@ import { ProfileHeader } from "@/components/wanderlens/profile-header";
 import { getCurrentUser, getPhotosByUserId } from "@/lib/mock-data";
 import { PhotoCard } from "@/components/wanderlens/photo-card";
 
-export default function ProfilePage() {
-    const currentUser = getCurrentUser();
-    const userPhotos = getPhotosByUserId(currentUser.id);
+export default async function ProfilePage() {
+    const currentUser = await getCurrentUser();
+    const userPhotos = await getPhotosByUserId(currentUser.id);
 
     return(
         <div className="container mx-auto px-4 py-8">
@@ -18,7 +18,7 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {userPhotos.map((photo) => (
                             <div key={photo.id} className="flex justify-center">
-                                <PhotoCard photo={photo} user={currentUser} />
+                                <PhotoCard photo={photo} user={currentUser} currentUser={currentUser} />
                             </div>
                         ))}
                     </div>

@@ -1,17 +1,18 @@
 import { ProfileHeader } from "@/components/wanderlens/profile-header";
-import { getUserById, getPhotosByUserId } from "@/lib/mock-data";
+import { getUserById, getPhotosByUserId, getCurrentUser } from "@/lib/mock-data";
 import { PhotoCard } from "@/components/wanderlens/photo-card";
 import { notFound } from "next/navigation";
 
-export default function ProfilePage({ params }: { params: { id: string } }) {
+export default async function ProfilePage({ params }: { params: { id: string } }) {
     const userId = parseInt(params.id, 10);
-    const user = getUserById(userId);
+    const user = await getUserById(userId);
 
     if (!user) {
         notFound();
     }
 
-    const userPhotos = getPhotosByUserId(user.id);
+    const userPhotos = await getPhotosByUserId(user.id);
+    const currentUser = await getCurrentUser();
 
     return(
         <div className="container mx-auto px-4 py-8">
@@ -25,7 +26,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {userPhotos.map((photo) => (
                             <div key={photo.id} className="flex justify-center">
-                                <PhotoCard photo={photo} user={user} />
+                                <PhotoCard photo={photo} user={user} currentUser={currentUser} />
                             </div>
                         ))}
                     </div>

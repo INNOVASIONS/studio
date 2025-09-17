@@ -1,9 +1,10 @@
-import { getPhotos, getUsers } from '@/lib/mock-data';
+import { getPhotos, getUsers, getCurrentUser } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
 
-export default function DiscoverPage() {
-  const photos = getPhotos();
-  const users = getUsers();
+export default async function DiscoverPage() {
+  const photos = await getPhotos();
+  const users = await getUsers();
+  const currentUser = await getCurrentUser();
 
   const findUser = (userId: number) => users.find((u) => u.id === userId);
 
@@ -26,7 +27,7 @@ export default function DiscoverPage() {
           const user = findUser(photo.userId);
           return user ? (
             <div key={photo.id} className="flex justify-center">
-              <PhotoCard photo={photo} user={user} />
+              <PhotoCard photo={photo} user={user} currentUser={currentUser} />
             </div>
           ) : null;
         })}

@@ -24,6 +24,7 @@ import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { User } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { useRouter } from 'next/navigation';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -52,6 +53,7 @@ export function EditProfileDialog({
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -71,12 +73,14 @@ export function EditProfileDialog({
         title: 'Profile Updated',
         description: 'Your changes have been saved successfully.',
       });
+      // Force a reload of the page to reflect header changes
+      router.refresh();
     }
     // Reset preview when dialog opens
     if (!open) {
       setAvatarPreview(null);
     }
-  }, [state, toast, open]);
+  }, [state, toast, open, router]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -30,8 +30,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getCurrentUser } from '@/lib/mock-data';
+import { User as UserType } from '@/lib/types';
 import { AddPostDialog } from '../wanderlens/add-post-dialog';
+import { useEffect, useState } from 'react';
+import { getCurrentUser } from '@/lib/mock-data';
 
 const navLinks = [
   { href: '/', label: 'Home', icon: Home },
@@ -46,7 +48,19 @@ const navLinks = [
 export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const currentUser = getCurrentUser();
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Failed to fetch current user", error)
+      }
+    }
+    fetchUser();
+  }, [pathname]); // Refetch when path changes to reflect profile updates
 
   const handleLogout = () => {
     router.push('/auth');
@@ -75,6 +89,16 @@ export function AppHeader() {
       {label}
     </Link>
   );
+
+  if (!currentUser) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center">
+            {/* You can add a loading skeleton here */}
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
