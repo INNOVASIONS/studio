@@ -38,16 +38,19 @@ function getUsersFromStorage(): User[] {
     if (typeof window !== 'undefined' && window.localStorage) {
         const storedUsers = localStorage.getItem('users');
         if (storedUsers) {
-            // Use stored users but ensure default users are there if list is empty
             const parsedUsers = JSON.parse(storedUsers);
-            if (parsedUsers.length > 0) return parsedUsers;
+            if (parsedUsers.length > 0) {
+              return parsedUsers;
+            }
         }
-        // If nothing in storage, set it with initial users
+        // If nothing in storage or the stored list is empty, set it with initial users.
         localStorage.setItem('users', JSON.stringify(initialUsers));
+        return initialUsers;
     }
   } catch (error) {
     console.error("Could not access localStorage for users:", error);
   }
+  // Fallback for server-side rendering or environments without localStorage
   return initialUsers;
 }
 

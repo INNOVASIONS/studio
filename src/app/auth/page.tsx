@@ -66,6 +66,7 @@ export default function AuthPage() {
         description: 'Welcome back!',
       });
       router.push('/');
+      router.refresh();
     } else {
       toast({
         variant: 'destructive',
