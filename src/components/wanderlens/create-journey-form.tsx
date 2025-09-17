@@ -98,7 +98,6 @@ export function CreateJourneyForm() {
     if (startDate && endDate && endDate >= startDate) {
       const days = eachDayOfInterval({ start: startDate, end: endDate });
       const newDailyActivities: DailyActivityState[] = days.map((date, i) => {
-        // Try to find if this day already exists in the state to preserve its data
         const existingDay = dailyActivities.find(d => format(d.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'));
         return existingDay || { day: i + 1, date, places: [initialPlace] };
       });
@@ -422,5 +421,3 @@ export function CreateJourneyForm() {
     </Card>
   );
 }
-
-    
