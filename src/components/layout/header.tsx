@@ -15,11 +15,8 @@ import {
   User,
   LogOut,
   Route,
-  BookCopy,
   Wallet,
   Bell,
-  Heart,
-  MessageCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -35,10 +32,10 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User as UserType } from '@/lib/types';
 import { AddPostDialog } from '../wanderlens/add-post-dialog';
-import { useEffect, useState, useCallback } from 'react';
-import { getCurrentUser, getUsers, getPhotos } from '@/lib/mock-data';
+import { useEffect, useState, useCallback, useContext } from 'react';
+import { getCurrentUser } from '@/lib/mock-data';
 import { Badge } from '../ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { NotificationContext } from '@/context/notification-context';
 
 const navLinks = [
   { href: '/', label: 'Home', icon: Home },
@@ -50,39 +47,14 @@ const navLinks = [
   { href: '/trip-expenses', label: 'Trip Expenses', icon: Wallet },
 ];
 
-const notifications = [
-    {
-        user: { name: 'Bella Vista', avatarUrl: 'https://picsum.photos/id/238/100/100' },
-        action: 'liked your photo.',
-        time: '5m ago',
-        icon: Heart,
-        iconClass: 'text-red-500 fill-red-500'
-    },
-    {
-        user: { name: 'Chris Journeys', avatarUrl: 'https://picsum.photos/id/239/100/100' },
-        action: 'commented: "Incredible shot!"',
-        time: '12m ago',
-        icon: MessageCircle,
-        iconClass: 'text-blue-500'
-    },
-    {
-        user: { name: 'Alex Wanderer', avatarUrl: 'https://picsum.photos/id/1025/100/100' },
-        action: 'started following you.',
-        time: '1h ago',
-        icon: User,
-        iconClass: 'text-green-500'
-    },
-];
-
 export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+  const { notifications } = useContext(NotificationContext);
 
   const refreshPosts = useCallback(async () => {
     // This is a placeholder for a more robust state management solution
-    // For now, we can trigger a re-fetch on pages that need it.
-    // In a real app, you'd use a state manager like Redux or Zustand.
   }, []);
 
   useEffect(() => {
@@ -92,7 +64,10 @@ export function AppHeader() {
         setCurrentUser(user);
       } catch (error) {
         console.error("Failed to fetch current user", error)
-        router.push('/auth');
+        // This might happen if no user is in session, redirect to auth
+        if (pathname !== '/auth') {
+          router.push('/auth');
+        }
       }
     }
     fetchUser();
@@ -129,11 +104,12 @@ export function AppHeader() {
     </Link>
   );
 
+  // Render a minimal header or nothing while current user is being determined
   if (!currentUser) {
     return (
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center">
-            {/* You can add a loading skeleton here */}
+            {/* Minimal header for non-logged-in state */}
         </div>
       </header>
     );
@@ -177,7 +153,7 @@ export function AppHeader() {
           </SheetContent>
         </Sheet>
 
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2 sm:space-x-4">
            <AddPostDialog onPostCreated={refreshPosts}>
               <Button>
                   <Plus className="mr-2 h-4 w-4" /> New Post
@@ -187,14 +163,16 @@ export function AppHeader() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
                <Button variant="ghost" size="icon" className="relative h-10 w-10">
-                    <Bell className="h-6 w-6" />
-                    <Badge className="absolute top-1 right-1 h-5 w-5 justify-center p-0">{notifications.length}</Badge>
+                    <Bell className="h-5 w-5" />
+                    {notifications.length > 0 &&
+                      <Badge className="absolute top-1 right-1 h-5 w-5 justify-center p-0">{notifications.length}</Badge>
+                    }
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-80" align="end">
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {notifications.map((notification, index) => (
+                {notifications.length > 0 ? notifications.map((notification, index) => (
                     <DropdownMenuItem key={index} className="flex items-start gap-3 p-2 cursor-pointer">
                         <Avatar className="h-8 w-8 mt-1">
                             <AvatarImage src={notification.user.avatarUrl} alt={notification.user.name} />
@@ -209,7 +187,9 @@ export function AppHeader() {
                         </div>
                          <notification.icon className={cn('h-5 w-5 ml-auto text-muted-foreground', notification.iconClass)} />
                     </DropdownMenuItem>
-                ))}
+                )) : (
+                  <p className="p-4 text-sm text-center text-muted-foreground">No new notifications</p>
+                )}
                  <DropdownMenuSeparator />
                  <DropdownMenuItem className="justify-center text-sm font-medium text-primary cursor-pointer">
                     See all notifications

@@ -3,6 +3,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { AppHeader } from '@/components/layout/header';
 import { Toaster } from '@/components/ui/toaster';
+import { NotificationProvider } from '@/context/notification-context';
 
 export const metadata: Metadata = {
   title: 'WanderLens',
@@ -33,11 +34,13 @@ export default function RootLayout({
           'min-h-screen bg-background font-body antialiased',
         )}
       >
-        <div className="relative flex min-h-screen flex-col">
-          <AppHeader />
-          <main className="flex-1">{children}</main>
-        </div>
-        <Toaster />
+        <NotificationProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <AppHeader />
+            <main className="flex-1">{children}</main>
+          </div>
+          <Toaster />
+        </NotificationProvider>
       </body>
     </html>
   );

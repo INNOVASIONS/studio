@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,7 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Loader2, Plus, Star } from 'lucide-react';
+import { Loader2, Plus, Star, FilePlus2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { ScrollArea } from '../ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -32,6 +32,7 @@ import { Switch } from '../ui/switch';
 import { RupeeIcon } from './rupee-icon';
 import { addPhoto, getCurrentUser } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
+import { NotificationContext } from '@/context/notification-context';
 
 const StarRating = ({
   rating,
@@ -103,6 +104,7 @@ export function AddPostDialog({
   const [showHotelDetails, setShowHotelDetails] = useState(false);
   const [showEntryFee, setShowEntryFee] = useState(false);
   const { toast } = useToast();
+  const { addNotification } = useContext(NotificationContext);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -153,7 +155,7 @@ export function AddPostDialog({
     try {
       const currentUser = await getCurrentUser();
       
-      await addPhoto({
+      const newPost = await addPhoto({
         userId: currentUser.id,
         imageUrl: photoDataUri,
         caption,
@@ -178,6 +180,14 @@ export function AddPostDialog({
       toast({
         title: "Post Created!",
         description: "Your new post has been successfully shared.",
+      });
+
+      addNotification({
+        user: currentUser,
+        action: 'created a new post.',
+        time: 'Just now',
+        icon: FilePlus2,
+        iconClass: 'text-primary'
       });
 
       onPostCreated?.();
@@ -389,5 +399,3 @@ export function AddPostDialog({
     </Dialog>
   );
 }
-
-    
