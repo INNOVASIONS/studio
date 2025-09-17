@@ -11,7 +11,7 @@ import {
 } from '@/ai/flows/image-based-location-finder';
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
-import { addPhoto, getCurrentUser, addJourney, deletePhoto, updateUser } from './mock-data';
+import { addJourney, deletePhoto, updateUser, getCurrentUser } from './mock-data';
 import { DailyActivity, VisitedPlace } from './types';
 
 export type ItineraryState = {
@@ -67,72 +67,6 @@ export async function handleFindLocation(
     console.error(e);
     return { error: e.message || 'Failed to identify location from image.' };
   }
-}
-
-export type CreatePostState = {
-  message: string;
-  success?: boolean;
-};
-
-export async function handleCreatePost(
-  prevState: CreatePostState,
-  formData: FormData,
-): Promise<CreatePostState> {
-  const currentUser = await getCurrentUser();
-  const photoDataUri = formData.get('photoDataUri') as string;
-  const caption = formData.get('caption') as string;
-  const location = formData.get('location') as string;
-  const currency = formData.get('currency') as string | undefined;
-  const transportDetails = formData.get('transportDetails') as string | undefined;
-  const foodDetails = formData.get('foodDetails') as string | undefined;
-  const hotelDetails = formData.get('hotelDetails') as string | undefined;
-  const restaurantName = formData.get('restaurantName') as string | undefined;
-  const hotelName = formData.get('hotelName') as string | undefined;
-  const transportName = formData.get('transportName') as string | undefined;
-  const transportRating = parseInt(formData.get('transportRating') as string, 10) || undefined;
-  const foodRating = parseInt(formData.get('foodRating') as string, 10) || undefined;
-  const hotelRating = parseInt(formData.get('hotelRating') as string, 10) || undefined;
-  const transportCost = parseFloat(formData.get('transportCost') as string) || undefined;
-  const foodCost = parseFloat(formData.get('foodCost') as string) || undefined;
-  const hotelCost = parseFloat(formData.get('hotelCost') as string) || undefined;
-  const attractionName = formData.get('attractionName') as string | undefined;
-  const entryFeeCost = parseFloat(formData.get('entryFeeCost') as string) || undefined;
-  
-  if (!photoDataUri || !caption || !location) {
-    return { message: 'Photo, caption, and location are required.' };
-  }
-
-  try {
-    await addPhoto({
-      userId: currentUser.id,
-      imageUrl: photoDataUri, // Using data URI directly as mock data
-      caption,
-      location,
-      currency,
-      transportDetails,
-      foodDetails,
-      hotelDetails,
-      restaurantName,
-      hotelName,
-      transportName,
-      transportRating,
-      foodRating,
-      hotelRating,
-      transportCost,
-      foodCost,
-      hotelCost,
-      attractionName,
-      entryFeeCost,
-    });
-  } catch (error) {
-    console.error(error);
-    return { message: 'Failed to create post.' };
-  }
-
-  revalidatePath('/');
-  revalidatePath('/profile');
-  revalidatePath('/discover');
-  return { message: 'Post created successfully', success: true };
 }
 
 export type TranslationState = {

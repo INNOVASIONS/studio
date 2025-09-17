@@ -1,8 +1,7 @@
 
 'use client';
 
-import React, { useState, useActionState, useRef } from 'react';
-import { useFormStatus } from 'react-dom';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,7 +17,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { handleCreatePost, CreatePostState } from '@/lib/actions';
 import { Loader2, Plus, Star } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { ScrollArea } from '../ui/scroll-area';
@@ -32,22 +30,8 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '../ui/switch';
 import { RupeeIcon } from './rupee-icon';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" disabled={pending} className="w-full">
-      {pending ? (
-        <Loader2 className="animate-spin" />
-      ) : (
-        <>
-          <Plus className="mr-2" />
-          Create Post
-        </>
-      )}
-    </Button>
-  );
-}
+import { addPhoto, getCurrentUser } from '@/lib/mock-data';
+import { useToast } from '@/hooks/use-toast';
 
 const StarRating = ({
   rating,
@@ -105,8 +89,9 @@ export function AddPostDialog({
   onPostCreated?: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const initialState: CreatePostState = { message: '' };
-  const [state, dispatch] = useActionState(handleCreatePost, initialState);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -117,6 +102,7 @@ export function AddPostDialog({
   const [currency, setCurrency] = useState('');
   const [showHotelDetails, setShowHotelDetails] = useState(false);
   const [showEntryFee, setShowEntryFee] = useState(false);
+  const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -131,25 +117,85 @@ export function AddPostDialog({
     }
   };
 
-  React.useEffect(() => {
-    if (state.success) {
+  const resetForm = () => {
+    setPreview(null);
+    setTransportRating(0);
+    setFoodRating(0);
+    setHotelRating(0);
+    setShowHotelDetails(false);
+    setShowEntryFee(false);
+    setCurrency('');
+    setError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const photoDataUri = preview;
+    const caption = formData.get('caption') as string;
+    const location = formData.get('location') as string;
+
+    if (!photoDataUri || !caption || !location) {
+      setError('Photo, caption, and location are required.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const currentUser = await getCurrentUser();
+      
+      await addPhoto({
+        userId: currentUser.id,
+        imageUrl: photoDataUri,
+        caption,
+        location,
+        currency: currency || undefined,
+        transportDetails: formData.get('transportDetails') as string || undefined,
+        foodDetails: formData.get('foodDetails') as string || undefined,
+        hotelDetails: formData.get('hotelDetails') as string || undefined,
+        restaurantName: formData.get('restaurantName') as string || undefined,
+        hotelName: formData.get('hotelName') as string || undefined,
+        transportName: formData.get('transportName') as string || undefined,
+        transportRating: transportRating || undefined,
+        foodRating: foodRating || undefined,
+        hotelRating: hotelRating || undefined,
+        transportCost: parseFloat(formData.get('transportCost') as string) || undefined,
+        foodCost: parseFloat(formData.get('foodCost') as string) || undefined,
+        hotelCost: parseFloat(formData.get('hotelCost') as string) || undefined,
+        attractionName: formData.get('attractionName') as string || undefined,
+        entryFeeCost: parseFloat(formData.get('entryFeeCost') as string) || undefined,
+      });
+
+      toast({
+        title: "Post Created!",
+        description: "Your new post has been successfully shared.",
+      });
+
       onPostCreated?.();
       setOpen(false);
-      setPreview(null);
-      setTransportRating(0);
-      setFoodRating(0);
-      setHotelRating(0);
-      setShowHotelDetails(false);
-      setShowEntryFee(false);
-      setCurrency('');
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      if (formRef.current) {
-        formRef.current.reset();
-      }
+      resetForm();
+    } catch (err: any) {
+      setError(err.message || 'Failed to create post. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [state.success, onPostCreated]);
+  };
+  
+  // Reset form when dialog is closed
+  React.useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -162,12 +208,7 @@ export function AddPostDialog({
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="pr-6 -mr-6">
-          <form action={dispatch} ref={formRef} className="space-y-4">
-            <input type="hidden" name="transportRating" value={transportRating} />
-            <input type="hidden" name="foodRating" value={foodRating} />
-            <input type="hidden" name="hotelRating" value={hotelRating} />
-            <input type="hidden" name="currency" value={currency} />
-
+          <form onSubmit={handleSubmit} ref={formRef} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="photo">Photo</Label>
               <Input
@@ -179,7 +220,6 @@ export function AddPostDialog({
                 onChange={handleFileChange}
                 ref={fileInputRef}
               />
-              <input type="hidden" name="photoDataUri" value={preview || ''} />
             </div>
 
             {preview && (
@@ -216,7 +256,7 @@ export function AddPostDialog({
 
             <div className="space-y-2">
               <Label htmlFor="currency-select">Currency (Optional)</Label>
-              <Select onValueChange={setCurrency}>
+              <Select onValueChange={setCurrency} name="currency">
                 <SelectTrigger id="currency-select">
                   <SelectValue placeholder="Select a currency" />
                 </SelectTrigger>
@@ -231,7 +271,6 @@ export function AddPostDialog({
                 </SelectContent>
               </Select>
             </div>
-
 
             <div className="space-y-4 border-t pt-4">
                 <div className="flex justify-between items-center">
@@ -320,11 +359,10 @@ export function AddPostDialog({
                )}
             </div>
 
-
-            {state?.message && !state.success && (
+            {error && (
               <Alert variant="destructive">
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{state.message}</AlertDescription>
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
@@ -334,7 +372,16 @@ export function AddPostDialog({
                     Cancel
                     </Button>
                 </DialogClose>
-                <SubmitButton />
+                <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
+                    {isSubmitting ? (
+                        <Loader2 className="animate-spin" />
+                    ) : (
+                        <>
+                        <Plus className="mr-2" />
+                        Create Post
+                        </>
+                    )}
+                </Button>
             </DialogFooter>
           </form>
         </ScrollArea>

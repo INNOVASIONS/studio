@@ -1,6 +1,4 @@
 
-'use server';
-
 import type { User, Photo, UserPlace, Comment, Journey } from './types';
 
 // =================================================================================================
@@ -484,5 +482,3 @@ export async function addJourney(journeyData: Omit<Journey, 'id'>): Promise<Jour
     setInStorage('journeys', updatedJourneys);
     return newJourney;
 };
-
-    
