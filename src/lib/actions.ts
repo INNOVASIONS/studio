@@ -242,7 +242,10 @@ export async function handleCreateJourney(
       hotelCost: parseFloat(formData.get('hotel-cost') as string) || undefined,
       hotelCurrency: formData.get('hotel-currency') as string | undefined,
       hotelReview: formData.get('hotel-review') as string | undefined,
-      dailyActivities: dailyActivities,
+      dailyActivities: dailyActivities.map(day => ({
+        ...day,
+        places: day.places.filter(p => p.name.trim() !== '')
+      })),
     };
 
     await addJourney(journeyData);
