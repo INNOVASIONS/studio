@@ -21,6 +21,10 @@ export default function ProfilePage() {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const handlePostDeleted = (photoId: number) => {
+      setUserPhotos(prevPhotos => prevPhotos.filter(p => p.id !== photoId));
+    };
+
     useEffect(() => {
         if (!id) return;
 
@@ -103,7 +107,7 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {userPhotos.map((photo) => (
                             <div key={photo.id} className="flex justify-center">
-                                <PhotoCard photo={photo} user={user} currentUser={currentUser} />
+                                <PhotoCard photo={photo} user={user} currentUser={currentUser} onPostDeleted={handlePostDeleted} />
                             </div>
                         ))}
                     </div>
@@ -116,5 +120,3 @@ export default function ProfilePage() {
         </div>
     )
 }
-
-    

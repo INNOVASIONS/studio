@@ -11,8 +11,8 @@ import {
 } from '@/ai/flows/image-based-location-finder';
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
-import { addJourney, deletePhoto, updateUser, getCurrentUser } from './mock-data';
-import { DailyActivity, VisitedPlace } from './types';
+import { addJourney, addPhoto, deletePhoto, updateUser, getCurrentUser } from './mock-data';
+import { DailyActivity, VisitedPlace, Photo } from './types';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -81,10 +81,10 @@ export type TranslationState = {
 export async function handleTranslatePost(
   input: TranslatePostInput
 ): Promise<TranslationState> {
-  const { caption, targetLanguage, photoUrl } = input;
+  const { caption, targetLanguage } = input;
 
-  if (!caption || !targetLanguage || !photoUrl) {
-    return { error: 'Caption, target language, and photo are required.' };
+  if (!caption || !targetLanguage) {
+    return { error: 'Caption and target language are required.' };
   }
 
   try {
@@ -100,7 +100,7 @@ export async function handleTranslatePost(
     console.error('Translation action failed:', e);
     // Provide a more user-friendly error message
     if (e.message.includes('FETCH_ERROR') || e.message.includes('permission') || e.message.includes('CORS')) {
-      return { error: 'Could not retrieve the image for translation context due to a network or permission issue. Please try again later.' };
+      return { error: 'There was a network issue preventing translation. Please try again later.' };
     }
     return { error: e.message || 'An unexpected error occurred during translation.' };
   }
@@ -254,4 +254,55 @@ export async function handleUpdateProfile(
   return { success: true };
 }
 
+
+export async function handleCreatePost(
+  formData: FormData
+): Promise<{ newPost?: Photo; error?: string }> {
+  const caption = formData.get('caption') as string;
+  const location = formData.get('location') as string;
+  const photoDataUri = formData.get('photoDataUri') as string;
+
+  if (!photoDataUri || !caption || !location) {
+    return { error: 'Photo, caption, and location are required.' };
+  }
+
+  try {
+    const currentUser = await getCurrentUser();
+    const newPostData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'> = {
+      userId: currentUser.id,
+      imageUrl: photoDataUri,
+      caption,
+      location,
+      currency: (formData.get('currency') as string) || undefined,
+      transportDetails:
+        (formData.get('transportDetails') as string) || undefined,
+      foodDetails: (formData.get('foodDetails') as string) || undefined,
+      hotelDetails: (formData.get('hotelDetails') as string) || undefined,
+      restaurantName:
+        (formData.get('restaurantName') as string) || undefined,
+      hotelName: (formData.get('hotelName') as string) || undefined,
+      transportName: (formData.get('transportName') as string) || undefined,
+      transportRating:
+        Number(formData.get('transportRating')) || undefined,
+      foodRating: Number(formData.get('foodRating')) || undefined,
+      hotelRating: Number(formData.get('hotelRating')) || undefined,
+      transportCost:
+        parseFloat(formData.get('transportCost') as string) || undefined,
+      foodCost: parseFloat(formData.get('foodCost') as string) || undefined,
+      hotelCost: parseFloat(formData.get('hotelCost') as string) || undefined,
+      attractionName:
+        (formData.get('attractionName') as string) || undefined,
+      entryFeeCost:
+        parseFloat(formData.get('entryFeeCost') as string) || undefined,
+    };
     
+    const newPost = await addPhoto(newPostData);
+    revalidatePath('/');
+    revalidatePath('/discover');
+    revalidatePath('/profile');
+    
+    return { newPost };
+  } catch (err: any) {
+    return { error: err.message || 'Failed to create post. Please try again.' };
+  }
+}

@@ -54,6 +54,10 @@ export default function Home() {
     setPhotos(photosData);
   }, []);
 
+  const handlePostDeleted = (photoId: number) => {
+    setPhotos(prevPhotos => prevPhotos.filter(p => p.id !== photoId));
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -174,7 +178,7 @@ export default function Home() {
           {photos.slice(0, 3).map((photo) => {
             const user = findUser(photo.userId);
             return user && currentUser ? (
-              <PhotoCard key={photo.id} photo={photo} user={user} currentUser={currentUser}/>
+              <PhotoCard key={photo.id} photo={photo} user={user} currentUser={currentUser} onPostDeleted={handlePostDeleted}/>
             ) : null;
           })}
         </div>

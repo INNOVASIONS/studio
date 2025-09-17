@@ -43,7 +43,6 @@ const TranslatePostInputSchema = z.object({
     .string()
     .optional()
     .describe('The name or number of the transport, if any (e.g., "Bus 7H").'),
-  photoUrl: z.string().url().describe("The public URL of the post's photo."),
   rating: z
     .number()
     .optional()
@@ -84,10 +83,9 @@ const prompt = ai.definePrompt({
   output: {schema: TranslatePostOutputSchema},
   prompt: `You are a helpful translation assistant for a travel social media app. Your task is to translate the user's post content into {{targetLanguage}}.
 
-Use the provided context to make the translation more natural and accurate. The context includes a photo, user ratings, and costs. For example, if the photo is of a beach, use a more relaxed and descriptive tone. If costs are mentioned, ensure they are formatted correctly and are understandable in the target language and culture.
+Use the provided context to make the translation more natural and accurate. The context includes user ratings and costs. If costs are mentioned, ensure they are formatted correctly and are understandable in the target language and culture.
 
 **Context:**
-- **Photo:** A photo is available at the following URL. Analyze it for context (location, mood, objects). {{media url=photoUrl}}
 - **Overall Rating:** {{rating}}/5
 - **Currency for costs:** {{currency}}
 

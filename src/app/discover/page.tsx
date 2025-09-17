@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { getPhotos, getUsers, getCurrentUser } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
@@ -14,6 +14,10 @@ export default function DiscoverPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handlePostDeleted = (photoId: number) => {
+    setPhotos(prevPhotos => prevPhotos.filter(p => p.id !== photoId));
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -92,7 +96,7 @@ export default function DiscoverPage() {
           const user = findUser(photo.userId);
           return user ? (
             <div key={photo.id} className="flex justify-center">
-              <PhotoCard photo={photo} user={user} currentUser={currentUser} />
+              <PhotoCard photo={photo} user={user} currentUser={currentUser} onPostDeleted={handlePostDeleted} />
             </div>
           ) : null;
         })}
@@ -100,5 +104,3 @@ export default function DiscoverPage() {
     </div>
   );
 }
-
-    

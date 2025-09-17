@@ -192,7 +192,7 @@ const CostDisplay = ({ cost, currency, label = "per person" }: { cost?: number; 
 };
 
 
-export function PhotoCard({ photo, user, currentUser }: { photo: Photo, user: User, currentUser: User }) {
+export function PhotoCard({ photo, user, currentUser, onPostDeleted }: { photo: Photo, user: User, currentUser: User, onPostDeleted: (photoId: number) => void }) {
   const hasDetails = photo.transportDetails || photo.foodDetails || photo.hotelDetails || photo.entryFeeCost;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(photo.likes);
@@ -220,7 +220,6 @@ export function PhotoCard({ photo, user, currentUser }: { photo: Photo, user: Us
         hotelDetails: photo.hotelDetails,
         restaurantName: photo.restaurantName,
         hotelName: photo.hotelName,
-        photoUrl: photo.imageUrl,
         rating,
         transportCost: photo.transportCost,
         foodCost: photo.foodCost,
@@ -279,6 +278,7 @@ export function PhotoCard({ photo, user, currentUser }: { photo: Photo, user: Us
           title: 'Post Deleted',
           description: 'Your post has been successfully removed.',
         });
+        onPostDeleted(photo.id);
       }
     });
   };
