@@ -14,28 +14,42 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { User } from '@/lib/types';
 import { Camera } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-type UserCredentials = {
+type MockUserStore = {
   email: string;
   password?: string;
+  id: number;
 };
 
+// This component now simulates a user database and session management.
 export default function AuthPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [signupName, setSignupName] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [activeTab, setActiveTab] = useState('login');
 
-  // Simulate a user database. Start with the default mock user.
-  const [registeredUsers, setRegisteredUsers] = useState<UserCredentials[]>([
-    { email: 'yourhandle@example.com', password: 'password' }, // Default user
-  ]);
+  // We use localStorage to persist the mock user database across reloads.
+  const [registeredUsers, setRegisteredUsers] = useState<MockUserStore[]>([]);
+
+  useEffect(() => {
+    // Initialize users from localStorage or with a default user.
+    const storedUsers = localStorage.getItem('registeredUsers');
+    if (storedUsers) {
+      setRegisteredUsers(JSON.parse(storedUsers));
+    } else {
+      const defaultUser: MockUserStore = { id: 1, email: 'yourhandle@example.com', password: 'password' };
+      setRegisteredUsers([defaultUser]);
+      localStorage.setItem('registeredUsers', JSON.stringify([defaultUser]));
+    }
+  }, []);
 
   const handleLogin = () => {
     const user = registeredUsers.find(
@@ -45,6 +59,8 @@ export default function AuthPage() {
     const isPasswordCorrect = user && user.password === loginPassword;
 
     if (user && isPasswordCorrect) {
+      // Simulate session by storing user ID in sessionStorage
+      sessionStorage.setItem('currentUser', JSON.stringify({ id: user.id, email: user.email }));
       toast({
         title: 'Login Successful',
         description: 'Welcome back!',
@@ -61,37 +77,58 @@ export default function AuthPage() {
   };
 
   const handleSignUp = () => {
-    if (!signupEmail || !signupPassword) {
+    if (!signupName || !signupEmail || !signupPassword) {
       toast({
         variant: 'destructive',
         title: 'Sign Up Failed',
-        description: 'Please enter both an email and a password.',
+        description: 'Please enter your name, email, and password.',
       });
       return;
     }
 
-    // Check if user already exists (case-insensitive)
     if (registeredUsers.some(u => u.email.toLowerCase() === signupEmail.toLowerCase())) {
         toast({
             variant: 'destructive',
             title: 'Sign Up Failed',
-            description: 'Account already exists.',
+            description: 'An account with this email already exists.',
         });
         return;
     }
 
-    // "Register" the new user in our state
-    setRegisteredUsers([...registeredUsers, { email: signupEmail, password: signupPassword }]);
+    // Create a new user with a unique ID
+    const newUserId = registeredUsers.length > 0 ? Math.max(...registeredUsers.map(u => u.id)) + 1 : 1;
+    const newUser: MockUserStore = { id: newUserId, email: signupEmail, password: signupPassword };
+
+    const updatedUsers = [...registeredUsers, newUser];
+    setRegisteredUsers(updatedUsers);
+    localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+    
+    // Also add to the main user list in mock-data. This is a hack for the mock environment.
+    // In a real app, this would be a single database operation.
+    const mainUserList: User[] = JSON.parse(localStorage.getItem('users') || '[]');
+    const newUserProfile: User = {
+        id: newUserId,
+        name: signupName,
+        handle: `@${signupEmail.split('@')[0]}`,
+        email: signupEmail,
+        avatarUrl: `https://picsum.photos/seed/${newUserId}/100/100`,
+        bio: 'Just joined WanderLens! Ready to explore.',
+    };
+    localStorage.setItem('users', JSON.stringify([...mainUserList, newUserProfile]));
+
 
     toast({
       title: 'Account Created!',
       description: "You've been successfully signed up. Please log in.",
     });
 
-    // Switch to login tab and pre-fill email
     setLoginEmail(signupEmail);
-    setLoginPassword(''); // Clear password field for login
+    setLoginPassword('');
     setActiveTab('login');
+    // Clear signup form
+    setSignupName('');
+    setSignupEmail('');
+    setSignupPassword('');
   };
 
   return (
@@ -168,7 +205,12 @@ export default function AuthPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="signup-name">Name</Label>
-                <Input id="signup-name" placeholder="Your Name" />
+                <Input 
+                  id="signup-name" 
+                  placeholder="Your Name"
+                  value={signupName}
+                  onChange={(e) => setSignupName(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
