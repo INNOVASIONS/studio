@@ -8,8 +8,8 @@ import type { Journey, User } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Calendar, Users, Plane, Train, Car, Ship, Bus, Hotel, MapPin, Wallet, BookOpen, Heart, MessageCircle, Expand } from 'lucide-react';
-import { format, parseISO, toDate } from 'date-fns';
-import { utcToZonedTime } from 'date-fns-tz';
+import { format } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import {
   Carousel,
@@ -107,8 +107,8 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
     // By assuming the user's local timezone for parsing, we avoid hydration errors
     // where the server (UTC) and client (local) would render different days.
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const zonedStartDate = utcToZonedTime(new Date(journey.startDate), timeZone);
-    const zonedEndDate = utcToZonedTime(new Date(journey.endDate), timeZone);
+    const zonedStartDate = toZonedTime(new Date(journey.startDate), timeZone);
+    const zonedEndDate = toZonedTime(new Date(journey.endDate), timeZone);
 
     return `${format(zonedStartDate, 'd MMM yyyy')} - ${format(zonedEndDate, 'd MMM yyyy')}`;
   };
