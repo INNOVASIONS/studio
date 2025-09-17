@@ -31,22 +31,24 @@ function getUsersFromStorage(): User[] {
       },
   ];
 
+  if (typeof window === 'undefined') {
+    return initialUsers;
+  }
+  
   try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-        const storedUsers = localStorage.getItem('users');
-        if (storedUsers) {
-            const parsedUsers = JSON.parse(storedUsers);
-            if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
-              return parsedUsers;
-            }
+    const storedUsers = localStorage.getItem('users');
+    if (storedUsers) {
+        const parsedUsers = JSON.parse(storedUsers);
+        if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
+          return parsedUsers;
         }
-        localStorage.setItem('users', JSON.stringify(initialUsers));
-        return initialUsers;
     }
+    localStorage.setItem('users', JSON.stringify(initialUsers));
+    return initialUsers;
   } catch (error) {
     console.error("Could not access localStorage for users:", error);
+    return initialUsers;
   }
-  return initialUsers;
 }
 
 const getInitialPhotos = (): Photo[] => {
@@ -331,7 +333,7 @@ const getPhotosFromStorage = (): Photo[] => {
         return initialPhotos;
     } catch (error) {
         console.error("Could not access localStorage for photos:", error);
-        return getInitialPhotos();
+        return [];
     }
 };
 
@@ -356,7 +358,21 @@ const getUserPlacesFromStorage = (): UserPlace[] => [
     }
 ];
 
-const getJourneysFromStorage = (): Journey[] => [];
+const getJourneysFromStorage = (): Journey[] => {
+    if (typeof window === 'undefined') {
+        return [];
+    }
+    try {
+        const storedJourneys = localStorage.getItem('journeys');
+        if (storedJourneys) {
+            return JSON.parse(storedJourneys);
+        }
+    } catch (error) {
+        console.error("Could not access localStorage for journeys:", error);
+    }
+    return [];
+};
+
 
 export async function getUsers(): Promise<User[]> { 
     return getUsersFromStorage();
@@ -367,16 +383,17 @@ export async function getUserById(id: number): Promise<User | undefined> {
 }
 
 export async function getCurrentUser(): Promise<User> {
+  if (typeof window === 'undefined') {
+    return getUsersFromStorage()[0];
+  }
   try {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      const storedUser = sessionStorage.getItem('currentUser');
-      if (storedUser) {
-        const { id } = JSON.parse(storedUser);
-        const allUsers = getUsersFromStorage();
-        const user = allUsers.find(u => u.id === id);
-        if (user) {
-          return user;
-        }
+    const storedUser = sessionStorage.getItem('currentUser');
+    if (storedUser) {
+      const { id } = JSON.parse(storedUser);
+      const allUsers = getUsersFromStorage();
+      const user = allUsers.find(u => u.id === id);
+      if (user) {
+        return user;
       }
     }
   } catch (error) {
@@ -414,8 +431,6 @@ export async function getUserPlaces(): Promise<UserPlace[]> { return getUserPlac
 export async function addPhoto(photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'>): Promise<Photo> {
     if (typeof window === 'undefined') {
         console.error("addPhoto called on the server. This should only happen on the client.");
-        // In a real app, you might throw an error or handle this differently.
-        // For this mock setup, we'll prevent it from crashing.
         return { ...photoData, id: -1, likes: 0, comments: [], timestamp: 'Error' };
     }
     const photos = getPhotosFromStorage();
@@ -453,16 +468,6 @@ export async function addUserPlace(place: Omit<UserPlace, 'id'>): Promise<UserPl
 };
 
 export async function getJourneys(): Promise<Journey[]> { 
-    try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            const storedJourneys = localStorage.getItem('journeys');
-            if (storedJourneys) {
-                return JSON.parse(storedJourneys);
-            }
-        }
-    } catch (error) {
-        console.error("Could not access localStorage for journeys:", error);
-    }
     return getJourneysFromStorage();
 }
 
@@ -475,13 +480,11 @@ export async function addJourney(journeyData: Omit<Journey, 'id'>): Promise<Jour
 
     const updatedJourneys = [newJourney, ...journeys];
     
-    try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('journeys', JSON.stringify(updatedJourneys));
-        }
-    } catch (error) {
-        console.error("Could not access localStorage for journeys:", error);
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('journeys', JSON.stringify(updatedJourneys));
     }
 
     return newJourney;
 };
+
+    

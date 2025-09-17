@@ -1,12 +1,13 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, FileText, Globe, Map, Wallet } from 'lucide-react';
+import { ArrowRight, FileText, Globe, Map, Wallet, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPhotos, getUsers, getCurrentUser } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { AddPostDialog } from '@/components/wanderlens/add-post-dialog';
 import { Photo, User } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -169,3 +170,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
