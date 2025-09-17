@@ -104,8 +104,8 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
   const formatDateRange = () => {
     if (!journey.startDate || !journey.endDate) return 'Date not specified';
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const zonedStartDate = toZonedTime(new Date(journey.startDate), timeZone);
-    const zonedEndDate = toZonedTime(new Date(journey.endDate), timeZone);
+    const zonedStartDate = toZonedTime(journey.startDate, timeZone);
+    const zonedEndDate = toZonedTime(journey.endDate, timeZone);
 
     return `${format(zonedStartDate, 'd MMM yyyy')} - ${format(zonedEndDate, 'd MMM yyyy')}`;
   };
