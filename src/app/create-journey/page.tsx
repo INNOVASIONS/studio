@@ -32,7 +32,7 @@ export default function CreateJourneyPage() {
         </div>
 
         {journeys.length > 0 ? (
-            <div className="space-y-8">
+            <div className="flex flex-col items-center space-y-8">
             {journeys.map((journey) => (
                 <JourneyCard key={journey.id} journey={journey} user={currentUser} />
             ))}

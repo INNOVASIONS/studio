@@ -1,11 +1,13 @@
 
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { Journey, User } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Calendar, Users, Plane, Train, Car, Ship, Bus, Hotel, MapPin, Wallet, BookOpen, Image as ImageIcon } from 'lucide-react';
+import { Calendar, Users, Plane, Train, Car, Ship, Bus, Hotel, MapPin, Wallet, BookOpen, Heart, MessageCircle, Expand } from 'lucide-react';
 import { format } from 'date-fns';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import {
@@ -14,9 +16,17 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
+} from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-
+import { Button } from '../ui/button';
 
 const AutoRickshawIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -31,7 +41,6 @@ const AutoRickshawIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-
 const transportIcons: { [key: string]: React.ElementType } = {
   plane: Plane,
   train: Train,
@@ -41,45 +50,31 @@ const transportIcons: { [key: string]: React.ElementType } = {
   'auto-rickshaw': AutoRickshawIcon,
 };
 
-const InfoItem = ({ icon: Icon, label, value }: { icon: React.ElementType, label: string, value: string | number }) => (
-    <div className="flex items-center gap-3 text-sm">
-        <Icon className="h-5 w-5 text-muted-foreground" />
-        <div>
-            <p className="font-semibold">{value}</p>
-            <p className="text-xs text-muted-foreground">{label}</p>
-        </div>
-    </div>
-);
-
-const DetailSection = ({ title, icon: Icon, children }: { title: string, icon: React.ElementType, children: React.ReactNode }) => (
-    <div>
-        <h4 className="font-headline text-lg mb-2 flex items-center gap-2"><Icon className="h-5 w-5 text-primary"/>{title}</h4>
-        <div className="text-sm text-muted-foreground pl-7 space-y-2">{children}</div>
-    </div>
-)
-
 const ImageCarousel = ({ images, alt }: { images: string[], alt: string }) => {
-    if (!images || images.length === 0) {
-        return (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <ImageIcon className="h-4 w-4" />
-                <span>No photos uploaded.</span>
-            </div>
-        );
-    }
+    if (!images || images.length === 0) return null;
     
     return (
-         <Carousel className="w-full max-w-sm" opts={{loop: true}}>
+         <Carousel className="w-full" opts={{loop: true}}>
             <CarouselContent>
                 {images.map((src, index) => (
                     <CarouselItem key={index}>
-                        <div className="p-1">
-                            <Card className="overflow-hidden">
-                                <CardContent className="flex aspect-video items-center justify-center p-0">
-                                    <Image src={src} alt={`${alt} photo ${index + 1}`} width={400} height={225} className="object-cover w-full h-full" />
-                                </CardContent>
-                            </Card>
-                        </div>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div className="bg-muted relative group cursor-pointer aspect-video overflow-hidden">
+                                    <Image src={src} alt={`${alt} photo ${index + 1}`} fill className="object-cover" />
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <Expand className="h-10 w-10 text-white" />
+                                    </div>
+                                </div>
+                            </DialogTrigger>
+                             <DialogContent className="max-w-4xl p-0">
+                                <DialogHeader className="sr-only">
+                                    <DialogTitle>Enlarged photo: {alt}</DialogTitle>
+                                    <DialogDescription>A larger view of the journey image.</DialogDescription>
+                                </DialogHeader>
+                                <Image src={src} alt={alt} width={1600} height={900} className="w-full h-auto object-contain rounded-lg" />
+                            </DialogContent>
+                        </Dialog>
                     </CarouselItem>
                 ))}
             </CarouselContent>
@@ -94,97 +89,140 @@ const ImageCarousel = ({ images, alt }: { images: string[], alt: string }) => {
 }
 
 export function JourneyCard({ journey, user }: { journey: Journey, user: User }) {
+  const [isLiked, setIsLiked] = useState(false);
+  
+  const allPhotos = journey.dailyActivities.flatMap(day => day.places.flatMap(place => place.photos)).concat(journey.hotelPhotos);
   const TransportIcon = journey.transportMode ? transportIcons[journey.transportMode] : Car;
 
   const formatDateRange = () => {
-    if (!journey.startDate || !journey.endDate) return 'N/A';
-    return `${format(new Date(journey.startDate), 'LLL d, yyyy')} - ${format(new Date(journey.endDate), 'LLL d, yyyy')}`;
+    if (!journey.startDate || !journey.endDate) return 'Date not specified';
+    return `${format(new Date(journey.startDate), 'd MMM yyyy')} - ${format(new Date(journey.endDate), 'd MMM yyyy')}`;
+  };
+
+  const handleLikeClick = () => {
+    setIsLiked(!isLiked);
+    // In a real app, you'd also update the like count on the server
   };
 
   return (
-    <Card className="max-w-4xl mx-auto shadow-lg overflow-hidden">
-      <CardHeader className="bg-muted/30 p-4">
-        <div className="flex justify-between items-start">
-            <div>
-                <CardTitle className="font-headline text-2xl text-primary">{journey.placeVisited}</CardTitle>
-                <CardDescription className="flex items-center gap-2 pt-1">
-                    <Avatar className="h-5 w-5">
-                        <AvatarImage src={user.avatarUrl} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <span>Journey by {user.name}</span>
-                </CardDescription>
-            </div>
-            <div className="text-right flex-shrink-0">
-                <InfoItem icon={Calendar} label="Date" value={formatDateRange()} />
-            </div>
+    <Card className="w-full max-w-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl">
+      <CardHeader className="flex flex-row items-center gap-3 p-4">
+        <Link href={`/profile/${user.id}`}>
+          <Avatar>
+            <AvatarImage src={user.avatarUrl} alt={user.name} />
+            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+        </Link>
+        <div className="flex flex-col">
+          <Link href={`/profile/${user.id}`} className="font-semibold hover:underline text-sm">
+            {user.name}
+          </Link>
+          <div className="flex items-center text-xs text-muted-foreground">
+            <MapPin className="h-3 w-3 mr-1 text-accent" />
+            <span>{journey.placeVisited}</span>
+          </div>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+            <time className="text-xs text-muted-foreground">
+              {formatDateRange()}
+            </time>
         </div>
       </CardHeader>
-      <CardContent className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 space-y-4">
-            <InfoItem icon={Users} label="Travelers" value={journey.travelers} />
-            {journey.transportMode && <InfoItem icon={TransportIcon} label="Transport" value={journey.transportMode.charAt(0).toUpperCase() + journey.transportMode.slice(1)} />}
-            {journey.hotelName && <InfoItem icon={Hotel} label="Stayed at" value={journey.hotelName} />}
-        </div>
-        <div className="md:col-span-2 space-y-6">
-            {journey.transportDetails && (
-                <DetailSection title="Transport Notes" icon={TransportIcon}>
-                    <p>{journey.transportDetails}</p>
-                     {journey.transportCost && journey.transportCurrency && (
-                        <p className="flex items-center gap-2"><Wallet className="h-4 w-4"/>~{journey.transportCurrency} {journey.transportCost}</p>
-                    )}
-                </DetailSection>
-            )}
-            {journey.hotelName && (
-                 <DetailSection title="Hotel Review" icon={Hotel}>
-                    {journey.hotelReview && <p>"{journey.hotelReview}"</p>}
-                    <ImageCarousel images={journey.hotelPhotos} alt={journey.hotelName} />
-                    {journey.hotelCost && journey.hotelCurrency && (
-                        <p className="flex items-center gap-2 pt-2"><Wallet className="h-4 w-4"/>~{journey.hotelCurrency} {journey.hotelCost} / night</p>
-                    )}
-                </DetailSection>
-            )}
-        </div>
+      
+      <CardContent className="p-0">
+          {allPhotos.length > 0 ? (
+             <ImageCarousel images={allPhotos} alt={`Photos from ${journey.placeVisited}`} />
+          ) : (
+             <div className="aspect-video bg-muted flex flex-col items-center justify-center text-muted-foreground">
+                <BookOpen className="h-12 w-12 mb-2" />
+                <p>A journey by {user.name}</p>
+             </div>
+          )}
       </CardContent>
-      {journey.dailyActivities && journey.dailyActivities.length > 0 && (
-          <CardFooter className="p-0">
-            <Accordion type="single" collapsible className="w-full bg-muted/20" defaultValue='day-0'>
-                <AccordionItem value="item-0">
-                    <AccordionTrigger className="px-4 md:px-6 py-3 font-headline text-lg hover:no-underline">
-                        <div className="flex items-center gap-2">
-                           <BookOpen className="h-5 w-5 text-primary"/>
-                            Daily Itinerary ({journey.dailyActivities.length} {journey.dailyActivities.length > 1 ? 'Days' : 'Day'})
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="p-4 md:p-6 pt-0">
-                        <Accordion type="multiple" className="w-full space-y-2">
+      
+      <div className="p-4 space-y-2">
+        <p className="text-sm">
+           A {journey.dailyActivities.length}-day journey to <strong>{journey.placeVisited}</strong> with {journey.travelers} {journey.travelers > 1 ? 'travelers' : 'traveler'}.
+        </p>
+      </div>
+      
+       <div className="px-4 pb-2">
+          <Accordion type="multiple" className="w-full">
+             <AccordionItem value="details">
+                <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+                   <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-accent" />
+                       Journey Details & Itinerary
+                   </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground space-y-4 pt-4">
+
+                {journey.transportDetails && (
+                    <div className="space-y-2">
+                        <h4 className="font-semibold flex items-center gap-2 text-foreground"><TransportIcon className="h-4 w-4 text-primary"/>Transport</h4>
+                        <p className="pl-6">{journey.transportDetails}</p>
+                        {journey.transportCost && journey.transportCurrency && (
+                            <p className="pl-6 flex items-center gap-2 text-xs"><Wallet className="h-3 w-3"/>~{journey.transportCurrency} {journey.transportCost}</p>
+                        )}
+                    </div>
+                )}
+                
+                {journey.hotelName && (
+                     <div className="space-y-2">
+                         <h4 className="font-semibold flex items-center gap-2 text-foreground"><Hotel className="h-4 w-4 text-primary"/>Accommodation</h4>
+                         <div className="pl-6 space-y-2">
+                           <p>Stayed at <strong>{journey.hotelName}</strong> for {journey.hotelDuration} {journey.hotelDuration && journey.hotelDuration > 1 ? 'nights' : 'night'}.</p>
+                           {journey.hotelReview && <p>"{journey.hotelReview}"</p>}
+                           {journey.hotelCost && journey.hotelCurrency && (
+                                <p className="flex items-center gap-2 text-xs"><Wallet className="h-3 w-3"/>~{journey.hotelCurrency} {journey.hotelCost} / night</p>
+                            )}
+                         </div>
+                    </div>
+                )}
+
+                {journey.dailyActivities && journey.dailyActivities.length > 0 && (
+                    <div className="space-y-2">
+                        <h4 className="font-semibold flex items-center gap-2 text-foreground"><Calendar className="h-4 w-4 text-primary"/>Daily Log</h4>
+                        <Accordion type="multiple" className="w-full space-y-2 pl-2">
                             {journey.dailyActivities.map((day, dayIndex) => (
                                 <AccordionItem key={dayIndex} value={`day-${dayIndex}`} className="border-none">
-                                    <AccordionTrigger className="flex w-full items-center justify-between rounded-md bg-muted/50 px-4 py-2 text-md font-semibold text-primary/80 hover:no-underline">
+                                    <AccordionTrigger className="flex w-full items-center justify-between rounded-md bg-muted/50 px-3 py-1.5 text-xs font-semibold text-primary/80 hover:no-underline">
                                         Day {day.day}: {format(new Date(day.date), 'MMMM do')}
                                     </AccordionTrigger>
-                                    <AccordionContent className="p-4 space-y-4">
+                                    <AccordionContent className="p-2 space-y-2">
                                         {day.places.map((place, placeIndex) => (
-                                            <div key={placeIndex} className="p-3 rounded-md border bg-background space-y-3">
-                                                <h5 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-accent"/>{place.name}</h5>
-                                                {place.description && <p className="text-sm text-muted-foreground pl-6">{place.description}</p>}
-                                                <div className="pl-6">
-                                                   <ImageCarousel images={place.photos} alt={place.name} />
-                                                </div>
+                                            place.name && <div key={placeIndex} className="p-2 rounded-md border bg-background/50 space-y-2">
+                                                <h5 className="font-semibold flex items-center gap-2 text-foreground"><MapPin className="h-4 w-4 text-accent"/>{place.name}</h5>
+                                                {place.description && <p className="text-xs text-muted-foreground pl-6">{place.description}</p>}
                                             </div>
                                         ))}
                                         {day.places.length === 0 || (day.places.length === 1 && !day.places[0].name) ? (
-                                            <p className='text-sm text-muted-foreground text-center py-4'>No activities logged for this day.</p>
+                                            <p className='text-xs text-muted-foreground text-center py-2'>No specific stops logged for this day.</p>
                                         ): null}
                                     </AccordionContent>
                                 </AccordionItem>
                             ))}
                         </Accordion>
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-          </CardFooter>
-      )}
+                    </div>
+                 )}
+
+                </AccordionContent>
+             </AccordionItem>
+          </Accordion>
+       </div>
+
+      <CardFooter className="p-4 border-t flex justify-between items-center">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <Button variant="ghost" size="sm" className="flex items-center gap-2 group" onClick={handleLikeClick}>
+            <Heart className={cn("h-5 w-5 text-accent transition-all group-hover:scale-110", isLiked && "fill-accent")} />
+            <span>{(journey.id * 13) % 100}</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex items-center gap-2 group">
+              <MessageCircle className="h-5 w-5 text-accent transition-all group-hover:scale-110" />
+              <span>{(journey.id * 7) % 100}</span>
+          </Button>
+        </div>
+      </CardFooter>
     </Card>
   );
 }
