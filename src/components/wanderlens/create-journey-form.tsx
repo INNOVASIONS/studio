@@ -105,6 +105,7 @@ export function CreateJourneyForm() {
     } else {
       setDailyActivities([]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate]);
 
 
@@ -159,6 +160,7 @@ export function CreateJourneyForm() {
                     value={JSON.stringify(dailyActivities.map(day => ({
                         ...day,
                         date: day.date.toISOString(),
+                        places: day.places.filter(p => p.name.trim() !== ''),
                     })))} 
                 />
                  <input type="hidden" name="start-date" value={startDate?.toISOString() ?? ''} />

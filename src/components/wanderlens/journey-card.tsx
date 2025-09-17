@@ -103,7 +103,7 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
 
   const formatDateRange = () => {
     if (!journey.startDate || !journey.endDate) return 'Date not specified';
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timeZone = typeof window !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC';
     const zonedStartDate = toZonedTime(journey.startDate, timeZone);
     const zonedEndDate = toZonedTime(journey.endDate, timeZone);
 
@@ -197,7 +197,7 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
                             {journey.dailyActivities.map((day, dayIndex) => (
                                 <AccordionItem key={dayIndex} value={`day-${dayIndex}`} className="border-none">
                                     <AccordionTrigger className="flex w-full items-center justify-between rounded-md bg-muted/50 px-3 py-1.5 text-xs font-semibold text-primary/80 hover:no-underline">
-                                        Day {day.day}: {format(new Date(day.date), 'MMMM do')}
+                                        Day {day.day}: {format(toZonedTime(day.date, typeof window !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC'), 'MMMM do')}
                                     </AccordionTrigger>
                                     <AccordionContent className="p-2 space-y-2">
                                         {day.places.map((place, placeIndex) => (
