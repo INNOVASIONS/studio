@@ -198,7 +198,9 @@ export async function handleCreateJourney(
 
     const dailyActivitiesPromises = dailyActivitiesData.map(async (day: any, dayIndex: number) => {
         const placesPromises = day.places.map(async (place: any, placeIndex: number) => {
-            const photos: File[] = formData.getAll(`day-${dayIndex}-place-${placeIndex}-photos`) as File[];
+            const photoInputName = `day-${dayIndex}-place-${placeIndex}-photos`;
+            const photos: File[] = formData.getAll(photoInputName) as File[];
+
             const photoUrls = await Promise.all(
                 photos.filter(photo => photo.size > 0).map(photo => readFileAsDataURL(photo))
             );
@@ -314,3 +316,5 @@ export async function handleUpdateProfile(
   revalidatePath('/', 'layout');
   return { success: true };
 }
+
+    
