@@ -97,7 +97,7 @@ export function JourneyCard({ journey, user }: { journey: Journey, user: User })
       day.places.flatMap(place => place.photos || [])
     ),
   ];
-  const TransportIcon = journey.transportMode ? transportIcons[journey.transportMode] : Car;
+  const TransportIcon = (journey.transportMode && transportIcons[journey.transportMode]) ? transportIcons[journey.transportMode] : Car;
 
   const formatDateRange = () => {
     if (!journey.startDate || !journey.endDate) return 'Date not specified';
