@@ -1,4 +1,6 @@
 
+'use client';
+
 import type { User, Photo, UserPlace, Comment, Journey } from './types';
 
 // =================================================================================================
@@ -81,10 +83,7 @@ const INITIAL_PHOTOS: Photo[] = [
     caption: 'Took a trip to the mountains. The air was so fresh!',
     location: 'Rocky Mountains, USA',
     likes: 15,
-    comments: [
-      { id: 1, user: INITIAL_USERS[2], text: 'Wow, incredible shot!', timestamp: '1d' },
-      { id: 2, user: INITIAL_USERS[1], text: 'Looks so peaceful.', timestamp: '1d' },
-    ],
+    comments: [],
     timestamp: '1d',
     transportName: 'Jeep Wrangler 4x4',
     transportDetails: 'Drove up in a 4x4. The roads were a bit rough but the views were worth it.',
@@ -108,10 +107,7 @@ const INITIAL_PHOTOS: Photo[] = [
     caption: 'Sunrise over the serene mountain lake. An unforgettable moment.',
     location: 'Alpine Lake, Switzerland',
     likes: 1204,
-    comments: [
-       { id: 3, user: INITIAL_USERS[0], text: 'Adding this to my bucket list!', timestamp: '2d' },
-       { id: 4, user: INITIAL_USERS[2], text: 'Absolutely stunning.', timestamp: '2d' },
-    ],
+    comments: [],
     timestamp: '2d',
     transportName: 'SBB Train & PostBus',
     transportDetails: 'Best way to get here is by train to the nearest town, then a local bus. The bus is scenic and much cheaper than a taxi!',
@@ -332,20 +328,16 @@ const INITIAL_PLACES: UserPlace[] = [
  * @returns The data from localStorage or the initial data.
  */
 function getFromStorage<T>(key: string, initialData: T): T {
-  // If we are on the server, return the initial data.
   if (typeof window === 'undefined') {
     return initialData;
   }
-  // If we are on the client, try to use localStorage.
   try {
     const storedValue = localStorage.getItem(key);
     if (storedValue) {
       return JSON.parse(storedValue);
-    } else {
-      // If localStorage is empty, initialize it with the default data.
-      localStorage.setItem(key, JSON.stringify(initialData));
-      return initialData;
     }
+    localStorage.setItem(key, JSON.stringify(initialData));
+    return initialData;
   } catch (error) {
     console.error(`Error reading from localStorage key "${key}":`, error);
     return initialData;
@@ -370,13 +362,13 @@ function setInStorage<T>(key: string, data: T) {
 
 
 // Public Data Accessors
-export async function getUsers(): Promise<User[]> { 
+export async function getUsers(): Promise<User[]> {
     return getFromStorage('users', INITIAL_USERS);
 }
 
-export async function getUserById(id: number): Promise<User | undefined> { 
+export async function getUserById(id: number): Promise<User | undefined> {
     const users = await getUsers();
-    return users.find((user) => user.id === id); 
+    return users.find((user) => user.id === id);
 }
 
 export async function getCurrentUser(): Promise<User> {
@@ -394,11 +386,13 @@ export async function getCurrentUser(): Promise<User> {
   } catch (error) {
     console.error("Could not access sessionStorage:", error);
   }
-  
+
   const users = await getUsers();
   if (users.length > 0) return users[0];
-  
-  throw new Error("No users found and no user in session. Please log in.");
+
+  // This part is problematic, it's better to handle this in the UI
+  // where the auth flow can be initiated. For now, we return the first default user.
+  return INITIAL_USERS[0];
 }
 
 
@@ -410,21 +404,21 @@ export async function updateUser(userId: number, data: Partial<Omit<User, 'id' |
     }
     const updatedUser = { ...users[userIndex], ...data };
     users[userIndex] = updatedUser;
-    
+
     setInStorage('users', users);
     return updatedUser;
 };
 
-export async function getPhotos(): Promise<Photo[]> { 
+export async function getPhotos(): Promise<Photo[]> {
     return getFromStorage('photos', INITIAL_PHOTOS);
 }
 
-export async function getPhotosByUserId(userId: number): Promise<Photo[]> { 
+export async function getPhotosByUserId(userId: number): Promise<Photo[]> {
     const photos = await getPhotos();
-    return photos.filter((photo) => photo.userId === userId); 
+    return photos.filter((photo) => photo.userId === userId);
 }
 
-export async function getUserPlaces(): Promise<UserPlace[]> { 
+export async function getUserPlaces(): Promise<UserPlace[]> {
     return getFromStorage('user_places', INITIAL_PLACES);
 }
 
@@ -445,11 +439,11 @@ export async function addPhoto(photoData: Omit<Photo, 'id' | 'likes' | 'comments
 export async function deletePhoto(photoId: number): Promise<void> {
   const photos = await getPhotos();
   const photoIndex = photos.findIndex((p) => p.id === photoId);
-  
+
   if (photoIndex === -1) {
     throw new Error('Photo not found');
   }
-  
+
   const currentUser = await getCurrentUser();
   if (photos[photoIndex].userId !== currentUser.id) {
     throw new Error('You are not authorized to delete this post.');
@@ -467,7 +461,7 @@ export async function addUserPlace(place: Omit<UserPlace, 'id'>): Promise<UserPl
     return newPlace;
 };
 
-export async function getJourneys(): Promise<Journey[]> { 
+export async function getJourneys(): Promise<Journey[]> {
     return getFromStorage('journeys', INITIAL_JOURNEYS);
 }
 
@@ -482,3 +476,5 @@ export async function addJourney(journeyData: Omit<Journey, 'id'>): Promise<Jour
     setInStorage('journeys', updatedJourneys);
     return newJourney;
 };
+
+    
