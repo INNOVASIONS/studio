@@ -1,20 +1,15 @@
+'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  Camera,
-  Compass,
-  FileText,
-  Globe,
-  Map,
-  Plus,
-  Wallet,
-} from 'lucide-react';
+import { ArrowRight, FileText, Globe, Map, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPhotos, getUsers, getCurrentUser } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AddPostDialog } from '@/components/wanderlens/add-post-dialog';
+import { Photo, User } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const featureCards = [
     {
@@ -47,12 +42,60 @@ const featureCards = [
     },
 ]
 
-export default async function Home() {
-  const photos = await getPhotos();
-  const users = await getUsers();
-  const currentUser = await getCurrentUser();
+export default function Home() {
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [photosData, usersData, currentUserData] = await Promise.all([
+          getPhotos(),
+          getUsers(),
+          getCurrentUser(),
+        ]);
+        setPhotos(photosData);
+        setUsers(usersData);
+        setCurrentUser(currentUserData);
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   const findUser = (userId: number) => users.find((u) => u.id === userId);
+
+  if (loading || !currentUser) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <section className="text-center mb-16">
+          <Skeleton className="h-16 w-3/4 mx-auto" />
+          <Skeleton className="h-6 w-1/2 mx-auto mt-4" />
+          <div className="mt-8 flex justify-center gap-4">
+            <Skeleton className="h-12 w-36" />
+            <Skeleton className="h-12 w-36" />
+          </div>
+        </section>
+        <section>
+          <Skeleton className="h-10 w-1/3 mx-auto mb-8" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex flex-col gap-4">
+                <Skeleton className="h-[250px] w-full" />
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -71,7 +114,7 @@ export default async function Home() {
           </Button>
           <AddPostDialog>
             <Button size="lg" variant="outline">
-              Upload a Photo <Plus />
+              Upload a Photo
             </Button>
           </AddPostDialog>
         </div>
@@ -108,9 +151,9 @@ export default async function Home() {
           Recent Moments
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {photos.map((photo) => {
+          {photos.slice(0, 3).map((photo) => {
             const user = findUser(photo.userId);
-            return user ? (
+            return user && currentUser ? (
               <PhotoCard key={photo.id} photo={photo} user={user} currentUser={currentUser}/>
             ) : null;
           })}

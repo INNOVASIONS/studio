@@ -3,9 +3,6 @@
 
 import type { User, Photo, UserPlace, Comment, Journey } from './types';
 
-// This function simulates getting all users.
-// In a real app, it would fetch from a database.
-// It also syncs with localStorage to get users created via the signup form.
 function getUsersFromStorage(): User[] {
   let initialUsers: User[] = [
       {
@@ -39,26 +36,20 @@ function getUsersFromStorage(): User[] {
         const storedUsers = localStorage.getItem('users');
         if (storedUsers) {
             const parsedUsers = JSON.parse(storedUsers);
-            if (parsedUsers.length > 0) {
+            if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
               return parsedUsers;
             }
         }
-        // If nothing in storage or the stored list is empty, set it with initial users.
         localStorage.setItem('users', JSON.stringify(initialUsers));
         return initialUsers;
     }
   } catch (error) {
     console.error("Could not access localStorage for users:", error);
   }
-  // Fallback for server-side rendering or environments without localStorage
   return initialUsers;
 }
 
-
-// These are now functions to simulate dynamic data access
-// In a real app, these would be database queries.
-
-const getPhotosFromStorage = (): Photo[] => {
+const getInitialPhotos = (): Photo[] => {
     return [
     {
     id: 11,
@@ -323,6 +314,27 @@ const getPhotosFromStorage = (): Photo[] => {
 ];
 };
 
+const getPhotosFromStorage = (): Photo[] => {
+    if (typeof window === 'undefined') {
+        return [];
+    }
+    try {
+        const storedPhotos = localStorage.getItem('photos');
+        if (storedPhotos) {
+            const parsed = JSON.parse(storedPhotos);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        }
+        const initialPhotos = getInitialPhotos();
+        localStorage.setItem('photos', JSON.stringify(initialPhotos));
+        return initialPhotos;
+    } catch (error) {
+        console.error("Could not access localStorage for photos:", error);
+        return getInitialPhotos();
+    }
+};
+
 const getUserPlacesFromStorage = (): UserPlace[] => [
     {
         id: 1,
@@ -370,8 +382,11 @@ export async function getCurrentUser(): Promise<User> {
   } catch (error) {
     console.error("Could not access sessionStorage:", error);
   }
-  // Fallback to the default user if not found or in a server environment
-  return getUsersFromStorage()[0];
+  const users = getUsersFromStorage();
+  if (users.length > 0) {
+    return users[0];
+  }
+  throw new Error("No users found and no user in session. Please log in.");
 }
 
 
@@ -397,7 +412,13 @@ export async function getPhotosByUserId(userId: number): Promise<Photo[]> {
 export async function getUserPlaces(): Promise<UserPlace[]> { return getUserPlacesFromStorage(); }
 
 export async function addPhoto(photoData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'>): Promise<Photo> {
-    let photos = getPhotosFromStorage();
+    if (typeof window === 'undefined') {
+        console.error("addPhoto called on the server. This should only happen on the client.");
+        // In a real app, you might throw an error or handle this differently.
+        // For this mock setup, we'll prevent it from crashing.
+        return { ...photoData, id: -1, likes: 0, comments: [], timestamp: 'Error' };
+    }
+    const photos = getPhotosFromStorage();
     const newPhoto: Photo = {
         id: photos.length > 0 ? Math.max(...photos.map(p => p.id)) + 1 : 1,
         likes: 0,
@@ -405,9 +426,8 @@ export async function addPhoto(photoData: Omit<Photo, 'id' | 'likes' | 'comments
         timestamp: 'Just now',
         ...photoData,
     };
-    // This is a mock, so we can't really persist the data server-side.
-    // In a real app, this would be an INSERT query to a database.
-    console.log("New photo added (mock):", newPhoto);
+    const updatedPhotos = [newPhoto, ...photos];
+    localStorage.setItem('photos', JSON.stringify(updatedPhotos));
     return newPhoto;
 };
 
@@ -421,8 +441,8 @@ export async function deletePhoto(photoId: number): Promise<void> {
   if (photos[photoIndex].userId !== currentUser.id) {
     throw new Error('You are not authorized to delete this post.');
   }
-  // This is a mock, so we can't really persist the data server-side.
-  console.log("Photo deleted (mock):", photoId);
+  const updatedPhotos = photos.filter(p => p.id !== photoId);
+  localStorage.setItem('photos', JSON.stringify(updatedPhotos));
 };
 
 export async function addUserPlace(place: Omit<UserPlace, 'id'>): Promise<UserPlace> {
@@ -465,5 +485,3 @@ export async function addJourney(journeyData: Omit<Journey, 'id'>): Promise<Jour
 
     return newJourney;
 };
-
-    
