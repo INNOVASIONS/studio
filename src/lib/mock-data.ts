@@ -373,7 +373,9 @@ export async function getUserById(id: number): Promise<User | undefined> {
 
 export async function getCurrentUser(): Promise<User> {
   if (typeof window === 'undefined') {
-    return INITIAL_USERS[0];
+    // This is a server-side call. We can't know the current user.
+    // Return a default or throw an error. Throwing is better to catch bugs.
+    throw new Error("Attempted to call getCurrentUser() from the server but it's a client-only function.");
   }
   try {
     const storedUser = sessionStorage.getItem('currentUser');
@@ -387,12 +389,13 @@ export async function getCurrentUser(): Promise<User> {
     console.error("Could not access sessionStorage:", error);
   }
 
+  // Fallback if no user is in session. This should ideally not happen in an authenticated context.
   const users = await getUsers();
-  if (users.length > 0) return users[0];
-
-  // This part is problematic, it's better to handle this in the UI
-  // where the auth flow can be initiated. For now, we return the first default user.
-  return INITIAL_USERS[0];
+  if (users.length > 0) {
+    return users[0];
+  }
+  
+  throw new Error("No users found and no user in session. Please log in.");
 }
 
 
@@ -436,7 +439,7 @@ export async function addPhoto(photoData: Omit<Photo, 'id' | 'likes' | 'comments
     return newPhoto;
 };
 
-export async function deletePhoto(photoId: number): Promise<void> {
+export async function deletePhoto(photoId: number, userId: number): Promise<void> {
   const photos = await getPhotos();
   const photoIndex = photos.findIndex((p) => p.id === photoId);
 
@@ -444,8 +447,7 @@ export async function deletePhoto(photoId: number): Promise<void> {
     throw new Error('Photo not found');
   }
 
-  const currentUser = await getCurrentUser();
-  if (photos[photoIndex].userId !== currentUser.id) {
+  if (photos[photoIndex].userId !== userId) {
     throw new Error('You are not authorized to delete this post.');
   }
 

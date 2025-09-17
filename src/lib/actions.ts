@@ -11,8 +11,8 @@ import {
 } from '@/ai/flows/image-based-location-finder';
 import { translatePost, TranslatePostInput } from '@/ai/flows/translate-text';
 import { revalidatePath } from 'next/cache';
-import { addJourney, addPhoto, deletePhoto, updateUser, getCurrentUser } from './mock-data';
-import { DailyActivity, VisitedPlace, Photo } from './types';
+import { addJourney, addPhoto, deletePhoto, updateUser } from './mock-data';
+import { DailyActivity, VisitedPlace, Photo, User } from './types';
 
 export type ItineraryState = {
   itinerary?: string;
@@ -125,7 +125,10 @@ export async function handleCreateJourney(
   prevState: CreateJourneyState,
   formData: FormData
 ): Promise<CreateJourneyState> {
-  const currentUser = await getCurrentUser();
+  const userId = parseInt(formData.get('userId') as string, 10);
+  if (isNaN(userId)) {
+    return { error: 'User is not authenticated.' };
+  }
 
   try {
     const dailyActivitiesData = JSON.parse(formData.get('daily-activities-data') as string);
@@ -161,7 +164,7 @@ export async function handleCreateJourney(
     );
 
     const journeyData = {
-      userId: currentUser.id,
+      userId: userId,
       placeVisited: formData.get('place-visited') as string,
       startDate: formData.get('start-date') as string,
       endDate: formData.get('end-date') as string,
@@ -199,14 +202,15 @@ export type DeletePostState = {
 };
 
 export async function handleDeletePost(
-  photoId: number
+  photoId: number,
+  userId: number
 ): Promise<DeletePostState> {
   if (typeof photoId !== 'number') {
     return { error: 'Invalid Photo ID.' };
   }
 
   try {
-    await deletePhoto(photoId);
+    await deletePhoto(photoId, userId);
   } catch (error: any) {
     return { error: error.message };
   }
@@ -230,7 +234,11 @@ export async function handleUpdateProfile(
   const handle = formData.get('handle') as string;
   const bio = formData.get('bio') as string;
   const avatarDataUri = formData.get('avatarDataUri') as string | undefined;
-  const currentUser = await getCurrentUser();
+  const userId = parseInt(formData.get('userId') as string, 10);
+  
+  if (isNaN(userId)) {
+    return { error: 'User is not authenticated.' };
+  }
 
   if (!name || !handle) {
     return { error: 'Name and handle are required.' };
@@ -241,13 +249,13 @@ export async function handleUpdateProfile(
     if (avatarDataUri) {
       userData.avatarUrl = avatarDataUri;
     }
-    await updateUser(currentUser.id, userData);
+    await updateUser(userId, userData);
   } catch (e: any) {
     console.error(e);
     return { error: e.message };
   }
 
-  revalidatePath(`/profile/${currentUser.id}`);
+  revalidatePath(`/profile/${userId}`);
   revalidatePath('/profile');
   // Revalidate layout to update header avatar
   revalidatePath('/', 'layout');
@@ -256,7 +264,8 @@ export async function handleUpdateProfile(
 
 
 export async function handleCreatePost(
-  formData: FormData
+  formData: FormData,
+  userId: number
 ): Promise<{ newPost?: Photo; error?: string }> {
   const caption = formData.get('caption') as string;
   const location = formData.get('location') as string;
@@ -267,9 +276,8 @@ export async function handleCreatePost(
   }
 
   try {
-    const currentUser = await getCurrentUser();
     const newPostData: Omit<Photo, 'id' | 'likes' | 'comments' | 'timestamp'> = {
-      userId: currentUser.id,
+      userId: userId,
       imageUrl: photoDataUri,
       caption,
       location,

@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,9 +30,12 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '../ui/switch';
 import { RupeeIcon } from './rupee-icon';
-import { addPhoto, getCurrentUser } from '@/lib/mock-data';
+import { getCurrentUser } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
 import { NotificationContext } from '@/context/notification-context';
+import { handleCreatePost } from '@/lib/actions';
+import type { User } from '@/lib/types';
+
 
 const StarRating = ({
   rating,
@@ -105,6 +108,15 @@ export function AddPostDialog({
   const [showEntryFee, setShowEntryFee] = useState(false);
   const { toast } = useToast();
   const { addNotification } = useContext(NotificationContext);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+    }
+    fetchUser();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -138,44 +150,22 @@ export function AddPostDialog({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!currentUser) {
+        setError('You must be logged in to create a post.');
+        return;
+    }
     setIsSubmitting(true);
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const photoDataUri = preview;
-    const caption = formData.get('caption') as string;
-    const location = formData.get('location') as string;
-
-    if (!photoDataUri || !caption || !location) {
-      setError('Photo, caption, and location are required.');
-      setIsSubmitting(false);
-      return;
-    }
+    formData.set('photoDataUri', preview || '');
 
     try {
-      const currentUser = await getCurrentUser();
-      
-      const newPost = await addPhoto({
-        userId: currentUser.id,
-        imageUrl: photoDataUri,
-        caption,
-        location,
-        currency: currency || undefined,
-        transportDetails: formData.get('transportDetails') as string || undefined,
-        foodDetails: formData.get('foodDetails') as string || undefined,
-        hotelDetails: formData.get('hotelDetails') as string || undefined,
-        restaurantName: formData.get('restaurantName') as string || undefined,
-        hotelName: formData.get('hotelName') as string || undefined,
-        transportName: formData.get('transportName') as string || undefined,
-        transportRating: transportRating || undefined,
-        foodRating: foodRating || undefined,
-        hotelRating: hotelRating || undefined,
-        transportCost: parseFloat(formData.get('transportCost') as string) || undefined,
-        foodCost: parseFloat(formData.get('foodCost') as string) || undefined,
-        hotelCost: parseFloat(formData.get('hotelCost') as string) || undefined,
-        attractionName: formData.get('attractionName') as string || undefined,
-        entryFeeCost: parseFloat(formData.get('entryFeeCost') as string) || undefined,
-      });
+      const result = await handleCreatePost(formData, currentUser.id);
+
+      if (result.error) {
+          throw new Error(result.error);
+      }
 
       toast({
         title: "Post Created!",

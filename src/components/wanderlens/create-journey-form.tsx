@@ -21,6 +21,8 @@ import { handleCreateJourney, CreateJourneyState } from '@/lib/actions';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { RupeeIcon } from './rupee-icon';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { getCurrentUser } from '@/lib/mock-data';
+import type { User } from '@/lib/types';
 
 type VisitedPlace = {
   name: string;
@@ -93,6 +95,16 @@ export function CreateJourneyForm() {
   const [dailyActivities, setDailyActivities] = useState<DailyActivityState[]>([]);
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // This is a client component, so we can fetch the user here.
+    const fetchUser = async () => {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+    }
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     if (startDate && endDate && endDate >= startDate) {
@@ -165,6 +177,7 @@ export function CreateJourneyForm() {
                 />
                  <input type="hidden" name="start-date" value={startDate?.toISOString() ?? ''} />
                  <input type="hidden" name="end-date" value={endDate?.toISOString() ?? ''} />
+                 {currentUser && <input type="hidden" name="userId" value={currentUser.id} />}
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="space-y-2">

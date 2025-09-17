@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -57,7 +57,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-import { getCurrentUser } from '@/lib/mock-data';
 import { ScrollArea } from '../ui/scroll-area';
 import { Input } from '../ui/input';
 import { handleTranslatePost, TranslationState, handleDeletePost } from '@/lib/actions';
@@ -266,7 +265,7 @@ export function PhotoCard({ photo, user, currentUser, onPostDeleted }: { photo: 
 
   const onDeletePost = () => {
     startDeleteTransition(async () => {
-      const result = await handleDeletePost(photo.id);
+      const result = await handleDeletePost(photo.id, currentUser.id);
       if (result.error) {
         toast({
           variant: 'destructive',
