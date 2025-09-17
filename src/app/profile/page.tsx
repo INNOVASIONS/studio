@@ -2,36 +2,46 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { ProfileHeader } from "@/components/wanderlens/profile-header";
 import { getCurrentUser, getPhotosByUserId } from "@/lib/mock-data";
 import { PhotoCard } from "@/components/wanderlens/photo-card";
 import { User, Photo } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [userPhotos, setUserPhotos] = useState<Photo[]>([]);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const user = await getCurrentUser();
-                setCurrentUser(user);
-                if (user) {
-                    const photos = await getPhotosByUserId(user.id);
-                    setUserPhotos(photos);
-                }
+                // Use a timeout to ensure localStorage is populated on first load
+                setTimeout(async () => {
+                    const user = await getCurrentUser();
+                    setCurrentUser(user);
+                    if (user) {
+                        const photos = await getPhotosByUserId(user.id);
+                        setUserPhotos(photos);
+                    } else {
+                        // If no user is found in session, redirect to auth page
+                        router.push('/auth');
+                    }
+                    setLoading(false);
+                }, 100);
             } catch (error) {
                 console.error("Failed to fetch profile data", error);
-            } finally {
-                setLoading(false);
+                router.push('/auth'); // Redirect on error
             }
         }
         fetchData();
-    }, []);
+    }, [router]);
 
-    if (loading || !currentUser) {
+    if (loading) {
         return (
             <div className="container mx-auto px-4 py-8">
                 <div className="flex flex-col md:flex-row items-center gap-8">
@@ -55,6 +65,20 @@ export default function ProfilePage() {
             </div>
         );
     }
+    
+    if (!currentUser) {
+        return (
+         <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[50vh]">
+           <div className="text-center">
+               <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+               <h2 className="text-2xl font-semibold">Loading Profile...</h2>
+               <p className="text-muted-foreground mt-2">
+                   Please <Link href="/auth" className="text-primary underline">log in</Link> to view your profile.
+               </p>
+           </div>
+         </div>
+        )
+     }
 
     return(
         <div className="container mx-auto px-4 py-8">

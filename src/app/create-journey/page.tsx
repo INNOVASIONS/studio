@@ -1,11 +1,60 @@
+
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { CreateJourneyForm } from '@/components/wanderlens/create-journey-form';
 import { getJourneys, getCurrentUser } from '@/lib/mock-data';
 import { JourneyCard } from '@/components/wanderlens/journey-card';
 import { Separator } from '@/components/ui/separator';
+import { Journey, User } from '@/lib/types';
+import { Loader2 } from 'lucide-react';
 
-export default async function CreateJourneyPage() {
-  const journeys = await getJourneys();
-  const currentUser = await getCurrentUser();
+export default function CreateJourneyPage() {
+  const [journeys, setJourneys] = useState<Journey[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setTimeout(async () => {
+          const [journeysData, currentUserData] = await Promise.all([
+            getJourneys(),
+            getCurrentUser(),
+          ]);
+          setJourneys(journeysData);
+          setCurrentUser(currentUserData);
+          setLoading(false);
+        }, 100);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold">Authentication Required</h2>
+          <p className="text-muted-foreground mt-2">
+            Please <Link href="/auth" className="text-primary underline">log in</Link> to create and view journeys.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -47,3 +96,5 @@ export default async function CreateJourneyPage() {
     </div>
   );
 }
+
+    

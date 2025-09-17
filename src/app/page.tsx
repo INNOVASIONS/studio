@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, FileText, Globe, Map, Wallet, Bell } from 'lucide-react';
+import { ArrowRight, FileText, Globe, Map, Wallet, Bell, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPhotos, getUsers, getCurrentUser } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
@@ -52,17 +52,20 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [photosData, usersData, currentUserData] = await Promise.all([
-          getPhotos(),
-          getUsers(),
-          getCurrentUser(),
-        ]);
-        setPhotos(photosData);
-        setUsers(usersData);
-        setCurrentUser(currentUserData);
+        // Use a timeout to ensure localStorage is populated on first load
+        setTimeout(async () => {
+          const [photosData, usersData, currentUserData] = await Promise.all([
+            getPhotos(),
+            getUsers(),
+            getCurrentUser(),
+          ]);
+          setPhotos(photosData);
+          setUsers(usersData);
+          setCurrentUser(currentUserData);
+          setLoading(false);
+        }, 100); // A small delay can help in some race conditions with localStorage initialization.
       } catch (error) {
         console.error("Failed to fetch data", error);
-      } finally {
         setLoading(false);
       }
     }
@@ -71,7 +74,7 @@ export default function Home() {
 
   const findUser = (userId: number) => users.find((u) => u.id === userId);
 
-  if (loading || !currentUser) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <section className="text-center mb-16">
@@ -96,6 +99,20 @@ export default function Home() {
         </section>
       </div>
     );
+  }
+
+  if (!currentUser) {
+     return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold">Loading User Profile...</h2>
+            <p className="text-muted-foreground mt-2">
+                If you are not redirected, please <Link href="/auth" className="text-primary underline">log in</Link>.
+            </p>
+        </div>
+      </div>
+     )
   }
 
   return (

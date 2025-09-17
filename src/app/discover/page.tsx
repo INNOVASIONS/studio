@@ -2,10 +2,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { getPhotos, getUsers, getCurrentUser } from '@/lib/mock-data';
 import { PhotoCard } from '@/components/wanderlens/photo-card';
 import { Photo, User } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2 } from 'lucide-react';
 
 export default function DiscoverPage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -15,20 +17,23 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     async function fetchData() {
-      try {
-        const [photosData, usersData, currentUserData] = await Promise.all([
-          getPhotos(),
-          getUsers(),
-          getCurrentUser(),
-        ]);
-        // A simple shuffle function
-        const shuffledPhotos = [...photosData].sort(() => 0.5 - Math.random());
-        setPhotos(shuffledPhotos);
-        setUsers(usersData);
-        setCurrentUser(currentUserData);
+       try {
+        // Use a timeout to ensure localStorage is populated on first load
+        setTimeout(async () => {
+          const [photosData, usersData, currentUserData] = await Promise.all([
+            getPhotos(),
+            getUsers(),
+            getCurrentUser(),
+          ]);
+          // A simple shuffle function
+          const shuffledPhotos = [...photosData].sort(() => 0.5 - Math.random());
+          setPhotos(shuffledPhotos);
+          setUsers(usersData);
+          setCurrentUser(currentUserData);
+          setLoading(false);
+        }, 100);
       } catch (error) {
         console.error("Failed to fetch data", error);
-      } finally {
         setLoading(false);
       }
     }
@@ -37,7 +42,7 @@ export default function DiscoverPage() {
 
   const findUser = (userId: number) => users.find((u) => u.id === userId);
 
-  if (loading || !currentUser) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
@@ -55,6 +60,20 @@ export default function DiscoverPage() {
         </div>
       </div>
     );
+  }
+  
+  if (!currentUser) {
+     return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[50vh]">
+        <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold">Loading User Profile...</h2>
+            <p className="text-muted-foreground mt-2">
+                If you are not redirected, please <Link href="/auth" className="text-primary underline">log in</Link>.
+            </p>
+        </div>
+      </div>
+     )
   }
 
   return (
