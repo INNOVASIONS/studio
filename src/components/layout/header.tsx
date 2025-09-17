@@ -17,6 +17,9 @@ import {
   Route,
   BookCopy,
   Wallet,
+  Bell,
+  Heart,
+  MessageCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -32,8 +35,10 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User as UserType } from '@/lib/types';
 import { AddPostDialog } from '../wanderlens/add-post-dialog';
-import { useEffect, useState } from 'react';
-import { getCurrentUser } from '@/lib/mock-data';
+import { useEffect, useState, useCallback } from 'react';
+import { getCurrentUser, getUsers, getPhotos } from '@/lib/mock-data';
+import { Badge } from '../ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 
 const navLinks = [
   { href: '/', label: 'Home', icon: Home },
@@ -45,10 +50,40 @@ const navLinks = [
   { href: '/trip-expenses', label: 'Trip Expenses', icon: Wallet },
 ];
 
+const notifications = [
+    {
+        user: { name: 'Bella Vista', avatarUrl: 'https://picsum.photos/id/238/100/100' },
+        action: 'liked your photo.',
+        time: '5m ago',
+        icon: Heart,
+        iconClass: 'text-red-500 fill-red-500'
+    },
+    {
+        user: { name: 'Chris Journeys', avatarUrl: 'https://picsum.photos/id/239/100/100' },
+        action: 'commented: "Incredible shot!"',
+        time: '12m ago',
+        icon: MessageCircle,
+        iconClass: 'text-blue-500'
+    },
+    {
+        user: { name: 'Alex Wanderer', avatarUrl: 'https://picsum.photos/id/1025/100/100' },
+        action: 'started following you.',
+        time: '1h ago',
+        icon: User,
+        iconClass: 'text-green-500'
+    },
+];
+
 export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+
+  const refreshPosts = useCallback(async () => {
+    // This is a placeholder for a more robust state management solution
+    // For now, we can trigger a re-fetch on pages that need it.
+    // In a real app, you'd use a state manager like Redux or Zustand.
+  }, []);
 
   useEffect(() => {
     async function fetchUser() {
@@ -57,12 +92,16 @@ export function AppHeader() {
         setCurrentUser(user);
       } catch (error) {
         console.error("Failed to fetch current user", error)
+        router.push('/auth');
       }
     }
     fetchUser();
-  }, [pathname]); // Refetch when path changes to reflect profile updates
+  }, [pathname, router]);
 
   const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('currentUser');
+    }
     router.push('/auth');
   };
 
@@ -139,11 +178,45 @@ export function AppHeader() {
         </Sheet>
 
         <div className="flex flex-1 items-center justify-end space-x-4">
-           <AddPostDialog>
+           <AddPostDialog onPostCreated={refreshPosts}>
               <Button>
                   <Plus className="mr-2 h-4 w-4" /> New Post
               </Button>
            </AddPostDialog>
+           
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+               <Button variant="ghost" size="icon" className="relative h-10 w-10">
+                    <Bell className="h-6 w-6" />
+                    <Badge className="absolute top-1 right-1 h-5 w-5 justify-center p-0">{notifications.length}</Badge>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-80" align="end">
+                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {notifications.map((notification, index) => (
+                    <DropdownMenuItem key={index} className="flex items-start gap-3 p-2 cursor-pointer">
+                        <Avatar className="h-8 w-8 mt-1">
+                            <AvatarImage src={notification.user.avatarUrl} alt={notification.user.name} />
+                            <AvatarFallback>{notification.user.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="text-sm">
+                            <p>
+                                <span className="font-semibold">{notification.user.name}</span>{' '}
+                                <span className="text-muted-foreground">{notification.action}</span>
+                            </p>
+                            <time className="text-xs text-muted-foreground">{notification.time}</time>
+                        </div>
+                         <notification.icon className={cn('h-5 w-5 ml-auto text-muted-foreground', notification.iconClass)} />
+                    </DropdownMenuItem>
+                ))}
+                 <DropdownMenuSeparator />
+                 <DropdownMenuItem className="justify-center text-sm font-medium text-primary cursor-pointer">
+                    See all notifications
+                 </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -169,7 +242,7 @@ export function AppHeader() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/profile/${currentUser.id}`}>
+                <Link href={'/profile'}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>

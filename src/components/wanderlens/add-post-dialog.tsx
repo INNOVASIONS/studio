@@ -97,7 +97,13 @@ const currencies = [
   { value: 'ZAR', label: 'ZAR - South African Rand' },
 ];
 
-export function AddPostDialog({ children }: { children: React.ReactNode }) {
+export function AddPostDialog({
+  children,
+  onPostCreated,
+}: {
+  children: React.ReactNode;
+  onPostCreated?: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const initialState: CreatePostState = { message: '' };
   const [state, dispatch] = useActionState(handleCreatePost, initialState);
@@ -127,6 +133,7 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     if (state.success) {
+      onPostCreated?.();
       setOpen(false);
       setPreview(null);
       setTransportRating(0);
@@ -142,7 +149,7 @@ export function AddPostDialog({ children }: { children: React.ReactNode }) {
         formRef.current.reset();
       }
     }
-  }, [state.success]);
+  }, [state.success, onPostCreated]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

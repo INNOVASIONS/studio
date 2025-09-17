@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowRight, FileText, Globe, Map, Wallet, Bell, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -49,21 +49,23 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   
+  const refreshPosts = useCallback(async () => {
+    const photosData = await getPhotos();
+    setPhotos(photosData);
+  }, []);
+
   useEffect(() => {
     async function fetchData() {
       try {
-        // Use a timeout to ensure localStorage is populated on first load
-        setTimeout(async () => {
-          const [photosData, usersData, currentUserData] = await Promise.all([
-            getPhotos(),
-            getUsers(),
-            getCurrentUser(),
-          ]);
-          setPhotos(photosData);
-          setUsers(usersData);
-          setCurrentUser(currentUserData);
-          setLoading(false);
-        }, 100); // A small delay can help in some race conditions with localStorage initialization.
+        const [photosData, usersData, currentUserData] = await Promise.all([
+          getPhotos(),
+          getUsers(),
+          getCurrentUser(),
+        ]);
+        setPhotos(photosData);
+        setUsers(usersData);
+        setCurrentUser(currentUserData);
+        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch data", error);
         setLoading(false);
@@ -130,7 +132,7 @@ export default function Home() {
               Explore Photos <ArrowRight />
             </Link>
           </Button>
-          <AddPostDialog>
+          <AddPostDialog onPostCreated={refreshPosts}>
             <Button size="lg" variant="outline">
               Upload a Photo
             </Button>
@@ -187,5 +189,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
