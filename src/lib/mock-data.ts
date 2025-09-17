@@ -318,7 +318,7 @@ const getInitialPhotos = (): Photo[] => {
 
 const getPhotosFromStorage = (): Photo[] => {
     if (typeof window === 'undefined') {
-        return [];
+        return getInitialPhotos();
     }
     try {
         const storedPhotos = localStorage.getItem('photos');
@@ -333,7 +333,7 @@ const getPhotosFromStorage = (): Photo[] => {
         return initialPhotos;
     } catch (error) {
         console.error("Could not access localStorage for photos:", error);
-        return [];
+        return getInitialPhotos();
     }
 };
 
@@ -486,5 +486,7 @@ export async function addJourney(journeyData: Omit<Journey, 'id'>): Promise<Jour
 
     return newJourney;
 };
+
+    
 
     
