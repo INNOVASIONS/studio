@@ -462,3 +462,5 @@ export async function addJourney(journeyData: Omit<Journey, 'id'>): Promise<Jour
 
     return newJourney;
 };
+
+    
