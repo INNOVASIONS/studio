@@ -91,7 +91,12 @@ const ImageCarousel = ({ images, alt }: { images: string[], alt: string }) => {
 export function JourneyCard({ journey, user }: { journey: Journey, user: User }) {
   const [isLiked, setIsLiked] = useState(false);
   
-  const allPhotos = journey.dailyActivities.flatMap(day => day.places.flatMap(place => place.photos)).concat(journey.hotelPhotos);
+  const allPhotos = [
+    ...(journey.hotelPhotos || []),
+    ...journey.dailyActivities.flatMap(day =>
+      day.places.flatMap(place => place.photos || [])
+    ),
+  ];
   const TransportIcon = journey.transportMode ? transportIcons[journey.transportMode] : Car;
 
   const formatDateRange = () => {
