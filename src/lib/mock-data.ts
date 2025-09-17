@@ -383,9 +383,7 @@ export async function getUserById(id: number): Promise<User | undefined> {
 
 export async function getCurrentUser(): Promise<User> {
   if (typeof window === 'undefined') {
-    const users = await getUsers();
-    if(users.length > 0) return users[0];
-    throw new Error("No users found and no user in session. Please log in.");
+    return INITIAL_USERS[0];
   }
   try {
     const storedUser = sessionStorage.getItem('currentUser');
