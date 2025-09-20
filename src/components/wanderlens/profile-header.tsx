@@ -27,7 +27,7 @@ export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
     }, [])
 
     const isCurrentUserProfile = user.id === currentUser?.id;
-    const isNewUser = isCurrentUserProfile && photosCount === 0 && user.bio === 'Welcome to WanderLens! Click "Edit Profile" to tell us about yourself.';
+    const isNewUser = isCurrentUserProfile && user.bio === 'Welcome to WanderLens! Click "Edit Profile" to tell us about yourself.';
 
     const stats = [
         { label: "Posts", value: photosCount },
