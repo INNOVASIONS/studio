@@ -27,12 +27,12 @@ export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
     }, [])
 
     const isCurrentUserProfile = user.id === currentUser?.id;
-    const isDefaultProfile = isCurrentUserProfile && user.name === "Your Name";
+    const isNewUser = isCurrentUserProfile && photosCount === 0 && user.bio === 'Welcome to WanderLens! Click "Edit Profile" to tell us about yourself.';
 
     const stats = [
         { label: "Posts", value: photosCount },
-        { label: "Followers", value: isDefaultProfile ? 0 : "1.2k" },
-        { label: "Following", value: isDefaultProfile ? 0 : "345" },
+        { label: "Followers", value: isNewUser ? 0 : "1.2k" },
+        { label: "Following", value: isNewUser ? 0 : "345" },
     ]
 
     return (

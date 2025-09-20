@@ -78,11 +78,11 @@ export default function AuthPage() {
   };
 
   const handleSignUp = () => {
-    if (!signupEmail || !signupPassword) {
+    if (!signupName || !signupEmail || !signupPassword) {
       toast({
         variant: 'destructive',
         title: 'Sign Up Failed',
-        description: 'Please enter your email and password.',
+        description: 'Please enter your name, email and password.',
       });
       return;
     }
@@ -108,8 +108,8 @@ export default function AuthPage() {
     const mainUserList: User[] = JSON.parse(localStorage.getItem('users') || '[]');
     const newUserProfile: User = {
         id: newUserId,
-        name: "Your Name",
-        handle: `@yourhandle`,
+        name: signupName,
+        handle: `@${signupName.toLowerCase().replace(/\s+/g, '')}`,
         email: signupEmail,
         avatarUrl: `https://picsum.photos/seed/${newUserId}/100/100`,
         bio: 'Welcome to WanderLens! Click "Edit Profile" to tell us about yourself.',
@@ -203,6 +203,16 @@ export default function AuthPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="signup-name">Name</Label>
+                <Input
+                  id="signup-name"
+                  type="text"
+                  placeholder="Your Name"
+                  value={signupName}
+                  onChange={(e) => setSignupName(e.target.value)}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
                 <Input

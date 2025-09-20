@@ -35,7 +35,8 @@ export default function ProfilePage() {
                     if (user) {
                         const photos = await getPhotosByUserId(user.id);
                         setUserPhotos(photos);
-                        if (user.name === "Your Name") {
+                        // A user is considered "new" if they have 0 posts and the default bio.
+                        if (photos.length === 0 && user.bio === 'Welcome to WanderLens! Click "Edit Profile" to tell us about yourself.') {
                             setIsNewUser(true);
                         }
                     } else {
@@ -100,7 +101,7 @@ export default function ProfilePage() {
                     <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
                         <PartyPopper className="h-12 w-12 text-primary hidden sm:block" />
                         <div className="flex-1 text-center sm:text-left">
-                            <h3 className="text-xl font-semibold text-primary">Welcome to WanderLens!</h3>
+                            <h3 className="text-xl font-semibold text-primary">Welcome, {currentUser.name}!</h3>
                             <p className="text-muted-foreground mt-1">
                                 It looks like you're new here. Complete your profile to get started.
                             </p>
