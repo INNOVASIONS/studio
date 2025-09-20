@@ -78,11 +78,11 @@ export default function AuthPage() {
   };
 
   const handleSignUp = () => {
-    if (!signupName || !signupEmail || !signupPassword) {
+    if (!signupEmail || !signupPassword) {
       toast({
         variant: 'destructive',
         title: 'Sign Up Failed',
-        description: 'Please enter your name, email, and password.',
+        description: 'Please enter your email and password.',
       });
       return;
     }
@@ -104,16 +104,15 @@ export default function AuthPage() {
     setRegisteredUsers(updatedUsers);
     localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
     
-    // Also add to the main user list in mock-data. This is a hack for the mock environment.
-    // In a real app, this would be a single database operation.
+    // Also add to the main user list in mock-data.
     const mainUserList: User[] = JSON.parse(localStorage.getItem('users') || '[]');
     const newUserProfile: User = {
         id: newUserId,
-        name: signupName,
-        handle: `@${signupEmail.split('@')[0]}`,
+        name: "Your Name",
+        handle: `@yourhandle`,
         email: signupEmail,
         avatarUrl: `https://picsum.photos/seed/${newUserId}/100/100`,
-        bio: 'Just joined WanderLens! Ready to explore.',
+        bio: 'Welcome to WanderLens! Click "Edit Profile" to tell us about yourself.',
     };
     localStorage.setItem('users', JSON.stringify([...mainUserList, newUserProfile]));
 
@@ -205,15 +204,6 @@ export default function AuthPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="signup-name">Name</Label>
-                <Input 
-                  id="signup-name" 
-                  placeholder="Your Name"
-                  value={signupName}
-                  onChange={(e) => setSignupName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
                 <Input
                   id="signup-email"
@@ -244,5 +234,3 @@ export default function AuthPage() {
     </div>
   );
 }
-
-    

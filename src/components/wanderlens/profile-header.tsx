@@ -27,11 +27,12 @@ export function ProfileHeader({ user, photosCount }: ProfileHeaderProps) {
     }, [])
 
     const isCurrentUserProfile = user.id === currentUser?.id;
+    const isDefaultProfile = isCurrentUserProfile && user.name === "Your Name";
 
     const stats = [
         { label: "Posts", value: photosCount },
-        { label: "Followers", value: "1.2k" },
-        { label: "Following", value: "345" },
+        { label: "Followers", value: isDefaultProfile ? 0 : "1.2k" },
+        { label: "Following", value: isDefaultProfile ? 0 : "345" },
     ]
 
     return (

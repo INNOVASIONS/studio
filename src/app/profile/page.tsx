@@ -8,14 +8,18 @@ import { getCurrentUser, getPhotosByUserId } from "@/lib/mock-data";
 import { PhotoCard } from "@/components/wanderlens/photo-card";
 import { User, Photo } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PartyPopper } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
+import { EditProfileDialog } from '@/components/wanderlens/edit-profile-dialog';
+import { Button } from '@/components/ui/button';
 
 export default function ProfilePage() {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [userPhotos, setUserPhotos] = useState<Photo[]>([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const [isNewUser, setIsNewUser] = useState(false);
 
     const handlePostDeleted = (photoId: number) => {
       setUserPhotos(prevPhotos => prevPhotos.filter(p => p.id !== photoId));
@@ -31,6 +35,9 @@ export default function ProfilePage() {
                     if (user) {
                         const photos = await getPhotosByUserId(user.id);
                         setUserPhotos(photos);
+                        if (user.name === "Your Name") {
+                            setIsNewUser(true);
+                        }
                     } else {
                         // If no user is found in session, redirect to auth page
                         router.push('/auth');
@@ -87,6 +94,23 @@ export default function ProfilePage() {
     return(
         <div className="container mx-auto px-4 py-8">
             <ProfileHeader user={currentUser} photosCount={userPhotos.length} />
+
+            {isNewUser && (
+                <Card className="my-8 bg-primary/10 border-primary/20">
+                    <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
+                        <PartyPopper className="h-12 w-12 text-primary hidden sm:block" />
+                        <div className="flex-1 text-center sm:text-left">
+                            <h3 className="text-xl font-semibold text-primary">Welcome to WanderLens!</h3>
+                            <p className="text-muted-foreground mt-1">
+                                It looks like you're new here. Complete your profile to get started.
+                            </p>
+                        </div>
+                        <EditProfileDialog user={currentUser}>
+                           <Button>Set Up Your Profile</Button>
+                        </EditProfileDialog>
+                    </CardContent>
+                </Card>
+            )}
             
             <div className="mt-12">
                 <h2 className="font-headline text-3xl font-semibold tracking-tight mb-6">
@@ -103,6 +127,7 @@ export default function ProfilePage() {
                 ) : (
                     <div className="text-center py-16 text-muted-foreground border-2 border-dashed rounded-lg">
                         <p>You haven't posted any photos yet.</p>
+                        <p className='mt-2'>Click "Upload a Photo" in the header to share your first moment!</p>
                     </div>
                 )}
             </div>
